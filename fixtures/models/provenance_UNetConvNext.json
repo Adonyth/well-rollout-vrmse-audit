@@ -1,0 +1,55 @@
+{
+ "runs": [
+  {
+   "access_date": "2026-07-12",
+   "model": "UNetConvNext",
+   "model_id": "polymathic-ai/UNetConvNext-rayleigh_taylor_instability",
+   "hf_sha": "835c7bcbfdaa302a097e78b6637608cb63d749ad",
+   "params": 22298392,
+   "device": "mps",
+   "torch": "2.13.0",
+   "threads": 10,
+   "rollout_steps": 30,
+   "onestep_starts": [
+    0,
+    2,
+    5,
+    12,
+    29
+   ],
+   "normalization_mean": [
+    0.7736300230026245,
+    -6.003599992254749e-06,
+    -1.6879999748198316e-05,
+    -4.467399776331149e-06
+   ],
+   "normalization_std": [
+    0.2688399851322174,
+    0.00822519976645708,
+    0.008185800164937973,
+    0.013937000185251236
+   ],
+   "sorted_files": [
+    "rayleigh_taylor_instability_At_0625.hdf5",
+    "rayleigh_taylor_instability_At_125.hdf5",
+    "rayleigh_taylor_instability_At_25.hdf5",
+    "rayleigh_taylor_instability_At_50.hdf5",
+    "rayleigh_taylor_instability_At_75.hdf5"
+   ],
+   "pairs": [
+    [
+     4,
+     1
+    ]
+   ],
+   "files": {
+    "rayleigh_taylor_instability_At_75.hdf5": {
+     "url": "https://sdsc-users.flatironinstitute.org/~polymathic/data/the_well/datasets/rayleigh_taylor_instability/data/test/rayleigh_taylor_instability_At_75.hdf5",
+     "bytes": 7985979776,
+     "etag": "\"675215c1-1dc006180\""
+    }
+   },
+   "wall_seconds": 1873.2835172079976
+  }
+ ]
+}

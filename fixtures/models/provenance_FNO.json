@@ -1,0 +1,70 @@
+{
+ "runs": [
+  {
+   "access_date": "2026-07-12",
+   "model": "FNO",
+   "model_id": "polymathic-ai/FNO-rayleigh_taylor_instability",
+   "hf_sha": "d0eed8f87db172b1db1463d09bdb46ba2c2c9f74",
+   "params": 302127236,
+   "device": "cpu",
+   "torch": "2.13.0",
+   "threads": 8,
+   "rollout_steps": 30,
+   "onestep_starts": [
+    0,
+    2,
+    5,
+    8,
+    12,
+    20,
+    29
+   ],
+   "normalization_mean": [
+    0.7736300230026245,
+    -6.003599992254749e-06,
+    -1.6879999748198316e-05,
+    -4.467399776331149e-06
+   ],
+   "normalization_std": [
+    0.2688399851322174,
+    0.00822519976645708,
+    0.008185800164937973,
+    0.013937000185251236
+   ],
+   "sorted_files": [
+    "rayleigh_taylor_instability_At_0625.hdf5",
+    "rayleigh_taylor_instability_At_125.hdf5",
+    "rayleigh_taylor_instability_At_25.hdf5",
+    "rayleigh_taylor_instability_At_50.hdf5",
+    "rayleigh_taylor_instability_At_75.hdf5"
+   ],
+   "pairs": [
+    [
+     4,
+     1
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     0
+    ]
+   ],
+   "files": {
+    "rayleigh_taylor_instability_At_75.hdf5": {
+     "url": "https://sdsc-users.flatironinstitute.org/~polymathic/data/the_well/datasets/rayleigh_taylor_instability/data/test/rayleigh_taylor_instability_At_75.hdf5",
+     "bytes": 7985979776,
+     "etag": "\"675215c1-1dc006180\""
+    },
+    "rayleigh_taylor_instability_At_25.hdf5": {
+     "url": "https://sdsc-users.flatironinstitute.org/~polymathic/data/the_well/datasets/rayleigh_taylor_instability/data/test/rayleigh_taylor_instability_At_25.hdf5",
+     "bytes": 7985979776,
+     "etag": "\"67521588-1dc006180\""
+    }
+   },
+   "wall_seconds": 8924.348950042002
+  }
+ ]
+}

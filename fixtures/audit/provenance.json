@@ -1,0 +1,62 @@
+{
+ "access_date": "2026-07-12",
+ "fields": [
+  "density",
+  "velocity_x",
+  "velocity_y",
+  "velocity_z"
+ ],
+ "files": {
+  "rayleigh_taylor_instability_At_75.hdf5": {
+   "url": "https://sdsc-users.flatironinstitute.org/~polymathic/data/the_well/datasets/rayleigh_taylor_instability/data/test/rayleigh_taylor_instability_At_75.hdf5",
+   "bytes": 7985979776,
+   "etag": "\"675215c1-1dc006180\"",
+   "n_trajectories": 2,
+   "n_frames": 119,
+   "density_offset": 21496,
+   "velocity_offset": 1996512248,
+   "range_read_crossvalidated_vs_h5py": true
+  },
+  "rayleigh_taylor_instability_At_25.hdf5": {
+   "url": "https://sdsc-users.flatironinstitute.org/~polymathic/data/the_well/datasets/rayleigh_taylor_instability/data/test/rayleigh_taylor_instability_At_25.hdf5",
+   "bytes": 7985979776,
+   "etag": "\"67521588-1dc006180\"",
+   "n_trajectories": 2,
+   "n_frames": 119,
+   "density_offset": 21496,
+   "velocity_offset": 1996512248,
+   "range_read_crossvalidated_vs_h5py": true
+  },
+  "rayleigh_taylor_instability_At_125.hdf5": {
+   "url": "https://sdsc-users.flatironinstitute.org/~polymathic/data/the_well/datasets/rayleigh_taylor_instability/data/test/rayleigh_taylor_instability_At_125.hdf5",
+   "bytes": 7985979776,
+   "etag": "\"6752153d-1dc006180\"",
+   "n_trajectories": 2,
+   "n_frames": 119,
+   "density_offset": 21496,
+   "velocity_offset": 1996512248,
+   "range_read_crossvalidated_vs_h5py": true
+  },
+  "rayleigh_taylor_instability_At_50.hdf5": {
+   "url": "https://sdsc-users.flatironinstitute.org/~polymathic/data/the_well/datasets/rayleigh_taylor_instability/data/test/rayleigh_taylor_instability_At_50.hdf5",
+   "bytes": 7985979776,
+   "etag": "\"675215b3-1dc006180\"",
+   "n_trajectories": 2,
+   "n_frames": 119,
+   "density_offset": 21496,
+   "velocity_offset": 1996512248,
+   "range_read_crossvalidated_vs_h5py": true
+  },
+  "rayleigh_taylor_instability_At_0625.hdf5": {
+   "url": "https://sdsc-users.flatironinstitute.org/~polymathic/data/the_well/datasets/rayleigh_taylor_instability/data/test/rayleigh_taylor_instability_At_0625.hdf5",
+   "bytes": 7985979776,
+   "etag": "\"67521535-1dc006180\"",
+   "n_trajectories": 2,
+   "n_frames": 119,
+   "density_offset": 21496,
+   "velocity_offset": 1996512248,
+   "range_read_crossvalidated_vs_h5py": true
+  }
+ },
+ "wall_seconds": 3945.5745157499987
+}

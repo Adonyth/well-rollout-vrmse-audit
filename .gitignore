@@ -1,0 +1,13 @@
+# Internal changelog/freeze artifact — not part of the public package.
+DIGEST.md
+
+# verify.py output (regenerated on every run, not a committed input)
+fixtures/summary.json
+
+# Tier-2 cold-start scratch space (network downloads / eval output)
+results/
+hf-cache/
+
+__pycache__/
+*.pyc
+.DS_Store

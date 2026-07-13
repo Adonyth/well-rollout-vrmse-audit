@@ -1,0 +1,18 @@
+# Tier 1 (verify.py — actually re-executed to produce this harness's evidence):
+# pure-Python aggregation of the packaged raw fixtures. No network, no GPU.
+numpy>=1.26
+
+# Tier 2 (cold-start from public sources — documented in README.md, not
+# required to run verify.py). Uncomment / pip install separately if you want
+# to regenerate the raw fixtures themselves from scratch:
+# requests>=2.31
+# PyYAML>=6.0
+# h5py>=3.10
+# fsspec>=2024.10
+# torch==2.13.0
+# the_well==1.2.0          # PyPI/GitHub: PolymathicAI/the_well, pinned by the
+#                           # provenance capture in env-lock-full.txt
+#
+# For an exact, fully pinned Tier-2 environment (every transitive dependency,
+# captured at the time the frozen fixtures were produced), see
+# env-lock-full.txt and: pip install -r env-lock-full.txt
