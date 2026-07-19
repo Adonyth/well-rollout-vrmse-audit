@@ -9,8 +9,8 @@ with the public GitHub issue/PR trail this paper documents
 
 Everything this harness touches is **public**: The Well's RT test-split HDF5
 objects (CC-BY-4.0) served over plain HTTPS by Flatiron/SDSC, and
-`polymathic-ai/*` model checkpoints on the Hugging Face Hub (BSD-3, same
-license as the `the_well` codebase) — three RT checkpoints actually evaluated
+`polymathic-ai/*` model checkpoints on the Hugging Face Hub (under whatever
+license their model repositories declare) — three RT checkpoints actually evaluated
 (FNO, UNetClassic, UNetConvNext; TFNO appears in `the_well`'s own published
 table only, see note below) plus one shear-flow FNO checkpoint for the
 device-precision cross-check (Tier 2 continued, below). No private data, no

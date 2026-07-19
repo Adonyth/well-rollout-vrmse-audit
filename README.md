@@ -153,5 +153,5 @@ The packaged fixtures are derived statistics (MSE, sample variance, spatial
 means) over The Well's public Rayleigh-Taylor test-split data, which is
 released under CC-BY-4.0; the derived fixtures in this repository are
 likewise available under CC-BY-4.0. The upstream data and Hugging Face
-model checkpoints keep their own licenses (CC-BY-4.0 and BSD-3 respectively
+model checkpoints keep whatever licenses their model repositories declare
 — see MANIFEST.md).
