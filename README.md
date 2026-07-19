@@ -27,14 +27,14 @@ numpy, no network, no GPU, ~1 second) and checks 142 leaf values against the
 frozen `paper/extracted/numbers.json` reference (or, for the figure-vs-table
 and spatial-mean-baseline groups below, against a sibling key / a second
 independent code path) to 4 significant figures:
-for the pinned UNetClassic checkpoint, the one-step census under both the
+for the pinned UNetClassic checkpoint, the one-step estimate under both the
 library floor and the documented floor (eps=1e-5) together with its
 well-/ill-conditioned split, both rollout windows under the library floor,
 the documented floor, and the density-only reading, and the issue-#78
 last-batch-vs-all-batch counterfactual at both windows (17); the
 corresponding one-step, both-window rollout (library / documented-floor /
 density-only), and issue-#78 window-13-30 counterfactual cells for
-UNetConvNext (12); the one-step census under both floors and the
+UNetConvNext (12); the one-step estimate under both floors and the
 window-6-12 rollout cell under the library floor, the documented floor, and
 density-only for FNO (5); every cell of the full ten-trajectory
 denominator census in Table~census (50 = 10 trajectories x 5 printed
@@ -86,7 +86,7 @@ repro-harness/
     shear_checkpoint_eval.py <- device-precision cross-check source (second public Well
                                dataset; see MANIFEST.md "Tier 2 continued"; not re-executed
                                while assembling this harness)
-    aggregate_results.py   <- deterministic aggregation: raw scalars -> every VRMSE table cell
+    aggregate_results.py   <- deterministic aggregation: raw scalars -> the 142 enumerated VRMSE values
     spatial_mean_baseline.py <- trivial spatial-mean-predictor VRMSE baseline (cross-checked by verify.py)
     check_unsourced.py     <- numbers-must-trace-to-numbers.json checker (paper-writing discipline)
   fixtures/
@@ -102,7 +102,7 @@ repro-harness/
 
 **Tier 1 (what `verify.py` runs today):** the raw per-frame/per-window
 scalars (MSE, target/prediction variance — never raw field tensors) are
-packaged in `fixtures/` (~280 KB). `verify.py` re-derives every VRMSE/census
+packaged in `fixtures/` (~280 KB). `verify.py` re-derives the 142 enumerated VRMSE/census
 number from those scalars via `aggregate_results.py` and diffs against the
 frozen paper numbers. This is a genuine recomputation, not a file diff: the
 aggregation (eps variants, rollout window means, one-step interpolation,

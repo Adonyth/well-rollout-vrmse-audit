@@ -146,7 +146,7 @@ self-report alone.
 `fixtures/audit/*.json.gz` + `fixtures/models/*.json.gz` (env var
 `P3_RESULTS_DIR=fixtures`), which recomputes `fixtures/summary.json` from
 raw float64 MSE / target-variance scalars via pure numpy — no cached table
-is read, every VRMSE/census cell is derived fresh from the row-level
+is read, each of the 142 enumerated VRMSE/census values is derived fresh from the row-level
 fixtures on each run. It then *asserts* 142 leaf values: 84 against
 `fixtures/numbers_reference.json` (the frozen `paper/extracted/numbers.json`
 from the source repo) at 4 significant figures, plus 40 figure-vs-table
@@ -154,7 +154,7 @@ consistency checks (see below) against a sibling key in the same
 regenerated `summary.json`, plus 16 checks of every printed cell of
 Table~fieldsplit and 2 checks cross-validating the
 spatial-mean-predictor baseline (see below):
-- 17: UNetClassic one-step census under both the library floor and the
+- 17: UNetClassic one-step estimate under both the library floor and the
   documented floor (eps=1e-5) together with its well-/ill-conditioned
   split, both rollout windows under the library floor, the documented
   floor, and the density-only reading, and the issue-#78
@@ -165,7 +165,7 @@ spatial-mean-predictor baseline (see below):
   (library / documented-floor / density-only), and issue-#78
   window-13-30 counterfactual cells for UNetConvNext (the
   single-trajectory qualitative-replication cells cited in the abstract);
-- 5: the one-step census under both floors and the window-6-12 rollout
+- 5: the one-step estimate under both floors and the window-6-12 rollout
   cell under the library floor, the documented floor, and density-only
   for FNO (the two-trajectory divergence-diagnostic cells cited in the
   abstract);

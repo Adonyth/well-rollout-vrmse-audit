@@ -7,7 +7,7 @@ significant figures.
 
 This does NOT re-fetch data from the network or re-run model inference — it
 re-executes the deterministic aggregation step (aggregate_results.py) that
-turns stored raw MSE / target-variance scalars into every VRMSE table cell
+turns stored raw MSE / target-variance scalars into the 142 enumerated VRMSE values
 the P3 paper cites. See README.md "Tier 2" for the full cold-start commands
 that regenerate the raw fixtures themselves from public Well HTTP data and
 public Hugging Face checkpoints.
@@ -34,7 +34,7 @@ sys.path.insert(0, str(SCRIPTS))
 import spatial_mean_baseline  # noqa: E402
 
 # (dotted path into recomputed summary.json, dotted path into numbers_reference.json)
-# UNetClassic: the paper's headline one-step/rollout/issue-78 census cells (full
+# UNetClassic: the paper's headline one-step/rollout/issue-78 cells (full
 # ten-trajectory coverage), covering both the library-floor rollout cells and
 # the well-conditioned onestep split (the ">10" numbers) and the collapse
 # numbers (the documented-floor eps5 and density-only cells) that are the
@@ -104,8 +104,8 @@ FIELDSPLIT_CHECKS = [
 ]
 
 # Denominator census (Table~\ref{tab:census} in the paper): all five printed
-# columns, for all ten trajectories -- this is the "every census cell" claim
-# made by sec7_boundaries.tex item 6, so the assertion set below is sized to
+# columns, for all ten trajectories -- the full denominator-census set (50 of the
+# 142 checks) referenced by sec7_boundaries.tex item 6, so the assertion set below is sized to
 # match it exactly rather than being a token sample. Audit trajectory keys
 # contain a literal "." inside the filename (e.g.
 # "rayleigh_taylor_instability_At_0625.hdf5:0"), which breaks naive dotted-path
