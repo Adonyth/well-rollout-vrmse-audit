@@ -216,8 +216,7 @@ deltas — issue #75's epsilon propagation and issue #78's last-batch
 aggregation — the shear-flow device-precision cross-check below, and the
 paper's Appendix regression-anchor reproduction, Table~tab:anchor): those
 are documented with exact source scripts/commands but not part of this
-package's checked exit code. See `DIGEST.md` for the result of the run
-performed when this harness was assembled.
+package's checked exit code.
 
 ## Discipline notes carried over from the source repo
 
