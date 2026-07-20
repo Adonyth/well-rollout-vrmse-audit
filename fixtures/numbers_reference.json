@@ -717,7 +717,6 @@
     "cnextunet": 0.6699
    },
    "rollout_gt10_all_four_both_windows_table3": true,
-   "rt_late_window_unet_subthreshold_ref": 2.84,
    "velocity_frac_below_epslib_Ra1e6": 1.0,
    "velocity_frac_below_epslib_Ra1e7": 0.75,
    "velocity_frac_below_epslib_Ra1e8": 0.48,
@@ -732,7 +731,8 @@
    "vx_var_max": 0.00171,
    "pressure_frac_below_epsfix_tcool1p00": 0.2333,
    "pressure_frac_below_epsfix_faster_cooling": 0.0,
-   "pressure_var_min": 6.242e-06
+   "pressure_var_min": 6.242e-06,
+   "vy_var_min_slowest_cooling": 1.533e-05
   }
  }
 }
