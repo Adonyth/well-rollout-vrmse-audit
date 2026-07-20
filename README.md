@@ -86,7 +86,7 @@ repro-harness/
     shear_checkpoint_eval.py <- device-precision cross-check source (second public Well
                                dataset; see MANIFEST.md "Tier 2 continued"; not re-executed
                                while assembling this harness)
-    aggregate_results.py   <- deterministic aggregation: raw scalars -> the 142 enumerated VRMSE values
+    aggregate_results.py   <- deterministic aggregation: raw scalars -> the 142 enumerated value checks (VRMSE/census/field-split/figure-vs-table/spatial-mean)
     spatial_mean_baseline.py <- trivial spatial-mean-predictor VRMSE baseline (cross-checked by verify.py)
     check_unsourced.py     <- numbers-must-trace-to-numbers.json checker (paper-writing discipline)
   fixtures/
