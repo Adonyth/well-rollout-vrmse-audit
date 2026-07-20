@@ -58,7 +58,7 @@ independent derivation of the same quantity in
 $ python3 verify.py
 ...
 [3/3] 142 match, 0 mismatch.
-PASS: repro-harness regenerates the frozen P3 census numbers to a relative tolerance of 1e-4 (~4 sig figs).
+PASS: repro-harness regenerates the frozen P3 values to a relative tolerance of 1e-4 (~4 sig figs).
 ```
 
 This is what stands behind the paper's coverage-tier claim in

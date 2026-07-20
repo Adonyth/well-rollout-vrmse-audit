@@ -69,7 +69,7 @@ python3 rt_audit_pass.py --files 0,1,2,3,4 --output-dir ../results/audit
 # Pass B — checkpoint evaluation, one model per process
 # (device: "mps" on Apple Silicon, "cpu" elsewhere -- device does not affect
 # the frozen fixtures' identity claim; Lane-3's shear-smoke mps/cpu robustness
-# check found the two agree to ~1e-7 relative (8.098e-8) on this pipeline's VRMSE outputs.
+# check found the two agree to ~1e-7 relative (8.098e-8) on the shear pipeline's VRMSE outputs (a same-codebase cross-dataset proxy).
 # pairs = "file_index:trajectory", file_index per SORTED_FILES in rt_model_eval.py
 # (0=At_0625, 1=At_125, 2=At_25, 3=At_50, 4=At_75). Exact pairs/starts below are
 # the ones actually used to produce the packaged fixtures -- see
