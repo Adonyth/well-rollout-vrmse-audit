@@ -7,8 +7,9 @@ relative tolerance of 1e-4 (about four significant figures).
 
 This does NOT re-fetch data from the network or re-run model inference — it
 re-executes the deterministic aggregation step (aggregate_results.py) that
-turns stored raw MSE / target-variance scalars into the 142 enumerated VRMSE values
-the P3 paper cites. See README.md "Tier 2" for the full cold-start commands
+turns stored raw MSE / target-variance scalars into the 142 enumerated value checks
+the P3 paper cites (VRMSE/census cells plus field-split, figure-vs-table, and
+spatial-mean-baseline checks). See README.md "Tier 2" for the full cold-start commands
 that regenerate the raw fixtures themselves from public Well HTTP data and
 public Hugging Face checkpoints.
 

@@ -118,9 +118,9 @@ Rayleigh-Taylor checkpoints (FNO, UNetClassic, UNetConvNext) via
 `scripts/shear_checkpoint_eval.py`. `MANIFEST.md` gives the exact commands, exact
 `--pairs`/`--onestep-starts` arguments, and exact source URLs/HF commit
 shas used to produce the packaged fixtures, so a reviewer can regenerate
-them from scratch (network + ~1.4 GB checkpoint downloads + inference
-required — tens of minutes, not run inside this harness's one-command
-check).
+them from scratch (network + ~40 GB test-split streaming + ~1.4 GB checkpoint
+downloads + inference required — substantial time, dominated by the ~40 GB
+transfer; not run inside this harness's one-command check).
 
 ## Why the fixtures are safe to package
 
