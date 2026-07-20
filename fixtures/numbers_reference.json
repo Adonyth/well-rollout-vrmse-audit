@@ -696,5 +696,28 @@
     "fieldsplit": 16,
     "spatial_mean_baseline": 2,
     "total": 142
+  },
+  "generalization": {
+    "method": "data-only spatial-variance census, benchmark rollout window frames 4-33, eps_fix=1e-5",
+    "rayleigh_benard": {
+      "n_test_files_censused": 3,
+      "n_trajectories_censused": 6,
+      "velocity_frac_below_epsfix_Ra1e6": 1.0,
+      "velocity_frac_below_epsfix_Ra1e7": 1.0,
+      "velocity_frac_below_epsfix_Ra1e8": 0.63,
+      "buoyancy_var_min": 0.043,
+      "buoyancy_var_max": 0.102,
+      "buoyancy_frac_below_epsfix": 0.0,
+      "vx_var_min_overall": 9.2e-12,
+      "vx_var_max_Ra1e6": 7.13e-08
+    },
+    "control_turbulent_radiative_layer": {
+      "n_test_files_censused": 3,
+      "density_var_min": 1880.0,
+      "density_var_max": 2150.0,
+      "velocity_frac_below_epsfix": 0.0,
+      "vx_var_min": 0.00139,
+      "vx_var_max": 0.00171
+    }
   }
 }

@@ -1,0 +1,121 @@
+{
+  "window_frames": [
+    4,
+    33
+  ],
+  "eps_lib": 1e-07,
+  "eps_fix": 1e-05,
+  "files": {
+    "rayleigh_benard_Rayleigh_1e6_Prandtl_1.hdf5": {
+      "trajectories": [
+        {
+          "traj": 0,
+          "vx_var_min": 1.2795413513991785e-11,
+          "vx_var_max": 7.131861687839634e-08,
+          "vx_var_mean": 6.543327757400345e-09,
+          "vy_var_min": 2.740184698216952e-11,
+          "vy_var_max": 1.2924522276329596e-07,
+          "vy_var_mean": 1.1563412733894885e-08,
+          "buoy_var_min": 0.06827026184906826,
+          "buoy_var_max": 0.101511645454026,
+          "vx_frac_below_epslib": 1.0,
+          "vx_frac_below_epsfix": 1.0,
+          "vy_frac_below_epslib": 0.9666666666666667,
+          "vy_frac_below_epsfix": 1.0,
+          "buoy_frac_below_epsfix": 0.0
+        },
+        {
+          "traj": 1,
+          "vx_var_min": 9.196523713687367e-12,
+          "vx_var_max": 4.173503391515913e-08,
+          "vx_var_mean": 4.221517365058817e-09,
+          "vy_var_min": 2.4693723590946603e-11,
+          "vy_var_max": 7.494592063679209e-08,
+          "vy_var_mean": 7.718776647815827e-09,
+          "buoy_var_min": 0.07180209179890704,
+          "buoy_var_max": 0.1004384610273355,
+          "vx_frac_below_epslib": 1.0,
+          "vx_frac_below_epsfix": 1.0,
+          "vy_frac_below_epslib": 1.0,
+          "vy_frac_below_epsfix": 1.0,
+          "buoy_frac_below_epsfix": 0.0
+        }
+      ],
+      "read_seconds": 8.3
+    },
+    "rayleigh_benard_Rayleigh_1e7_Prandtl_1.hdf5": {
+      "trajectories": [
+        {
+          "traj": 0,
+          "vx_var_min": 3.537950927514179e-11,
+          "vx_var_max": 4.80976565941281e-06,
+          "vx_var_mean": 3.781854785654224e-07,
+          "vy_var_min": 9.79352148754982e-11,
+          "vy_var_max": 8.852775301174512e-06,
+          "vy_var_mean": 6.899292652790134e-07,
+          "buoy_var_min": 0.0598660044971525,
+          "buoy_var_max": 0.08370741797066185,
+          "vx_frac_below_epslib": 0.7666666666666667,
+          "vx_frac_below_epsfix": 1.0,
+          "vy_frac_below_epslib": 0.7333333333333333,
+          "vy_frac_below_epsfix": 1.0,
+          "buoy_frac_below_epsfix": 0.0
+        },
+        {
+          "traj": 1,
+          "vx_var_min": 3.560526723887485e-11,
+          "vx_var_max": 2.6239706848315447e-06,
+          "vx_var_mean": 1.996061000419581e-07,
+          "vy_var_min": 1.0823662868063115e-10,
+          "vy_var_max": 5.437930374938353e-06,
+          "vy_var_mean": 4.126322605276072e-07,
+          "buoy_var_min": 0.05986609367460331,
+          "buoy_var_max": 0.08379275968490814,
+          "vx_frac_below_epslib": 0.8,
+          "vx_frac_below_epsfix": 1.0,
+          "vy_frac_below_epslib": 0.7666666666666667,
+          "vy_frac_below_epsfix": 1.0,
+          "buoy_frac_below_epsfix": 0.0
+        }
+      ],
+      "read_seconds": 8.9
+    },
+    "rayleigh_benard_Rayleigh_1e8_Prandtl_1.hdf5": {
+      "trajectories": [
+        {
+          "traj": 0,
+          "vx_var_min": 9.94033140513771e-11,
+          "vx_var_max": 0.0009045907462746906,
+          "vx_var_mean": 0.0001347672613466972,
+          "vy_var_min": 2.8603590280698097e-10,
+          "vy_var_max": 0.001132869795139956,
+          "vy_var_mean": 0.0002561701063052338,
+          "buoy_var_min": 0.04263178643171066,
+          "buoy_var_max": 0.060434815681091617,
+          "vx_frac_below_epslib": 0.4666666666666667,
+          "vx_frac_below_epsfix": 0.6333333333333333,
+          "vy_frac_below_epslib": 0.4666666666666667,
+          "vy_frac_below_epsfix": 0.6,
+          "buoy_frac_below_epsfix": 0.0
+        },
+        {
+          "traj": 1,
+          "vx_var_min": 1.1072685692372726e-10,
+          "vx_var_max": 0.0009578579404343722,
+          "vx_var_mean": 0.0001374685687303123,
+          "vy_var_min": 3.20376609428795e-10,
+          "vy_var_max": 0.0013656760528412406,
+          "vy_var_mean": 0.0002618905035029004,
+          "buoy_var_min": 0.042631801526763026,
+          "buoy_var_max": 0.06062369620632468,
+          "vx_frac_below_epslib": 0.5,
+          "vx_frac_below_epsfix": 0.6333333333333333,
+          "vy_frac_below_epslib": 0.4666666666666667,
+          "vy_frac_below_epsfix": 0.6333333333333333,
+          "buoy_frac_below_epsfix": 0.0
+        }
+      ],
+      "read_seconds": 8.0
+    }
+  }
+}
