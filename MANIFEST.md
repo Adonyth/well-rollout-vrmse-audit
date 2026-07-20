@@ -56,8 +56,9 @@ its published-table cell for comparison only.)
 
 ## Exact commands (Tier 2 — cold reproduction of the raw fixtures)
 
-Run from `repro-harness/scripts/`. Each command is idempotent (skips files
-that already exist at the target `--output-dir`), streams data over HTTPS,
+Run from `repro-harness/scripts/`. Each command skips output files
+that already exist at the target `--output-dir` (re-running refreshes the
+run-provenance record), streams data over HTTPS,
 and writes only small per-frame/per-window JSON — never raw field tensors —
 to disk.
 
@@ -106,7 +107,8 @@ an unpinned or drifted checkpoint cannot silently be scored.
 
 Wall-clock: Pass A streams ~40 GB total over HTTPS (dominant cost); Pass B
 additionally downloads ~1.4 GB of checkpoints once and runs inference
-(30-step rollout + 22 one-step windows per trajectory). This is why Tier 1
+(30-step rollout + up to 22 one-step windows per trajectory; fewer for the
+sparse-sampled FNO and UNetConvNext checkpoints). This is why Tier 1
 (`verify.py`, below) ships the small raw-scalar fixtures instead of forcing
 a cold re-run for every reviewer.
 
@@ -149,7 +151,7 @@ raw float64 MSE / target-variance scalars via pure numpy — no cached table
 is read, each of the 142 enumerated VRMSE/census values is derived fresh from the row-level
 fixtures on each run. It then *asserts* 142 leaf values: 84 against
 `fixtures/numbers_reference.json` (the frozen `paper/extracted/numbers.json`
-from the source repo) at 4 significant figures, plus 40 figure-vs-table
+from the source repo) at a relative tolerance of 1e-4 (~4 significant figures), plus 40 figure-vs-table
 consistency checks (see below) against a sibling key in the same
 regenerated `summary.json`, plus 16 checks of every printed cell of
 Table~fieldsplit and 2 checks cross-validating the

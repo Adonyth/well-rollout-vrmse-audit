@@ -26,7 +26,7 @@ This recomputes `fixtures/summary.json` from the packaged raw fixtures (pure
 numpy, no network, no GPU, ~1 second) and checks 142 leaf values against the
 frozen `paper/extracted/numbers.json` reference (or, for the figure-vs-table
 and spatial-mean-baseline groups below, against a sibling key / a second
-independent code path) to 4 significant figures:
+independent code path) to a relative tolerance of 1e-4 (about four significant figures):
 for the pinned UNetClassic checkpoint, the one-step estimate under both the
 library floor and the documented floor (eps=1e-5) together with its
 well-/ill-conditioned split, both rollout windows under the library floor,
@@ -58,7 +58,7 @@ independent derivation of the same quantity in
 $ python3 verify.py
 ...
 [3/3] 142 match, 0 mismatch.
-PASS: repro-harness regenerates the frozen P3 census numbers exactly (within 4 sig figs).
+PASS: repro-harness regenerates the frozen P3 census numbers to a relative tolerance of 1e-4 (~4 sig figs).
 ```
 
 This is what stands behind the paper's coverage-tier claim in

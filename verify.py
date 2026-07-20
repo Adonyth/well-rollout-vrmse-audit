@@ -2,8 +2,8 @@
 """One-command verification: regenerate P3's summary.json from the packaged
 raw fixtures (public-RT-data-derived per-frame/per-window scalars) and check
 that the recomputed UNetClassic census numbers match the frozen paper
-numbers.json (paper/extracted/numbers.json in the source repo) to 4
-significant figures.
+numbers.json (paper/extracted/numbers.json in the source repo) to a
+relative tolerance of 1e-4 (about four significant figures).
 
 This does NOT re-fetch data from the network or re-run model inference — it
 re-executes the deterministic aggregation step (aggregate_results.py) that
@@ -246,7 +246,7 @@ def main() -> int:
     summary = json.loads((FIXTURES / "summary.json").read_text())
     reference = json.loads(REFERENCE.read_text())
 
-    print("[2/3] Checking recomputed values against paper/extracted/numbers.json (4 sig figs)...")
+    print("[2/3] Checking recomputed values against paper/extracted/numbers.json (rel tol 1e-4, ~4 sig figs)...")
     n_ok, n_bad = 0, 0
     for summary_path, ref_path in CHECKS:
         got = dig(summary, summary_path)
@@ -301,7 +301,7 @@ def main() -> int:
     if n_bad:
         print("FAIL: reproduction does not match frozen numbers.json")
         return 1
-    print("PASS: repro-harness regenerates the frozen P3 census numbers exactly (within 4 sig figs).")
+    print("PASS: repro-harness regenerates the frozen P3 census numbers to a relative tolerance of 1e-4 (~4 sig figs).")
     return 0
 
 
