@@ -79,7 +79,7 @@ repro-harness/
   verify.py               <- one-command reproduction + check (run this)
   scripts/
     fast_reader.py         <- HTTP-range HDF5 reader for public Well test objects
-    independent_metrics.py <- dependency-free VRMSE/variance reference implementation
+    independent_metrics.py <- the_well-independent VRMSE/variance reference implementation (numpy only)
     rt_audit_pass.py       <- Pass A: denominator/census audit (streams public data)
     rt_model_eval.py       <- Pass B: checkpoint eval (streams public data + public HF models;
                                --revision is required and drift-checked before scoring)
@@ -112,8 +112,10 @@ numpy executed fresh on every run.
 **Tier 2 (documented, not executed by `verify.py`):** the raw fixtures
 themselves were produced by streaming the public Well RT test-split HDF5
 objects over HTTPS (`scripts/fast_reader.py`, exact-byte-offset ranged GETs)
-and running four `polymathic-ai/*` Hugging Face checkpoints
-(`scripts/rt_model_eval.py`). `MANIFEST.md` gives the exact commands, exact
+and running the pinned `polymathic-ai/*` Hugging Face checkpoints --- three
+Rayleigh-Taylor checkpoints (FNO, UNetClassic, UNetConvNext) via
+`scripts/rt_model_eval.py`, plus a shear-flow FNO cross-check via
+`scripts/shear_checkpoint_eval.py`. `MANIFEST.md` gives the exact commands, exact
 `--pairs`/`--onestep-starts` arguments, and exact source URLs/HF commit
 shas used to produce the packaged fixtures, so a reviewer can regenerate
 them from scratch (network + ~1.4 GB checkpoint downloads + inference
