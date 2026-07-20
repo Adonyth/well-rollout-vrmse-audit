@@ -720,7 +720,8 @@
    "velocity_frac_below_epslib_Ra1e6": 1.0,
    "velocity_frac_below_epslib_Ra1e7": 0.75,
    "velocity_frac_below_epslib_Ra1e8": 0.48,
-   "velocity_frac_below_epsfix_Ra1e8_min": 0.6
+   "velocity_frac_below_epsfix_Ra1e8_min": 0.6,
+   "n_test_split_files_total": 35
   },
   "control_turbulent_radiative_layer": {
    "n_test_files_censused": 3,
@@ -732,7 +733,9 @@
    "pressure_frac_below_epsfix_tcool1p00": 0.2333,
    "pressure_frac_below_epsfix_faster_cooling": 0.0,
    "pressure_var_min": 6.242e-06,
-   "vy_var_min_slowest_cooling": 1.533e-05
+   "vy_var_min_slowest_cooling": 1.533e-05,
+   "dataset": "turbulent_radiative_layer_2D",
+   "n_cooling_times_total": 9
   }
  }
 }
