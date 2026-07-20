@@ -154,4 +154,4 @@ means) over The Well's public Rayleigh-Taylor test-split data, which is
 released under CC-BY-4.0; the derived fixtures in this repository are
 likewise available under CC-BY-4.0. The upstream data and Hugging Face
 model checkpoints keep whatever licenses their model repositories declare
-— see MANIFEST.md).
+— see MANIFEST.md.
