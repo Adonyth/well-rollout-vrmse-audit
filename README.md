@@ -23,7 +23,7 @@ python3 verify.py
 ```
 
 This recomputes `fixtures/summary.json` from the packaged raw fixtures (pure
-numpy, no network, no GPU, ~1 second) and checks 142 leaf values against the
+numpy, no network, no GPU, ~1 second) and runs 142 value checks against the
 frozen `paper/extracted/numbers.json` reference (or, for the figure-vs-table
 and spatial-mean-baseline groups below, against a sibling key / a second
 independent code path) to a relative tolerance of 1e-4 (about four significant figures):
