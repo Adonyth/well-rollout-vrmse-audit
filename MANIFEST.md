@@ -69,7 +69,7 @@ python3 rt_audit_pass.py --files 0,1,2,3,4 --output-dir ../results/audit
 # Pass B — checkpoint evaluation, one model per process
 # (device: "mps" on Apple Silicon, "cpu" elsewhere -- device does not affect
 # the frozen fixtures' identity claim; Lane-3's shear-smoke mps/cpu robustness
-# check found the two agree to ~1e-6 relative on this pipeline's VRMSE outputs.
+# check found the two agree to ~1e-7 relative (8.098e-8) on this pipeline's VRMSE outputs.
 # pairs = "file_index:trajectory", file_index per SORTED_FILES in rt_model_eval.py
 # (0=At_0625, 1=At_125, 2=At_25, 3=At_50, 4=At_75). Exact pairs/starts below are
 # the ones actually used to produce the packaged fixtures -- see
@@ -148,8 +148,8 @@ self-report alone.
 `fixtures/audit/*.json.gz` + `fixtures/models/*.json.gz` (env var
 `P3_RESULTS_DIR=fixtures`), which recomputes `fixtures/summary.json` from
 raw float64 MSE / target-variance scalars via pure numpy — no cached table
-is read, each of the 142 enumerated VRMSE/census values is derived fresh from the row-level
-fixtures on each run. It then *asserts* 142 leaf values: 84 against
+is read, each of the 142 enumerated values is derived fresh from the row-level
+fixtures on each run. It then *asserts* 142 value checks: 84 against
 `fixtures/numbers_reference.json` (the frozen `paper/extracted/numbers.json`
 from the source repo) at a relative tolerance of 1e-4 (~4 significant figures), plus 40 figure-vs-table
 consistency checks (see below) against a sibling key in the same

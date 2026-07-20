@@ -102,8 +102,8 @@ repro-harness/
 
 **Tier 1 (what `verify.py` runs today):** the raw per-frame/per-window
 scalars (MSE, target/prediction variance — never raw field tensors) are
-packaged in `fixtures/` (~280 KB). `verify.py` re-derives the 142 enumerated VRMSE/census
-number from those scalars via `aggregate_results.py` and diffs against the
+packaged in `fixtures/` (~280 KB). `verify.py` re-derives the 142 enumerated value checks
+from those scalars via `aggregate_results.py` and diffs against the
 frozen paper numbers. This is a genuine recomputation, not a file diff: the
 aggregation (eps variants, rollout window means, one-step interpolation,
 well-conditioned-subset splits, issue-#78 counterfactual) is ~350 lines of
