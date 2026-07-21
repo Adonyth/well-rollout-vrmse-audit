@@ -1,0 +1,107 @@
+{
+ "dataset": "acoustic_scattering_maze",
+ "n_test_files_total": 2,
+ "window_frames": [
+  4,
+  33
+ ],
+ "frame_stride": 1,
+ "eps_lib": 1e-07,
+ "eps_fix": 1e-05,
+ "files_censused": [
+  "acoustic_scattering_maze_chunk_18.hdf5",
+  "acoustic_scattering_maze_chunk_19.hdf5"
+ ],
+ "files": {
+  "acoustic_scattering_maze_chunk_18.hdf5": {
+   "fields": {
+    "pressure": {
+     "var_min": 0.020205833554856275,
+     "var_max": 0.0329712485569352,
+     "var_mean": 0.02518960159339325,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.0006449136137096612,
+     "var_max": 0.0013818346104391423,
+     "var_mean": 0.0010114909504859394,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 0.0008127383729374187,
+     "var_max": 0.00125700122762269,
+     "var_mean": 0.0010507691811530938,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 9.4,
+   "static_fields_excluded": [
+    "t0_fields/density",
+    "t0_fields/speed_of_sound"
+   ]
+  },
+  "acoustic_scattering_maze_chunk_19.hdf5": {
+   "fields": {
+    "pressure": {
+     "var_min": 0.013214622014314103,
+     "var_max": 0.018673528406661956,
+     "var_mean": 0.015606931559241493,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.00048069117991996174,
+     "var_max": 0.0007791914569040824,
+     "var_mean": 0.0006802480127760747,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 0.000487309877054926,
+     "var_max": 0.0009565543876928881,
+     "var_mean": 0.0006572190079376278,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 7.5,
+   "static_fields_excluded": [
+    "t0_fields/density",
+    "t0_fields/speed_of_sound"
+   ]
+  }
+ }
+}

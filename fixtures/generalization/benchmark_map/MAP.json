@@ -130,19 +130,6 @@
   "category": "genuine_failure"
  },
  {
-  "dataset": "euler_multi_quadrants_openBC",
-  "n_files": 3,
-  "n_total": 20,
-  "frame_stride": 4,
-  "gt10": "yes",
-  "most_susceptible_field": "momentum.0",
-  "min_var": 0.0016222096295322559,
-  "frac_le_epslib": 0.0,
-  "frac_le_epsfix": 0.0,
-  "susceptibility": "healthy",
-  "category": "genuine_failure"
- },
- {
   "dataset": "supernova_explosion_64",
   "n_files": 6,
   "n_total": 37,
@@ -156,13 +143,26 @@
   "category": "genuine_failure"
  },
  {
-  "dataset": "acoustic_scattering_inclusions",
+  "dataset": "euler_multi_quadrants_periodicBC",
   "n_files": 4,
-  "n_total": 4,
-  "frame_stride": 3,
+  "n_total": 10,
+  "frame_stride": 2,
+  "gt10": "yes",
+  "most_susceptible_field": "pressure",
+  "min_var": 0.08310714908289211,
+  "frac_le_epslib": 0.0,
+  "frac_le_epsfix": 0.0,
+  "susceptibility": "healthy",
+  "category": "genuine_failure"
+ },
+ {
+  "dataset": "acoustic_scattering_maze",
+  "n_files": 2,
+  "n_total": 2,
+  "frame_stride": 1,
   "gt10": "no",
-  "most_susceptible_field": "velocity.1",
-  "min_var": 7.525949509980109e-05,
+  "most_susceptible_field": "velocity.0",
+  "min_var": 0.00048069117991996174,
   "frac_le_epslib": 0.0,
   "frac_le_epsfix": 0.0,
   "susceptibility": "healthy",

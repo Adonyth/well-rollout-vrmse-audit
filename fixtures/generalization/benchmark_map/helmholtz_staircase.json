@@ -19,18 +19,6 @@
  "files": {
   "helmholtz_staircase_omega_006.hdf5": {
    "fields": {
-    "mask": {
-     "var_min": NaN,
-     "var_max": NaN,
-     "var_mean": NaN,
-     "frac_below_epslib": 0.0,
-     "frac_below_epsfix": 0.0,
-     "n_frames": 30,
-     "window": [
-      4,
-      33
-     ]
-    },
     "pressure_im": {
      "var_min": 0.009030244737570182,
      "var_max": 0.054411295674381674,
@@ -56,22 +44,13 @@
      ]
     }
    },
-   "sec": 14.4
+   "sec": 7.1,
+   "static_fields_excluded": [
+    "t0_fields/mask"
+   ]
   },
   "helmholtz_staircase_omega_06.hdf5": {
    "fields": {
-    "mask": {
-     "var_min": NaN,
-     "var_max": NaN,
-     "var_mean": NaN,
-     "frac_below_epslib": 0.0,
-     "frac_below_epsfix": 0.0,
-     "n_frames": 30,
-     "window": [
-      4,
-      33
-     ]
-    },
     "pressure_im": {
      "var_min": 0.028606588829603718,
      "var_max": 0.04246669929327682,
@@ -97,22 +76,13 @@
      ]
     }
    },
-   "sec": 13.7
+   "sec": 6.9,
+   "static_fields_excluded": [
+    "t0_fields/mask"
+   ]
   },
   "helmholtz_staircase_omega_11.hdf5": {
    "fields": {
-    "mask": {
-     "var_min": NaN,
-     "var_max": NaN,
-     "var_mean": NaN,
-     "frac_below_epslib": 0.0,
-     "frac_below_epsfix": 0.0,
-     "n_frames": 30,
-     "window": [
-      4,
-      33
-     ]
-    },
     "pressure_im": {
      "var_min": 0.015865433164404304,
      "var_max": 0.018300245064635935,
@@ -138,22 +108,13 @@
      ]
     }
    },
-   "sec": 13.4
+   "sec": 6.0,
+   "static_fields_excluded": [
+    "t0_fields/mask"
+   ]
   },
   "helmholtz_staircase_omega_17.hdf5": {
    "fields": {
-    "mask": {
-     "var_min": NaN,
-     "var_max": NaN,
-     "var_mean": NaN,
-     "frac_below_epslib": 0.0,
-     "frac_below_epsfix": 0.0,
-     "n_frames": 30,
-     "window": [
-      4,
-      33
-     ]
-    },
     "pressure_im": {
      "var_min": 0.01859208260126557,
      "var_max": 0.02005888535529098,
@@ -179,22 +140,13 @@
      ]
     }
    },
-   "sec": 14.3
+   "sec": 6.4,
+   "static_fields_excluded": [
+    "t0_fields/mask"
+   ]
   },
   "helmholtz_staircase_omega_21.hdf5": {
    "fields": {
-    "mask": {
-     "var_min": NaN,
-     "var_max": NaN,
-     "var_mean": NaN,
-     "frac_below_epslib": 0.0,
-     "frac_below_epsfix": 0.0,
-     "n_frames": 30,
-     "window": [
-      4,
-      33
-     ]
-    },
     "pressure_im": {
      "var_min": 0.022671789222937087,
      "var_max": 0.024292892063351123,
@@ -220,22 +172,13 @@
      ]
     }
    },
-   "sec": 14.6
+   "sec": 6.3,
+   "static_fields_excluded": [
+    "t0_fields/mask"
+   ]
   },
   "helmholtz_staircase_omega_25.hdf5": {
    "fields": {
-    "mask": {
-     "var_min": NaN,
-     "var_max": NaN,
-     "var_mean": NaN,
-     "frac_below_epslib": 0.0,
-     "frac_below_epsfix": 0.0,
-     "n_frames": 30,
-     "window": [
-      4,
-      33
-     ]
-    },
     "pressure_im": {
      "var_min": 0.0762718909013076,
      "var_max": 0.17988115788568096,
@@ -261,7 +204,10 @@
      ]
     }
    },
-   "sec": 10.6
+   "sec": 6.7,
+   "static_fields_excluded": [
+    "t0_fields/mask"
+   ]
   }
  }
 }

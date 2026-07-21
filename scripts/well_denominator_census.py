@@ -40,11 +40,17 @@ def spatial_var_per_frame(arr):
     return a.var(axis=1, ddof=1)
 
 
-def census_field_group(h5, grp, rank, win0, win1, out, fstride=1):
+def census_field_group(h5, grp, rank, win0, win1, out, fstride=1, static_out=None):
     if grp not in h5:
         return
     for name in h5[grp]:
         ds = h5[grp][name]
+        # Static fields (time_varying=False) have no time axis -- (n_traj, *spatial[, comp]) --
+        # and are not rollout-scored, so they are excluded from the census (recorded aside).
+        if not bool(ds.attrs.get("time_varying", True)):
+            if static_out is not None:
+                static_out.append(f"{grp}/{name}")
+            continue
         T = ds.shape[1]                      # (n_traj, T, *spatial[, comp...])
         w1 = min(win1, T - 1)
         block = ds[0, win0:w1 + 1:fstride]   # trajectory 0, window frames (strided)
@@ -70,24 +76,32 @@ def census_field_group(h5, grp, rank, win0, win1, out, fstride=1):
 
 
 def census_file(fs, url, win0, win1, fstride=1):
-    fields = {}
+    fields, statics = {}, []
     with fs.open(url, "rb", block_size=4 * 1024 * 1024) as fo:
         with h5py.File(fo, "r") as h5:
-            census_field_group(h5, "t0_fields", 0, win0, win1, fields, fstride)
-            census_field_group(h5, "t1_fields", 1, win0, win1, fields, fstride)
-            census_field_group(h5, "t2_fields", 2, win0, win1, fields, fstride)
-    return fields
+            census_field_group(h5, "t0_fields", 0, win0, win1, fields, fstride, statics)
+            census_field_group(h5, "t1_fields", 1, win0, win1, fields, fstride, statics)
+            census_field_group(h5, "t2_fields", 2, win0, win1, fields, fstride, statics)
+    return fields, statics
 
 
 def main():
-    ds = sys.argv[1]
-    n_files = int(sys.argv[2]) if len(sys.argv) > 2 else 3
-    win0 = int(sys.argv[3]) if len(sys.argv) > 3 else DEF_WIN0
-    win1 = int(sys.argv[4]) if len(sys.argv) > 4 else DEF_WIN1
-    fstride = int(sys.argv[5]) if len(sys.argv) > 5 else 1
-    all_files = list_test_files(ds)
-    picked = pick_spread(all_files, n_files)
-    base = RESOLVE.format(ds=ds)
+    argv = list(sys.argv[1:])
+    base_override = files_override = None
+    if "--base" in argv:
+        i = argv.index("--base"); base_override = argv[i + 1]; del argv[i:i + 2]
+    if "--list" in argv:
+        i = argv.index("--list")
+        files_override = [l.strip() for l in open(argv[i + 1]) if l.strip()]
+        del argv[i:i + 2]
+    ds = argv[0]
+    n_files = int(argv[1]) if len(argv) > 1 else 3
+    win0 = int(argv[2]) if len(argv) > 2 else DEF_WIN0
+    win1 = int(argv[3]) if len(argv) > 3 else DEF_WIN1
+    fstride = int(argv[4]) if len(argv) > 4 else 1
+    all_files = files_override if files_override is not None else list_test_files(ds)
+    picked = pick_spread(sorted(all_files), n_files)
+    base = base_override if base_override else RESOLVE.format(ds=ds)
     fs = fsspec.filesystem("http")
     out = {"dataset": ds, "n_test_files_total": len(all_files),
            "window_frames": [win0, win1], "frame_stride": fstride,
@@ -96,13 +110,15 @@ def main():
     for fn in picked:
         t = time.time()
         try:
-            fields = census_file(fs, base + fn, win0, win1, fstride)
+            fields, statics = census_file(fs, base + fn, win0, win1, fstride)
         except Exception as e:
             out["files"][fn] = {"error": str(e)}
             print(f"  {fn}: ERROR {e}", flush=True)
             continue
         sec = round(time.time() - t, 1)
         out["files"][fn] = {"fields": fields, "sec": sec}
+        if statics:
+            out["files"][fn]["static_fields_excluded"] = statics
         # compact per-file line: which fields dip to/below each floor
         flagged = [f"{k}(lib{d['frac_below_epslib']:.0%}/fix{d['frac_below_epsfix']:.0%},min{d['var_min']:.1e})"
                    for k, d in fields.items() if d["frac_below_epsfix"] > 0 or d["var_min"] <= EPS_FIX]

@@ -1,0 +1,279 @@
+{
+ "dataset": "euler_multi_quadrants_periodicBC",
+ "n_test_files_total": 10,
+ "window_frames": [
+  4,
+  33
+ ],
+ "frame_stride": 2,
+ "eps_lib": 1e-07,
+ "eps_fix": 1e-05,
+ "files_censused": [
+  "euler_multi_quadrants_periodicBC_gamma_1.13_C3H8_16.hdf5",
+  "euler_multi_quadrants_periodicBC_gamma_1.365_Dry_air_1000.hdf5",
+  "euler_multi_quadrants_periodicBC_gamma_1.453_H2_-76.hdf5",
+  "euler_multi_quadrants_periodicBC_gamma_1.76_Ar_-180.hdf5"
+ ],
+ "files": {
+  "euler_multi_quadrants_periodicBC_gamma_1.13_C3H8_16.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.2793699543316497,
+     "var_max": 1.1979197805742525,
+     "var_mean": 0.7514152095474409,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "energy": {
+     "var_min": 26.015263366960202,
+     "var_max": 176.7969789339801,
+     "var_mean": 87.1200011402236,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 0.4297853031219599,
+     "var_max": 2.7965634108325883,
+     "var_mean": 1.381991139710675,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "momentum.0": {
+     "var_min": 0.2695782746964684,
+     "var_max": 1.5565326707272773,
+     "var_mean": 0.6299716806883982,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "momentum.1": {
+     "var_min": 0.3152438185539553,
+     "var_max": 1.1674545186819698,
+     "var_mean": 0.7652532817290726,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 46.2
+  },
+  "euler_multi_quadrants_periodicBC_gamma_1.365_Dry_air_1000.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.26366531467460774,
+     "var_max": 0.7125545183049463,
+     "var_mean": 0.481467030890461,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "energy": {
+     "var_min": 0.9794260778304976,
+     "var_max": 2.2530236322983606,
+     "var_mean": 1.4978258754416154,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 0.13072137321321756,
+     "var_max": 0.2743861955479415,
+     "var_mean": 0.1845211327471287,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "momentum.0": {
+     "var_min": 0.1907639586291216,
+     "var_max": 0.5266659430106757,
+     "var_mean": 0.29770440475173326,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "momentum.1": {
+     "var_min": 0.20936687445380986,
+     "var_max": 0.308280497558501,
+     "var_mean": 0.24952542492063648,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 33.3
+  },
+  "euler_multi_quadrants_periodicBC_gamma_1.453_H2_-76.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.30633998408183566,
+     "var_max": 0.4542420187653205,
+     "var_mean": 0.37257654431695586,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "energy": {
+     "var_min": 0.4370836312964243,
+     "var_max": 1.077181020800565,
+     "var_mean": 0.7117255490014027,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 0.08310714908289211,
+     "var_max": 0.18831931229257248,
+     "var_mean": 0.12686315603230428,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "momentum.0": {
+     "var_min": 0.1673369131579177,
+     "var_max": 0.3529518291635972,
+     "var_mean": 0.2205415721211667,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "momentum.1": {
+     "var_min": 0.2271298160416271,
+     "var_max": 0.3762223323319871,
+     "var_mean": 0.2829015287859193,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 41.4
+  },
+  "euler_multi_quadrants_periodicBC_gamma_1.76_Ar_-180.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.16489915013494236,
+     "var_max": 0.4187304478734763,
+     "var_mean": 0.27944550082338704,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "energy": {
+     "var_min": 0.5655529818079862,
+     "var_max": 2.616323384606116,
+     "var_mean": 1.4297358319725761,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 0.2969981633949376,
+     "var_max": 0.9265372779234173,
+     "var_mean": 0.6276411187121016,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "momentum.0": {
+     "var_min": 0.1793163673945253,
+     "var_max": 0.4338440469406028,
+     "var_mean": 0.30554576130720246,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "momentum.1": {
+     "var_min": 0.1358709758657684,
+     "var_max": 0.46241564282099235,
+     "var_mean": 0.2769157668358611,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 34.5
+  }
+ }
+}

@@ -4,7 +4,6 @@
   "rayleigh_taylor_instability": "yes",
   "rayleigh_benard": "yes",
   "active_matter": "yes",
-  "euler_multi_quadrants_openBC": "yes",
   "gray_scott_reaction_diffusion": "yes",
   "shear_flow": "yes",
   "supernova_explosion_64": "yes",
@@ -14,9 +13,10 @@
   "turbulence_gravity_cooling": "no",
   "post_neutron_star_merger": "no",
   "MHD_64": "no",
-  "acoustic_scattering_inclusions": "no",
   "helmholtz_staircase": "no",
   "planetswe": "no",
-  "convective_envelope_rsg": "no"
+  "convective_envelope_rsg": "no",
+  "euler_multi_quadrants_periodicBC": "yes",
+  "acoustic_scattering_maze": "no"
  }
 }

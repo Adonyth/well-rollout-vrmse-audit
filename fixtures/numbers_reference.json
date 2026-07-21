@@ -724,7 +724,7 @@
    "n_test_split_files_total": 35
   },
   "benchmark_map": {
-   "method": "data-only spatial-variance census over rollout window frames 4-33, every field of every dataset, streamed public test splits; floors eps_lib=1e-7 (library/headline) and eps_fix=1e-5 (better-conditioned)",
+   "method": "data-only spatial-variance census over rollout window frames 4-33, every time-varying field of every dataset (static fields excluded; first trajectory of each sampled file), streamed public test splits; floors eps_lib=1e-7 (library/headline) and eps_fix=1e-5 (better-conditioned)",
    "n_datasets": 17,
    "counts": {
     "triggered_audited": 1,
@@ -857,18 +857,6 @@
      "susceptibility": "healthy",
      "category": "genuine_failure"
     },
-    "euler_multi_quadrants_openBC": {
-     "gt10": "yes",
-     "field": "momentum.0",
-     "min_var": 0.00162220962953,
-     "frac_le_epslib": 0.0,
-     "frac_le_epsfix": 0.0,
-     "n_files": 3,
-     "n_total": 20,
-     "frame_stride": 4,
-     "susceptibility": "healthy",
-     "category": "genuine_failure"
-    },
     "supernova_explosion_64": {
      "gt10": "yes",
      "field": "pressure",
@@ -881,15 +869,27 @@
      "susceptibility": "healthy",
      "category": "genuine_failure"
     },
-    "acoustic_scattering_inclusions": {
-     "gt10": "no",
-     "field": "velocity.1",
-     "min_var": 7.52594951e-05,
+    "euler_multi_quadrants_periodicBC": {
+     "gt10": "yes",
+     "field": "pressure",
+     "min_var": 0.08310714908289,
      "frac_le_epslib": 0.0,
      "frac_le_epsfix": 0.0,
      "n_files": 4,
-     "n_total": 4,
-     "frame_stride": 3,
+     "n_total": 10,
+     "frame_stride": 2,
+     "susceptibility": "healthy",
+     "category": "genuine_failure"
+    },
+    "acoustic_scattering_maze": {
+     "gt10": "no",
+     "field": "velocity.0",
+     "min_var": 0.00048069117992,
+     "frac_le_epslib": 0.0,
+     "frac_le_epsfix": 0.0,
+     "n_files": 2,
+     "n_total": 2,
+     "frame_stride": 1,
      "susceptibility": "healthy",
      "category": "well_conditioned"
     },
