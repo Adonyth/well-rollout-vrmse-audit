@@ -18,5 +18,11 @@
   "convective_envelope_rsg": "no",
   "euler_multi_quadrants_periodicBC": "yes",
   "acoustic_scattering_maze": "no"
+ },
+ "_variant_provenance": {
+  "euler_multi_quadrants_periodicBC": "Table 3's row is labeled 'euler_multi_quadrants'; the benchmark's baselines are the periodic-boundary variant per the paper's own row labels elsewhere: Table 2 and the appendix validation/hyperparameter tables all read 'euler_multi_quadrants (periodic b.c.)' (arXiv:2412.00568v2).",
+  "acoustic_scattering_maze": "Table 3's row is labeled 'acoustic_scattering (maze)' verbatim.",
+  "MHD_64": "Table 3's row is labeled 'MHD_64' verbatim (the 256 variant has no published row).",
+  "supernova_explosion_64": "Table 3's row is labeled 'supernova_explosion_64' verbatim (the 128 variant has no published row)."
  }
 }
