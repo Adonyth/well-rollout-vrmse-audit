@@ -1,0 +1,555 @@
+{
+ "dataset": "MHD_64",
+ "n_test_files_total": 10,
+ "window_frames": [
+  4,
+  33
+ ],
+ "frame_stride": 1,
+ "eps_lib": 1e-07,
+ "eps_fix": 1e-05,
+ "files_censused": [
+  "MHD_Ma_0.7_Ms_0.5.hdf5",
+  "MHD_Ma_0.7_Ms_1.5.hdf5",
+  "MHD_Ma_0.7_Ms_7.hdf5",
+  "MHD_Ma_2_Ms_0.5.hdf5",
+  "MHD_Ma_2_Ms_1.5.hdf5",
+  "MHD_Ma_2_Ms_7.hdf5"
+ ],
+ "files": {
+  "MHD_Ma_0.7_Ms_0.5.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.02556790330501349,
+     "var_max": 0.03386668060307541,
+     "var_mean": 0.030314470256224604,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.0": {
+     "var_min": 0.08386972489499313,
+     "var_max": 0.11154084049245445,
+     "var_mean": 0.1011772246658287,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.1": {
+     "var_min": 0.09024573642099251,
+     "var_max": 0.121731502502972,
+     "var_mean": 0.10416292456578996,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.2": {
+     "var_min": 0.10441177856839072,
+     "var_max": 0.15962373748044512,
+     "var_mean": 0.12981223989739304,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.18397014004759665,
+     "var_max": 0.2401716506481665,
+     "var_mean": 0.20907271105234995,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 0.08586749912940853,
+     "var_max": 0.11900315895077006,
+     "var_mean": 0.0971980586370967,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.2": {
+     "var_min": 0.1559688263246911,
+     "var_max": 0.18740875683234667,
+     "var_mean": 0.1687970289456278,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 88.1
+  },
+  "MHD_Ma_0.7_Ms_1.5.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.3424957373126721,
+     "var_max": 0.49508704447572877,
+     "var_mean": 0.39955831045946477,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.0": {
+     "var_min": 0.0465900159127094,
+     "var_max": 0.056553726317238484,
+     "var_mean": 0.051635265451859126,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.1": {
+     "var_min": 0.1035193745642563,
+     "var_max": 0.12364847810898591,
+     "var_mean": 0.11170089588438785,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.2": {
+     "var_min": 0.08319311795177169,
+     "var_max": 0.14334583412431698,
+     "var_mean": 0.117099187049086,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.24465322740264553,
+     "var_max": 0.277235165846721,
+     "var_mean": 0.2606769207561499,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 0.12355306431912473,
+     "var_max": 0.1603567154848098,
+     "var_mean": 0.1367376892155504,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.2": {
+     "var_min": 0.18396473078500802,
+     "var_max": 0.19383098756987996,
+     "var_mean": 0.18944570167703986,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 68.3
+  },
+  "MHD_Ma_0.7_Ms_7.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 2.7546967474835333,
+     "var_max": 3.259544177420448,
+     "var_mean": 2.949739712777883,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.0": {
+     "var_min": 0.03371412350028671,
+     "var_max": 0.03760166571945141,
+     "var_mean": 0.035835218917872,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.1": {
+     "var_min": 0.0750877813466861,
+     "var_max": 0.08327581179309647,
+     "var_mean": 0.07986061585351396,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.2": {
+     "var_min": 0.09282816125636285,
+     "var_max": 0.10143231295247969,
+     "var_mean": 0.0955216516577332,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.23729030639600376,
+     "var_max": 0.35810334330131793,
+     "var_mean": 0.29106118341535353,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 0.10881418493740784,
+     "var_max": 0.12730658233604442,
+     "var_mean": 0.1162640470523184,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.2": {
+     "var_min": 0.18848601971709894,
+     "var_max": 0.19591107352280093,
+     "var_mean": 0.19154542991467965,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 110.7
+  },
+  "MHD_Ma_2_Ms_0.5.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.01325868118138528,
+     "var_max": 0.01642658194728882,
+     "var_mean": 0.015063704802430584,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.0": {
+     "var_min": 0.09412552923851132,
+     "var_max": 0.12053600112059164,
+     "var_mean": 0.11243767242356553,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.1": {
+     "var_min": 0.10242354228100128,
+     "var_max": 0.14720098640076093,
+     "var_mean": 0.12518316800485196,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.2": {
+     "var_min": 0.10068135641389521,
+     "var_max": 0.11230553591462795,
+     "var_mean": 0.106363040600557,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.1729615291177092,
+     "var_max": 0.22303117374222034,
+     "var_mean": 0.19836799863841348,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 0.14029412280799602,
+     "var_max": 0.26214882576631476,
+     "var_mean": 0.1891812954646466,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.2": {
+     "var_min": 0.15178950919091236,
+     "var_max": 0.1815220332411032,
+     "var_mean": 0.16728532968499013,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 78.1
+  },
+  "MHD_Ma_2_Ms_1.5.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.325623199547872,
+     "var_max": 0.3848639591306101,
+     "var_mean": 0.3506231122418763,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.0": {
+     "var_min": 0.07300216891276158,
+     "var_max": 0.09032136627016489,
+     "var_mean": 0.08033814713055262,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.1": {
+     "var_min": 0.09574393472585116,
+     "var_max": 0.12081767380087798,
+     "var_mean": 0.11193850269337123,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.2": {
+     "var_min": 0.08113809460819588,
+     "var_max": 0.10088290416802144,
+     "var_mean": 0.08863780848741089,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.1282366764857252,
+     "var_max": 0.19080234868292387,
+     "var_mean": 0.17309712742892694,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 0.16474802077384504,
+     "var_max": 0.2927719701105906,
+     "var_mean": 0.22093406644550337,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.2": {
+     "var_min": 0.1406486268623033,
+     "var_max": 0.1909021862495652,
+     "var_mean": 0.16107700699241212,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 95.8
+  },
+  "MHD_Ma_2_Ms_7.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 1.7510046572241484,
+     "var_max": 2.484089981180307,
+     "var_mean": 2.0115764231754807,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.0": {
+     "var_min": 0.06158538890280012,
+     "var_max": 0.06992896128153939,
+     "var_mean": 0.06525475200741568,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.1": {
+     "var_min": 0.06357300482222478,
+     "var_max": 0.06886932084552329,
+     "var_mean": 0.06709457745200281,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.2": {
+     "var_min": 0.06541209859180845,
+     "var_max": 0.07306494225426487,
+     "var_mean": 0.06915887301008117,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.1672086715126639,
+     "var_max": 0.23384982026338738,
+     "var_mean": 0.20333465492673858,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 0.14577720836262278,
+     "var_max": 0.1843120214963107,
+     "var_mean": 0.16593305828682048,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.2": {
+     "var_min": 0.1592886220743772,
+     "var_max": 0.26242397166142617,
+     "var_mean": 0.21202014340730804,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 109.2
+  }
+ }
+}

@@ -1,0 +1,285 @@
+{
+ "dataset": "rayleigh_taylor_instability",
+ "n_test_files_total": 5,
+ "window_frames": [
+  4,
+  33
+ ],
+ "frame_stride": 3,
+ "eps_lib": 1e-07,
+ "eps_fix": 1e-05,
+ "files_censused": [
+  "rayleigh_taylor_instability_At_0625.hdf5",
+  "rayleigh_taylor_instability_At_125.hdf5",
+  "rayleigh_taylor_instability_At_25.hdf5",
+  "rayleigh_taylor_instability_At_50.hdf5",
+  "rayleigh_taylor_instability_At_75.hdf5"
+ ],
+ "files": {
+  "rayleigh_taylor_instability_At_0625.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.003375418545673737,
+     "var_max": 0.003425892295494927,
+     "var_mean": 0.0033969146866934343,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 10,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 1.1463873945475781e-11,
+     "var_max": 1.8047775010133083e-08,
+     "var_mean": 3.49977840254694e-09,
+     "frac_below_epslib": 1.0,
+     "frac_below_epsfix": 1.0,
+     "n_frames": 10,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 1.0969969044102257e-11,
+     "var_max": 1.8157559289661417e-08,
+     "var_mean": 3.5074407059264483e-09,
+     "frac_below_epslib": 1.0,
+     "frac_below_epsfix": 1.0,
+     "n_frames": 10,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.2": {
+     "var_min": 2.860804704632266e-11,
+     "var_max": 5.1721831227900713e-08,
+     "var_mean": 9.785599062758106e-09,
+     "frac_below_epslib": 1.0,
+     "frac_below_epsfix": 1.0,
+     "n_frames": 10,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 50.4
+  },
+  "rayleigh_taylor_instability_At_125.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.012016092914339385,
+     "var_max": 0.012222150822171277,
+     "var_mean": 0.012112580995148729,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 10,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 6.397196147723946e-11,
+     "var_max": 5.829725647558959e-07,
+     "var_mean": 1.0750767211875485e-07,
+     "frac_below_epslib": 0.7,
+     "frac_below_epsfix": 1.0,
+     "n_frames": 10,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 6.016434747360367e-11,
+     "var_max": 6.364067933702223e-07,
+     "var_mean": 1.134984723709714e-07,
+     "frac_below_epslib": 0.7,
+     "frac_below_epsfix": 1.0,
+     "n_frames": 10,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.2": {
+     "var_min": 1.9126957676246639e-10,
+     "var_max": 4.061143387159169e-06,
+     "var_mean": 6.377210895917344e-07,
+     "frac_below_epslib": 0.6,
+     "frac_below_epsfix": 1.0,
+     "n_frames": 10,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 46.8
+  },
+  "rayleigh_taylor_instability_At_25.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.036383598242773756,
+     "var_max": 0.039612131015370616,
+     "var_mean": 0.038697325352028814,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 10,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 2.2164944230301413e-10,
+     "var_max": 2.835576048537161e-06,
+     "var_mean": 5.736619474416303e-07,
+     "frac_below_epslib": 0.5,
+     "frac_below_epsfix": 1.0,
+     "n_frames": 10,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 2.232793580808897e-10,
+     "var_max": 2.9182830849673105e-06,
+     "var_mean": 5.920705153798332e-07,
+     "frac_below_epslib": 0.5,
+     "frac_below_epsfix": 1.0,
+     "n_frames": 10,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.2": {
+     "var_min": 1.3128317760757995e-09,
+     "var_max": 2.1225290469599895e-05,
+     "var_mean": 5.219840011222893e-06,
+     "frac_below_epslib": 0.3,
+     "frac_below_epsfix": 0.8,
+     "n_frames": 10,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 41.7
+  },
+  "rayleigh_taylor_instability_At_50.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.10644080437314413,
+     "var_max": 0.11001385557318324,
+     "var_mean": 0.10878524744120663,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 10,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 2.415692794413685e-10,
+     "var_max": 2.4852073081072396e-06,
+     "var_mean": 4.556405309299317e-07,
+     "frac_below_epslib": 0.6,
+     "frac_below_epsfix": 1.0,
+     "n_frames": 10,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 2.498581033760277e-10,
+     "var_max": 2.556059790695639e-06,
+     "var_mean": 4.719393654331747e-07,
+     "frac_below_epslib": 0.6,
+     "frac_below_epsfix": 1.0,
+     "n_frames": 10,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.2": {
+     "var_min": 2.5518847078646152e-09,
+     "var_max": 2.349776525197122e-05,
+     "var_mean": 4.127648339622545e-06,
+     "frac_below_epslib": 0.4,
+     "frac_below_epsfix": 0.8,
+     "n_frames": 10,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 38.3
+  },
+  "rayleigh_taylor_instability_At_75.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.17913399872376082,
+     "var_max": 0.18187238441263595,
+     "var_mean": 0.18043881634641118,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 10,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 3.011002405425916e-10,
+     "var_max": 1.9932306108394098e-06,
+     "var_mean": 3.5392560446462725e-07,
+     "frac_below_epslib": 0.6,
+     "frac_below_epsfix": 1.0,
+     "n_frames": 10,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 3.397792627564392e-10,
+     "var_max": 2.0567858295012738e-06,
+     "var_mean": 3.751124617026603e-07,
+     "frac_below_epslib": 0.6,
+     "frac_below_epsfix": 1.0,
+     "n_frames": 10,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.2": {
+     "var_min": 8.748845542809047e-09,
+     "var_max": 1.3349046344104392e-05,
+     "var_mean": 2.136926551593853e-06,
+     "frac_below_epslib": 0.5,
+     "frac_below_epsfix": 0.9,
+     "n_frames": 10,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 36.7
+  }
+ }
+}

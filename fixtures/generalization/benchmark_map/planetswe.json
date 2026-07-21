@@ -1,0 +1,267 @@
+{
+ "dataset": "planetswe",
+ "n_test_files_total": 12,
+ "window_frames": [
+  4,
+  33
+ ],
+ "frame_stride": 1,
+ "eps_lib": 1e-07,
+ "eps_fix": 1e-05,
+ "files_censused": [
+  "planetswe_IC36_s1.hdf5",
+  "planetswe_IC36_s3.hdf5",
+  "planetswe_IC37_s2.hdf5",
+  "planetswe_IC38_s2.hdf5",
+  "planetswe_IC39_s1.hdf5",
+  "planetswe_IC39_s3.hdf5"
+ ],
+ "files": {
+  "planetswe_IC36_s1.hdf5": {
+   "fields": {
+    "height": {
+     "var_min": 81848.48352725207,
+     "var_max": 83508.3067224864,
+     "var_mean": 82459.5187820134,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 64.0528184733315,
+     "var_max": 68.77676486321161,
+     "var_mean": 65.84472072128689,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 186.9600133243424,
+     "var_max": 191.10118477344008,
+     "var_mean": 189.80369052210918,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 9.4
+  },
+  "planetswe_IC36_s3.hdf5": {
+   "fields": {
+    "height": {
+     "var_min": 95232.51324800181,
+     "var_max": 99007.25088525136,
+     "var_mean": 96360.44059555377,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 74.29360144496877,
+     "var_max": 77.30331065482471,
+     "var_mean": 74.98777821425374,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 184.51948300481405,
+     "var_max": 186.1101855666537,
+     "var_mean": 185.3605288798524,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 10.7
+  },
+  "planetswe_IC37_s2.hdf5": {
+   "fields": {
+    "height": {
+     "var_min": 100751.48208511186,
+     "var_max": 101453.91865165981,
+     "var_mean": 101180.61597062142,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 46.576100969013105,
+     "var_max": 48.43442440873155,
+     "var_mean": 47.44945359448536,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 163.28636340978207,
+     "var_max": 165.71873982483442,
+     "var_mean": 164.5285157263462,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 11.6
+  },
+  "planetswe_IC38_s2.hdf5": {
+   "fields": {
+    "height": {
+     "var_min": 85487.4960340143,
+     "var_max": 86154.95068871778,
+     "var_mean": 85844.74046554546,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 40.63240372276854,
+     "var_max": 42.70414715967726,
+     "var_mean": 42.08317704351281,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 219.6443533717306,
+     "var_max": 222.248407881271,
+     "var_mean": 221.26140728774837,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 11.7
+  },
+  "planetswe_IC39_s1.hdf5": {
+   "fields": {
+    "height": {
+     "var_min": 103506.54772009443,
+     "var_max": 104018.28913037732,
+     "var_mean": 103745.73474044313,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 29.90899655977035,
+     "var_max": 33.51243271976799,
+     "var_mean": 31.910481266325757,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 138.68493945049477,
+     "var_max": 141.2541966330307,
+     "var_mean": 139.8164190579815,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 11.3
+  },
+  "planetswe_IC39_s3.hdf5": {
+   "fields": {
+    "height": {
+     "var_min": 110712.04826553693,
+     "var_max": 112129.91586625192,
+     "var_mean": 111541.37276732085,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 22.350629854660266,
+     "var_max": 28.895040134063606,
+     "var_mean": 24.815036820038433,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 160.6093071877636,
+     "var_max": 163.60176383432716,
+     "var_mean": 162.390220223689,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 10.8
+  }
+ }
+}

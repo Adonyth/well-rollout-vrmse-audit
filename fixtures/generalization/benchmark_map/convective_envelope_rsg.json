@@ -1,0 +1,93 @@
+{
+ "dataset": "convective_envelope_rsg",
+ "n_test_files_total": 3,
+ "window_frames": [
+  4,
+  33
+ ],
+ "frame_stride": 10,
+ "eps_lib": 1e-07,
+ "eps_fix": 1e-05,
+ "files_censused": [
+  "convective_envelope_rsg_trajectories_11.hdf5"
+ ],
+ "files": {
+  "convective_envelope_rsg_trajectories_11.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.058419510840526476,
+     "var_max": 0.059608222870097975,
+     "var_mean": 0.05890390056540721,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 3,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "energy": {
+     "var_min": 0.10484724411395868,
+     "var_max": 0.10512483315839043,
+     "var_mean": 0.1049767272742992,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 3,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 0.029329713013590424,
+     "var_max": 0.029775431638622944,
+     "var_mean": 0.029541831802518695,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 3,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.23712439481196368,
+     "var_max": 0.25069980704704264,
+     "var_mean": 0.24357932121153106,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 3,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 0.027089240760083108,
+     "var_max": 0.028964295687832355,
+     "var_mean": 0.028064001151074703,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 3,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.2": {
+     "var_min": 0.023828160627288576,
+     "var_max": 0.025585160799102707,
+     "var_mean": 0.02477318713784274,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 3,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 259.4
+  }
+ }
+}

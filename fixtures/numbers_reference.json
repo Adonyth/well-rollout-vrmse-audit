@@ -723,19 +723,225 @@
    "velocity_frac_below_epsfix_Ra1e8_min": 0.6,
    "n_test_split_files_total": 35
   },
-  "control_turbulent_radiative_layer": {
-   "n_test_files_censused": 3,
-   "density_var_min": 1880.0,
-   "density_var_max": 2150.0,
-   "velocity_frac_below_epsfix": 0.0,
-   "vx_var_min": 0.00139,
-   "vx_var_max": 0.00171,
-   "pressure_frac_below_epsfix_tcool1p00": 0.2333,
-   "pressure_frac_below_epsfix_faster_cooling": 0.0,
-   "pressure_var_min": 6.242e-06,
-   "vy_var_min_slowest_cooling": 1.533e-05,
-   "dataset": "turbulent_radiative_layer_2D",
-   "n_cooling_times_total": 9
+  "benchmark_map": {
+   "method": "data-only spatial-variance census over rollout window frames 4-33, every field of every dataset, streamed public test splits; floors eps_lib=1e-7 (library/headline) and eps_fix=1e-5 (better-conditioned)",
+   "n_datasets": 17,
+   "counts": {
+    "triggered_audited": 1,
+    "artifact_suspect": 5,
+    "latent": 3,
+    "genuine_failure": 3,
+    "well_conditioned": 5
+   },
+   "n_gt10_total": 9,
+   "n_gt10_susceptible": 6,
+   "n_gt10_genuine": 3,
+   "datasets": {
+    "rayleigh_taylor_instability": {
+     "gt10": "yes",
+     "field": "velocity.1",
+     "min_var": 1.097e-11,
+     "frac_le_epslib": 1.0,
+     "frac_le_epsfix": 1.0,
+     "n_files": 5,
+     "n_total": 5,
+     "frame_stride": 3,
+     "susceptibility": "severe",
+     "category": "triggered_audited"
+    },
+    "rayleigh_benard": {
+     "gt10": "yes",
+     "field": "velocity.0",
+     "min_var": 1.28e-11,
+     "frac_le_epslib": 1.0,
+     "frac_le_epsfix": 1.0,
+     "n_files": 6,
+     "n_total": 35,
+     "frame_stride": 1,
+     "susceptibility": "severe",
+     "category": "artifact_suspect"
+    },
+    "active_matter": {
+     "gt10": "yes",
+     "field": "concentration",
+     "min_var": 3.09998e-09,
+     "frac_le_epslib": 0.767,
+     "frac_le_epsfix": 1.0,
+     "n_files": 6,
+     "n_total": 21,
+     "frame_stride": 1,
+     "susceptibility": "severe",
+     "category": "artifact_suspect"
+    },
+    "turbulent_radiative_layer_3D": {
+     "gt10": "yes",
+     "field": "pressure",
+     "min_var": 2.9443888e-07,
+     "frac_le_epslib": 0.0,
+     "frac_le_epsfix": 0.9,
+     "n_files": 3,
+     "n_total": 9,
+     "frame_stride": 3,
+     "susceptibility": "susceptible",
+     "category": "artifact_suspect"
+    },
+    "shear_flow": {
+     "gt10": "yes",
+     "field": "pressure",
+     "min_var": 1.87272113e-06,
+     "frac_le_epslib": 0.0,
+     "frac_le_epsfix": 0.733,
+     "n_files": 6,
+     "n_total": 28,
+     "frame_stride": 1,
+     "susceptibility": "susceptible",
+     "category": "artifact_suspect"
+    },
+    "turbulent_radiative_layer_2D": {
+     "gt10": "yes",
+     "field": "pressure",
+     "min_var": 5.84419808e-06,
+     "frac_le_epslib": 0.0,
+     "frac_le_epsfix": 0.333,
+     "n_files": 9,
+     "n_total": 9,
+     "frame_stride": 1,
+     "susceptibility": "susceptible",
+     "category": "artifact_suspect"
+    },
+    "viscoelastic_instability": {
+     "gt10": "no",
+     "field": "pressure",
+     "min_var": 1.3214766e-07,
+     "frac_le_epslib": 0.0,
+     "frac_le_epsfix": 1.0,
+     "n_files": 7,
+     "n_total": 7,
+     "frame_stride": 1,
+     "susceptibility": "susceptible",
+     "category": "latent"
+    },
+    "turbulence_gravity_cooling": {
+     "gt10": "no",
+     "field": "pressure",
+     "min_var": 2.0801809e-07,
+     "frac_le_epslib": 0.0,
+     "frac_le_epsfix": 1.0,
+     "n_files": 4,
+     "n_total": 27,
+     "frame_stride": 3,
+     "susceptibility": "susceptible",
+     "category": "latent"
+    },
+    "post_neutron_star_merger": {
+     "gt10": "no",
+     "field": "pressure",
+     "min_var": 3.0786215e-07,
+     "frac_le_epslib": 0.0,
+     "frac_le_epsfix": 1.0,
+     "n_files": 1,
+     "n_total": 1,
+     "frame_stride": 5,
+     "susceptibility": "susceptible",
+     "category": "latent"
+    },
+    "gray_scott_reaction_diffusion": {
+     "gt10": "yes",
+     "field": "B",
+     "min_var": 0.00076493294228,
+     "frac_le_epslib": 0.0,
+     "frac_le_epsfix": 0.0,
+     "n_files": 6,
+     "n_total": 6,
+     "frame_stride": 1,
+     "susceptibility": "healthy",
+     "category": "genuine_failure"
+    },
+    "euler_multi_quadrants_openBC": {
+     "gt10": "yes",
+     "field": "momentum.0",
+     "min_var": 0.00162220962953,
+     "frac_le_epslib": 0.0,
+     "frac_le_epsfix": 0.0,
+     "n_files": 3,
+     "n_total": 20,
+     "frame_stride": 4,
+     "susceptibility": "healthy",
+     "category": "genuine_failure"
+    },
+    "supernova_explosion_64": {
+     "gt10": "yes",
+     "field": "pressure",
+     "min_var": 0.01322318540391,
+     "frac_le_epslib": 0.0,
+     "frac_le_epsfix": 0.0,
+     "n_files": 6,
+     "n_total": 37,
+     "frame_stride": 2,
+     "susceptibility": "healthy",
+     "category": "genuine_failure"
+    },
+    "acoustic_scattering_inclusions": {
+     "gt10": "no",
+     "field": "velocity.1",
+     "min_var": 7.52594951e-05,
+     "frac_le_epslib": 0.0,
+     "frac_le_epsfix": 0.0,
+     "n_files": 4,
+     "n_total": 4,
+     "frame_stride": 3,
+     "susceptibility": "healthy",
+     "category": "well_conditioned"
+    },
+    "helmholtz_staircase": {
+     "gt10": "no",
+     "field": "pressure_re",
+     "min_var": 0.008954275056,
+     "frac_le_epslib": 0.0,
+     "frac_le_epsfix": 0.0,
+     "n_files": 6,
+     "n_total": 16,
+     "frame_stride": 1,
+     "susceptibility": "healthy",
+     "category": "well_conditioned"
+    },
+    "MHD_64": {
+     "gt10": "no",
+     "field": "density",
+     "min_var": 0.01325868118139,
+     "frac_le_epslib": 0.0,
+     "frac_le_epsfix": 0.0,
+     "n_files": 6,
+     "n_total": 10,
+     "frame_stride": 1,
+     "susceptibility": "healthy",
+     "category": "well_conditioned"
+    },
+    "convective_envelope_rsg": {
+     "gt10": "no",
+     "field": "velocity.2",
+     "min_var": 0.02382816062729,
+     "frac_le_epslib": 0.0,
+     "frac_le_epsfix": 0.0,
+     "n_files": 1,
+     "n_total": 3,
+     "frame_stride": 10,
+     "susceptibility": "healthy",
+     "category": "well_conditioned"
+    },
+    "planetswe": {
+     "gt10": "no",
+     "field": "velocity.0",
+     "min_var": 22.351,
+     "frac_le_epslib": 0.0,
+     "frac_le_epsfix": 0.0,
+     "n_files": 6,
+     "n_total": 12,
+     "frame_stride": 1,
+     "susceptibility": "healthy",
+     "category": "well_conditioned"
+    }
+   }
   }
  }
 }

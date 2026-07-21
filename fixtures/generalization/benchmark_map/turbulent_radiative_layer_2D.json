@@ -1,0 +1,501 @@
+{
+ "dataset": "turbulent_radiative_layer_2D",
+ "n_test_files_total": 9,
+ "window_frames": [
+  4,
+  33
+ ],
+ "frame_stride": 1,
+ "eps_lib": 1e-07,
+ "eps_fix": 1e-05,
+ "files_censused": [
+  "turbulent_radiative_layer_tcool_0.03.hdf5",
+  "turbulent_radiative_layer_tcool_0.06.hdf5",
+  "turbulent_radiative_layer_tcool_0.10.hdf5",
+  "turbulent_radiative_layer_tcool_0.18.hdf5",
+  "turbulent_radiative_layer_tcool_0.32.hdf5",
+  "turbulent_radiative_layer_tcool_0.56.hdf5",
+  "turbulent_radiative_layer_tcool_1.00.hdf5",
+  "turbulent_radiative_layer_tcool_1.78.hdf5",
+  "turbulent_radiative_layer_tcool_3.16.hdf5"
+ ],
+ "files": {
+  "turbulent_radiative_layer_tcool_0.03.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 1884.6794056991966,
+     "var_max": 2108.043229596572,
+     "var_mean": 1970.0881592712742,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 4.294643429918389e-05,
+     "var_max": 0.001277144678779863,
+     "var_mean": 0.0003360166928617372,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.0013857177369315994,
+     "var_max": 0.0016717196698311945,
+     "var_mean": 0.0014847198175648518,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 0.00023463651417426754,
+     "var_max": 0.0011314794122661744,
+     "var_mean": 0.0006572714083662417,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 7.0
+  },
+  "turbulent_radiative_layer_tcool_0.06.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 1775.9988269126563,
+     "var_max": 2122.5473596394368,
+     "var_mean": 1931.3886361869284,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 8.477754683379903e-05,
+     "var_max": 0.002964223888044519,
+     "var_mean": 0.0007228845843903639,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.0015037868815296913,
+     "var_max": 0.0022706074764601084,
+     "var_mean": 0.00174524973124078,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 0.0002053861827680212,
+     "var_max": 0.0024083905545934994,
+     "var_mean": 0.0010712987071710138,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 7.0
+  },
+  "turbulent_radiative_layer_tcool_0.10.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 1911.9267119661058,
+     "var_max": 2132.3649789664546,
+     "var_mean": 2011.7015839240216,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 1.618263129050935e-05,
+     "var_max": 0.0007128776056145461,
+     "var_mean": 0.00019063334976728117,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.001388540245835708,
+     "var_max": 0.0017050253078191593,
+     "var_mean": 0.0015166217702709485,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 8.539599326762858e-05,
+     "var_max": 0.0009591699156306852,
+     "var_mean": 0.00041639820155817576,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 5.8
+  },
+  "turbulent_radiative_layer_tcool_0.18.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 1947.2935673231189,
+     "var_max": 2145.9040394412436,
+     "var_mean": 2026.4393694850612,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 2.2937244227654394e-05,
+     "var_max": 0.0005896805716506065,
+     "var_mean": 0.00021899475429750886,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.0014908905152870471,
+     "var_max": 0.0017979904451146185,
+     "var_mean": 0.001600317975898219,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 6.663914955381358e-05,
+     "var_max": 0.0007112255968286252,
+     "var_mean": 0.00033717754048492654,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 7.2
+  },
+  "turbulent_radiative_layer_tcool_0.32.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 2028.2371908697817,
+     "var_max": 2150.874538997284,
+     "var_mean": 2080.2331935467582,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 1.2752126468970607e-05,
+     "var_max": 7.654184672403598e-05,
+     "var_mean": 2.6480820310757917e-05,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.0014591546544582173,
+     "var_max": 0.001735871788929286,
+     "var_mean": 0.00154299871770181,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 2.9596772000625992e-05,
+     "var_max": 0.0003696186454722151,
+     "var_mean": 0.00017298860592209476,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 6.6
+  },
+  "turbulent_radiative_layer_tcool_0.56.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 1994.5345009741338,
+     "var_max": 2148.148402448841,
+     "var_mean": 2061.5908603064645,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 5.844198079585614e-06,
+     "var_max": 0.00011467192367628349,
+     "var_mean": 2.515199032923153e-05,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.3333333333333333,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.0014164098444182402,
+     "var_max": 0.0015691372308907457,
+     "var_mean": 0.0015050683822706373,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 1.9538754237876065e-05,
+     "var_max": 0.00025532837026702936,
+     "var_mean": 0.00013411409595780738,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 8.0
+  },
+  "turbulent_radiative_layer_tcool_1.00.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 2032.1062015305524,
+     "var_max": 2149.574361190073,
+     "var_mean": 2077.552571560476,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 6.242466484821321e-06,
+     "var_max": 0.0001496700058978499,
+     "var_mean": 3.360655633288328e-05,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.23333333333333334,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.0014756581031637858,
+     "var_max": 0.0015525008200667175,
+     "var_mean": 0.0015064634303607943,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 1.5331194237181426e-05,
+     "var_max": 0.00010932682710870863,
+     "var_mean": 7.025149646042524e-05,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 6.7
+  },
+  "turbulent_radiative_layer_tcool_1.78.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 2041.350146511268,
+     "var_max": 2152.128935411797,
+     "var_mean": 2092.896969782745,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 8.086766348313467e-06,
+     "var_max": 0.00014015956715810512,
+     "var_mean": 3.613602222368533e-05,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.06666666666666667,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.001467514662637494,
+     "var_max": 0.0016282765410028672,
+     "var_mean": 0.0015279171198549913,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 2.21588428824387e-05,
+     "var_max": 0.00011814285668401037,
+     "var_mean": 5.719358956065777e-05,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 7.5
+  },
+  "turbulent_radiative_layer_tcool_3.16.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 2064.6407225515536,
+     "var_max": 2150.53159724694,
+     "var_mean": 2094.898768411055,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 1.1399489577808256e-05,
+     "var_max": 0.0001925165074374803,
+     "var_mean": 5.6206673101217196e-05,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.0014440317747405726,
+     "var_max": 0.0015251538479227912,
+     "var_mean": 0.0014853473361645505,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 1.282792731824882e-05,
+     "var_max": 4.795349906752892e-05,
+     "var_mean": 2.644215466327606e-05,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 6.3
+  }
+ }
+}

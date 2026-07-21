@@ -1,0 +1,267 @@
+{
+ "dataset": "helmholtz_staircase",
+ "n_test_files_total": 16,
+ "window_frames": [
+  4,
+  33
+ ],
+ "frame_stride": 1,
+ "eps_lib": 1e-07,
+ "eps_fix": 1e-05,
+ "files_censused": [
+  "helmholtz_staircase_omega_006.hdf5",
+  "helmholtz_staircase_omega_06.hdf5",
+  "helmholtz_staircase_omega_11.hdf5",
+  "helmholtz_staircase_omega_17.hdf5",
+  "helmholtz_staircase_omega_21.hdf5",
+  "helmholtz_staircase_omega_25.hdf5"
+ ],
+ "files": {
+  "helmholtz_staircase_omega_006.hdf5": {
+   "fields": {
+    "mask": {
+     "var_min": NaN,
+     "var_max": NaN,
+     "var_mean": NaN,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure_im": {
+     "var_min": 0.009030244737570182,
+     "var_max": 0.054411295674381674,
+     "var_mean": 0.029227933888173987,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure_re": {
+     "var_min": 0.008954275056002213,
+     "var_max": 0.05433532599505887,
+     "var_mean": 0.03413763685431768,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 14.4
+  },
+  "helmholtz_staircase_omega_06.hdf5": {
+   "fields": {
+    "mask": {
+     "var_min": NaN,
+     "var_max": NaN,
+     "var_mean": NaN,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure_im": {
+     "var_min": 0.028606588829603718,
+     "var_max": 0.04246669929327682,
+     "var_mean": 0.035847019122691566,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure_re": {
+     "var_min": 0.028572490542196637,
+     "var_max": 0.042432601021579454,
+     "var_mean": 0.035192170716780415,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 13.7
+  },
+  "helmholtz_staircase_omega_11.hdf5": {
+   "fields": {
+    "mask": {
+     "var_min": NaN,
+     "var_max": NaN,
+     "var_mean": NaN,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure_im": {
+     "var_min": 0.015865433164404304,
+     "var_max": 0.018300245064635935,
+     "var_mean": 0.01713706188612285,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure_re": {
+     "var_min": 0.01586030035002501,
+     "var_max": 0.018295112241285934,
+     "var_mean": 0.017023483528871772,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 13.4
+  },
+  "helmholtz_staircase_omega_17.hdf5": {
+   "fields": {
+    "mask": {
+     "var_min": NaN,
+     "var_max": NaN,
+     "var_mean": NaN,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure_im": {
+     "var_min": 0.01859208260126557,
+     "var_max": 0.02005888535529098,
+     "var_mean": 0.01926451663297298,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure_re": {
+     "var_min": 0.018591607574324074,
+     "var_max": 0.020058410325579146,
+     "var_mean": 0.01938597630367171,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 14.3
+  },
+  "helmholtz_staircase_omega_21.hdf5": {
+   "fields": {
+    "mask": {
+     "var_min": NaN,
+     "var_max": NaN,
+     "var_mean": NaN,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure_im": {
+     "var_min": 0.022671789222937087,
+     "var_max": 0.024292892063351123,
+     "var_mean": 0.023415351525647894,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure_re": {
+     "var_min": 0.022669795214129814,
+     "var_max": 0.024290898048121314,
+     "var_mean": 0.023547335750719503,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 14.6
+  },
+  "helmholtz_staircase_omega_25.hdf5": {
+   "fields": {
+    "mask": {
+     "var_min": NaN,
+     "var_max": NaN,
+     "var_mean": NaN,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure_im": {
+     "var_min": 0.0762718909013076,
+     "var_max": 0.17988115788568096,
+     "var_mean": 0.12026191061556818,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure_re": {
+     "var_min": 0.07639558358981291,
+     "var_max": 0.18000485060529534,
+     "var_mean": 0.13601483082264937,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 10.6
+  }
+ }
+}

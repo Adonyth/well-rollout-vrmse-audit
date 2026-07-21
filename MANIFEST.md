@@ -26,6 +26,7 @@ private paths, no credentials.
 | Raw HDF5 field tensors (RT test split) | ~40 GB across 5 objects | `https://sdsc-users.flatironinstitute.org/~polymathic/data/the_well/datasets/rayleigh_taylor_instability/data/test/*.hdf5` | No — streamed via HTTP range GETs by `scripts/fast_reader.py`, never written to disk in bulk |
 | RT model checkpoints | 3 models, ~1.4 GB total | Hugging Face Hub, see table below | No — downloaded on demand into a local `hf-cache/` by `scripts/rt_model_eval.py` (standard `from_pretrained(revision=..., cache_dir=...)`) |
 | Shear-flow FNO checkpoint (device-precision cross-check only) | 1 model | Hugging Face Hub, see "Tier 2 continued" below | No — downloaded on demand by `scripts/shear_checkpoint_eval.py` |
+| Benchmark-wide denominator-conditioning census (paper §generalize, Table `tab:map`) | `fixtures/generalization/benchmark_map/*.json` (per-dataset outputs + `MAP.json`) | `scripts/well_denominator_census.py` (auto-discovering, data-only) over every Well dataset's public test split; assembled by `scripts/assemble_map.py` | Yes — frozen outputs packaged; **not** part of the 142 Tier-1 checks (streamed data-only, no model), re-runnable from the two scripts. The Rayleigh–Bénard detail fixture `fixtures/generalization/rayleigh_benard_census.json` (via `scripts/rb_census.py`) is the same census restricted to the RB Prandtl-1 spread. |
 
 ## Public Well test-split objects (audited, `fixtures/audit/provenance.json`)
 

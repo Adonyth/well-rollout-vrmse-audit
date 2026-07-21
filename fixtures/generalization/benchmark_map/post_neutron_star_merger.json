@@ -1,0 +1,165 @@
+{
+ "dataset": "post_neutron_star_merger",
+ "n_test_files_total": 1,
+ "window_frames": [
+  4,
+  33
+ ],
+ "frame_stride": 5,
+ "eps_lib": 1e-07,
+ "eps_fix": 1e-05,
+ "files_censused": [
+  "post_neutron_star_merger_scenario_2.hdf5"
+ ],
+ "files": {
+  "post_neutron_star_merger_scenario_2.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.0032682201248454153,
+     "var_max": 0.006811338788891647,
+     "var_mean": 0.00475634138318544,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 6,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "electron_fraction": {
+     "var_min": 0.0156663561579869,
+     "var_max": 0.020311939345711995,
+     "var_mean": 0.01715308904849434,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 6,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "entropy": {
+     "var_min": 7801.930833932337,
+     "var_max": 144406.15542668832,
+     "var_mean": 35271.24579178394,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 6,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "internal_energy": {
+     "var_min": 2.970137281456248e-06,
+     "var_max": 7.661085279021797e-06,
+     "var_mean": 4.309825671008418e-06,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 1.0,
+     "n_frames": 6,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 3.078621527695585e-07,
+     "var_max": 1.0557860681990807e-06,
+     "var_mean": 5.527184193383466e-07,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 1.0,
+     "n_frames": 6,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "temperature": {
+     "var_min": 4.370281070006215,
+     "var_max": 7.447515956073161,
+     "var_mean": 5.9654458032826305,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 6,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.0": {
+     "var_min": 4.285209440874649e-05,
+     "var_max": 9.673875262491063e-05,
+     "var_mean": 6.676824741488179e-05,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 6,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.1": {
+     "var_min": 3.1877071920681136e-07,
+     "var_max": 1.0458316314798195e-06,
+     "var_mean": 6.101539321187222e-07,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 1.0,
+     "n_frames": 6,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "magnetic_field.2": {
+     "var_min": 0.00016634326374840108,
+     "var_max": 0.0003840810669865972,
+     "var_mean": 0.00027860618139122076,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 6,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.020005805449290603,
+     "var_max": 0.02389541794086531,
+     "var_mean": 0.022360118256849502,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 6,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 0.00010290886069705329,
+     "var_max": 0.00012089223494269158,
+     "var_mean": 0.00011145572646770108,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 6,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.2": {
+     "var_min": 0.04791793492740927,
+     "var_max": 0.0570475782081161,
+     "var_mean": 0.05151847749293472,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 6,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 83.2
+  }
+ }
+}

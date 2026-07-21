@@ -1,0 +1,339 @@
+{
+ "dataset": "shear_flow",
+ "n_test_files_total": 28,
+ "window_frames": [
+  4,
+  33
+ ],
+ "frame_stride": 1,
+ "eps_lib": 1e-07,
+ "eps_fix": 1e-05,
+ "files_censused": [
+  "shear_flow_Reynolds_1e4_Schmidt_1e-1.hdf5",
+  "shear_flow_Reynolds_1e4_Schmidt_5e-1.hdf5",
+  "shear_flow_Reynolds_1e5_Schmidt_2e0.hdf5",
+  "shear_flow_Reynolds_5e4_Schmidt_1e1.hdf5",
+  "shear_flow_Reynolds_5e5_Schmidt_1e0.hdf5",
+  "shear_flow_Reynolds_5e5_Schmidt_5e0.hdf5"
+ ],
+ "files": {
+  "shear_flow_Reynolds_1e4_Schmidt_1e-1.hdf5": {
+   "fields": {
+    "pressure": {
+     "var_min": 0.00011923745321485127,
+     "var_max": 0.017666233224483435,
+     "var_mean": 0.007036966833421899,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "tracer": {
+     "var_min": 0.10764407452133513,
+     "var_max": 0.1903397798944423,
+     "var_mean": 0.15507586546472135,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.1648757432341682,
+     "var_max": 0.19890452979365744,
+     "var_mean": 0.18444529416658598,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 0.00021710042271234174,
+     "var_max": 0.027950709705353707,
+     "var_mean": 0.011098044142644868,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 12.0
+  },
+  "shear_flow_Reynolds_1e4_Schmidt_5e-1.hdf5": {
+   "fields": {
+    "pressure": {
+     "var_min": 2.40426639692689e-05,
+     "var_max": 0.0005624333001949009,
+     "var_mean": 0.00014545057661648802,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "tracer": {
+     "var_min": 0.19349378194619782,
+     "var_max": 0.19944609159457857,
+     "var_mean": 0.19644112382249254,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.19656389630665227,
+     "var_max": 0.19997599668594848,
+     "var_mean": 0.19875651950219536,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 8.483904129023831e-05,
+     "var_max": 0.0016837846239946947,
+     "var_mean": 0.00044147918916853326,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 18.7
+  },
+  "shear_flow_Reynolds_1e5_Schmidt_2e0.hdf5": {
+   "fields": {
+    "pressure": {
+     "var_min": 0.00014061408429027157,
+     "var_max": 0.0017406036596342436,
+     "var_mean": 0.0006619570083208416,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "tracer": {
+     "var_min": 0.14931413464248142,
+     "var_max": 0.15036046633903072,
+     "var_mean": 0.15002690253627585,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.14764509437795947,
+     "var_max": 0.15062736918408848,
+     "var_mean": 0.14964532684432302,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 0.00028846047017612,
+     "var_max": 0.002908560927948763,
+     "var_mean": 0.0011029056321690872,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 16.6
+  },
+  "shear_flow_Reynolds_5e4_Schmidt_1e1.hdf5": {
+   "fields": {
+    "pressure": {
+     "var_min": 5.9495496631887374e-05,
+     "var_max": 0.011807321422889186,
+     "var_mean": 0.0047680981509108595,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "tracer": {
+     "var_min": 0.22235267910661843,
+     "var_max": 0.2249745401418886,
+     "var_mean": 0.22429240502043502,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.18998325559989446,
+     "var_max": 0.2248466272987921,
+     "var_mean": 0.21121357634151,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 0.00014257123314560872,
+     "var_max": 0.03435497236977348,
+     "var_mean": 0.013395922909136725,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 16.2
+  },
+  "shear_flow_Reynolds_5e5_Schmidt_1e0.hdf5": {
+   "fields": {
+    "pressure": {
+     "var_min": 8.459269775316618e-05,
+     "var_max": 0.04209304694121473,
+     "var_mean": 0.017460161362082564,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "tracer": {
+     "var_min": 0.20108410399491003,
+     "var_max": 0.23728504134401807,
+     "var_mean": 0.22494554312984258,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.17496400557472433,
+     "var_max": 0.23713240259740717,
+     "var_mean": 0.20849146396243567,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 0.00017609424144742034,
+     "var_max": 0.06187114092503792,
+     "var_mean": 0.028555211913950614,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 14.9
+  },
+  "shear_flow_Reynolds_5e5_Schmidt_5e0.hdf5": {
+   "fields": {
+    "pressure": {
+     "var_min": 1.8727211287200833e-06,
+     "var_max": 4.9200366369913164e-05,
+     "var_mean": 9.32909097938095e-06,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.7333333333333333,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "tracer": {
+     "var_min": 0.1997160335604239,
+     "var_max": 0.19999418234620556,
+     "var_mean": 0.199905217466836,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.20019039845048658,
+     "var_max": 0.2004092361650386,
+     "var_mean": 0.2003774797444084,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 9.051029404440287e-06,
+     "var_max": 0.000253777759574509,
+     "var_mean": 4.68071173547134e-05,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.3333333333333333,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 97.6
+  }
+ }
+}

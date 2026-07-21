@@ -1,0 +1,339 @@
+{
+ "dataset": "rayleigh_benard",
+ "n_test_files_total": 35,
+ "window_frames": [
+  4,
+  33
+ ],
+ "frame_stride": 1,
+ "eps_lib": 1e-07,
+ "eps_fix": 1e-05,
+ "files_censused": [
+  "rayleigh_benard_Rayleigh_1e10_Prandtl_1.hdf5",
+  "rayleigh_benard_Rayleigh_1e6_Prandtl_1.hdf5",
+  "rayleigh_benard_Rayleigh_1e7_Prandtl_1.hdf5",
+  "rayleigh_benard_Rayleigh_1e7_Prandtl_5e-1.hdf5",
+  "rayleigh_benard_Rayleigh_1e8_Prandtl_5e-1.hdf5",
+  "rayleigh_benard_Rayleigh_1e9_Prandtl_5e-1.hdf5"
+ ],
+ "files": {
+  "rayleigh_benard_Rayleigh_1e10_Prandtl_1.hdf5": {
+   "fields": {
+    "buoyancy": {
+     "var_min": 0.026789135871344138,
+     "var_max": 0.03233539787294556,
+     "var_mean": 0.029990509561563652,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 0.0013392171713305454,
+     "var_max": 0.0018392808280355817,
+     "var_mean": 0.0015046304537436475,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 9.735756498462376e-10,
+     "var_max": 0.0012959010330300016,
+     "var_mean": 0.000357181668873292,
+     "frac_below_epslib": 0.2,
+     "frac_below_epsfix": 0.26666666666666666,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 3.0905397163176954e-09,
+     "var_max": 0.001417667066763073,
+     "var_mean": 0.00039882408894139715,
+     "frac_below_epslib": 0.2,
+     "frac_below_epsfix": 0.26666666666666666,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 12.3
+  },
+  "rayleigh_benard_Rayleigh_1e6_Prandtl_1.hdf5": {
+   "fields": {
+    "buoyancy": {
+     "var_min": 0.06827026184906826,
+     "var_max": 0.101511645454026,
+     "var_mean": 0.08958952385354359,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 0.001712106964542874,
+     "var_max": 0.003476648175584712,
+     "var_mean": 0.0026355294335322927,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 1.2795413513991785e-11,
+     "var_max": 7.131861687839634e-08,
+     "var_mean": 6.543327757400345e-09,
+     "frac_below_epslib": 1.0,
+     "frac_below_epsfix": 1.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 2.740184698216952e-11,
+     "var_max": 1.2924522276329596e-07,
+     "var_mean": 1.1563412733894885e-08,
+     "frac_below_epslib": 0.9666666666666667,
+     "frac_below_epsfix": 1.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 7.8
+  },
+  "rayleigh_benard_Rayleigh_1e7_Prandtl_1.hdf5": {
+   "fields": {
+    "buoyancy": {
+     "var_min": 0.0598660044971525,
+     "var_max": 0.08370741797066185,
+     "var_mean": 0.07493371228316252,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 0.005533668943758704,
+     "var_max": 0.006408802011965285,
+     "var_mean": 0.006002342372431266,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 3.537950927514179e-11,
+     "var_max": 4.80976565941281e-06,
+     "var_mean": 3.781854785654224e-07,
+     "frac_below_epslib": 0.7666666666666667,
+     "frac_below_epsfix": 1.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 9.79352148754982e-11,
+     "var_max": 8.852775301174512e-06,
+     "var_mean": 6.899292652790134e-07,
+     "frac_below_epslib": 0.7333333333333333,
+     "frac_below_epsfix": 1.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 8.4
+  },
+  "rayleigh_benard_Rayleigh_1e7_Prandtl_5e-1.hdf5": {
+   "fields": {
+    "buoyancy": {
+     "var_min": 0.05800108410064626,
+     "var_max": 0.08672960834263758,
+     "var_mean": 0.07689004980120168,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 0.0015316263261312575,
+     "var_max": 0.002485114217886439,
+     "var_mean": 0.0020080281426460007,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 3.259097135931995e-11,
+     "var_max": 0.00010976641129478144,
+     "var_mean": 7.572497794564062e-06,
+     "frac_below_epslib": 0.6333333333333333,
+     "frac_below_epsfix": 0.8666666666666667,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 9.49439142947667e-11,
+     "var_max": 0.00022668855959903886,
+     "var_mean": 1.517653199426201e-05,
+     "frac_below_epslib": 0.6,
+     "frac_below_epsfix": 0.8333333333333334,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 8.5
+  },
+  "rayleigh_benard_Rayleigh_1e8_Prandtl_5e-1.hdf5": {
+   "fields": {
+    "buoyancy": {
+     "var_min": 0.04578292678161833,
+     "var_max": 0.06469110844215291,
+     "var_mean": 0.05761963577173193,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 0.0014113348279123402,
+     "var_max": 0.0023996156037549314,
+     "var_mean": 0.0017118242138730202,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 9.654503154048711e-11,
+     "var_max": 0.0014619603964064149,
+     "var_mean": 0.00021770954949697436,
+     "frac_below_epslib": 0.4666666666666667,
+     "frac_below_epsfix": 0.6333333333333333,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 2.829033255864432e-10,
+     "var_max": 0.0016612274082221867,
+     "var_mean": 0.00034722389842591257,
+     "frac_below_epslib": 0.43333333333333335,
+     "frac_below_epsfix": 0.6,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 8.9
+  },
+  "rayleigh_benard_Rayleigh_1e9_Prandtl_5e-1.hdf5": {
+   "fields": {
+    "buoyancy": {
+     "var_min": 0.036156121269335983,
+     "var_max": 0.04744838928163081,
+     "var_mean": 0.04251116927694687,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 0.0013625980435255686,
+     "var_max": 0.0022945145856373035,
+     "var_mean": 0.0016372195793639957,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 3.2099464018572566e-10,
+     "var_max": 0.002204634295192445,
+     "var_mean": 0.0005075574394055234,
+     "frac_below_epslib": 0.3,
+     "frac_below_epsfix": 0.43333333333333335,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 9.580250919664584e-10,
+     "var_max": 0.0025150385135854093,
+     "var_mean": 0.0005981284986358819,
+     "frac_below_epslib": 0.3,
+     "frac_below_epsfix": 0.4,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 12.2
+  }
+ }
+}

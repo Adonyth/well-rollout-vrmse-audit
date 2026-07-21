@@ -1,0 +1,195 @@
+{
+ "dataset": "gray_scott_reaction_diffusion",
+ "n_test_files_total": 6,
+ "window_frames": [
+  4,
+  33
+ ],
+ "frame_stride": 1,
+ "eps_lib": 1e-07,
+ "eps_fix": 1e-05,
+ "files_censused": [
+  "gray_scott_reaction_diffusion_bubbles_F_0.098_k_0.057.hdf5",
+  "gray_scott_reaction_diffusion_gliders_F_0.014_k_0.054.hdf5",
+  "gray_scott_reaction_diffusion_maze_F_0.029_k_0.057.hdf5",
+  "gray_scott_reaction_diffusion_spirals_F_0.018_k_0.051.hdf5",
+  "gray_scott_reaction_diffusion_spots_F_0.03_k_0.062.hdf5",
+  "gray_scott_reaction_diffusion_worms_F_0.058_k_0.065.hdf5"
+ ],
+ "files": {
+  "gray_scott_reaction_diffusion_bubbles_F_0.098_k_0.057.hdf5": {
+   "fields": {
+    "A": {
+     "var_min": 0.015162407992848586,
+     "var_max": 0.02217207856988086,
+     "var_mean": 0.01807151884889688,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "B": {
+     "var_min": 0.007157742175220624,
+     "var_max": 0.010015263788734142,
+     "var_mean": 0.008397964739419957,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 8.5
+  },
+  "gray_scott_reaction_diffusion_gliders_F_0.014_k_0.054.hdf5": {
+   "fields": {
+    "A": {
+     "var_min": 0.006518765630435844,
+     "var_max": 0.13213675419534907,
+     "var_mean": 0.0336766197990812,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "B": {
+     "var_min": 0.0007649329422759432,
+     "var_max": 0.023879583087925087,
+     "var_mean": 0.0043244288856568594,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 9.1
+  },
+  "gray_scott_reaction_diffusion_maze_F_0.029_k_0.057.hdf5": {
+   "fields": {
+    "A": {
+     "var_min": 0.05155655050885803,
+     "var_max": 0.06931303427468408,
+     "var_mean": 0.061531419662877965,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "B": {
+     "var_min": 0.009008669488776128,
+     "var_max": 0.013303946359231626,
+     "var_mean": 0.01140959257326204,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 10.3
+  },
+  "gray_scott_reaction_diffusion_spirals_F_0.018_k_0.051.hdf5": {
+   "fields": {
+    "A": {
+     "var_min": 0.052841530936736755,
+     "var_max": 0.1496452936835999,
+     "var_mean": 0.06790326812919718,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "B": {
+     "var_min": 0.007789755722238823,
+     "var_max": 0.030023976111067524,
+     "var_mean": 0.011569026313252913,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 7.8
+  },
+  "gray_scott_reaction_diffusion_spots_F_0.03_k_0.062.hdf5": {
+   "fields": {
+    "A": {
+     "var_min": 0.018114520470210598,
+     "var_max": 0.08277161664205138,
+     "var_mean": 0.03561909423098343,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "B": {
+     "var_min": 0.003427835569737564,
+     "var_max": 0.01542769226526216,
+     "var_mean": 0.006699829584955788,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 9.1
+  },
+  "gray_scott_reaction_diffusion_worms_F_0.058_k_0.065.hdf5": {
+   "fields": {
+    "A": {
+     "var_min": 0.021796604380768875,
+     "var_max": 0.044132524248889846,
+     "var_mean": 0.02665603362475969,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "B": {
+     "var_min": 0.006800873323921831,
+     "var_max": 0.012547544331477947,
+     "var_mean": 0.008449034681752279,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 30,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 7.5
+  }
+ }
+}

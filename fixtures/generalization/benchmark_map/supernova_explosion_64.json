@@ -1,0 +1,483 @@
+{
+ "dataset": "supernova_explosion_64",
+ "n_test_files_total": 37,
+ "window_frames": [
+  4,
+  33
+ ],
+ "frame_stride": 2,
+ "eps_lib": 1e-07,
+ "eps_fix": 1e-05,
+ "files_censused": [
+  "supernova_explosion_Msun_0.1_dim64_file_00.hdf5",
+  "supernova_explosion_Msun_0.1_dim64_file_07.hdf5",
+  "supernova_explosion_Msun_1_dim64_file_02.hdf5",
+  "supernova_explosion_Msun_1_dim64_file_10.hdf5",
+  "supernova_explosion_Msun_1_dim64_file_17.hdf5",
+  "supernova_explosion_Msun_1_dim64_file_24.hdf5"
+ ],
+ "files": {
+  "supernova_explosion_Msun_0.1_dim64_file_00.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.6926468114627148,
+     "var_max": 0.850355621550795,
+     "var_mean": 0.7497124141273771,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 0.013223185403908433,
+     "var_max": 0.8462868639099135,
+     "var_mean": 0.14223790783721993,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "temperature": {
+     "var_min": 2588108370138.985,
+     "var_max": 5820389916314.2,
+     "var_mean": 3388924273918.581,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 1.1293199582480253,
+     "var_max": 1.8868892075237027,
+     "var_mean": 1.3754107875005368,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 0.7126940945240858,
+     "var_max": 1.4706676853345124,
+     "var_mean": 0.9015956853813899,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.2": {
+     "var_min": 0.6947123302335589,
+     "var_max": 1.4602930234176223,
+     "var_mean": 0.8546091572381781,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 53.0
+  },
+  "supernova_explosion_Msun_0.1_dim64_file_07.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.7788346858772409,
+     "var_max": 0.8899993499882438,
+     "var_mean": 0.8470770960935187,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 0.02028512321791471,
+     "var_max": 1.1371259663770565,
+     "var_mean": 0.18462780553849975,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "temperature": {
+     "var_min": 3119269757186.1587,
+     "var_max": 5880987577830.443,
+     "var_mean": 3919963441212.3145,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.8937615890447693,
+     "var_max": 1.690251855599655,
+     "var_mean": 1.1009975006362231,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 1.1923453283589702,
+     "var_max": 2.54871199136591,
+     "var_mean": 1.4029241309499467,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.2": {
+     "var_min": 1.138528354828439,
+     "var_max": 2.6254377505182998,
+     "var_mean": 1.6073717699632926,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 51.2
+  },
+  "supernova_explosion_Msun_1_dim64_file_02.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.4701504768408187,
+     "var_max": 0.5266895172466786,
+     "var_mean": 0.5001568214535367,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 1.0330304138522497,
+     "var_max": 6.829905121819961,
+     "var_mean": 2.2360093717393714,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "temperature": {
+     "var_min": 4939842081091.906,
+     "var_max": 16925204074369.605,
+     "var_mean": 12019220355791.63,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 3.2627109698047865,
+     "var_max": 7.017891679780669,
+     "var_mean": 5.086628664510782,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 3.1381021720238187,
+     "var_max": 6.694282180837534,
+     "var_mean": 4.929626158471079,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.2": {
+     "var_min": 2.9201869517810572,
+     "var_max": 5.99963253090572,
+     "var_mean": 4.590662222569616,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 51.0
+  },
+  "supernova_explosion_Msun_1_dim64_file_10.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.3329960832431924,
+     "var_max": 0.3498355963206948,
+     "var_mean": 0.3417951746161157,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 0.31559600938408056,
+     "var_max": 7.016934111286396,
+     "var_mean": 1.3180328098384426,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "temperature": {
+     "var_min": 1028456475594.9036,
+     "var_max": 3361306028460.8364,
+     "var_mean": 2386547958484.0825,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.9176383434408265,
+     "var_max": 1.6938403115440537,
+     "var_mean": 1.2112924301346086,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 1.1043689098621594,
+     "var_max": 1.669239835599599,
+     "var_mean": 1.3466783159050968,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.2": {
+     "var_min": 0.9842974080025425,
+     "var_max": 1.6829439650990727,
+     "var_mean": 1.3861259580952074,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 45.0
+  },
+  "supernova_explosion_Msun_1_dim64_file_17.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.4416497621206265,
+     "var_max": 0.5048516374336923,
+     "var_mean": 0.4657269689187589,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 0.6535341924714604,
+     "var_max": 9.6464116192427,
+     "var_mean": 2.350392566489925,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "temperature": {
+     "var_min": 1071201005126.6193,
+     "var_max": 3813575477718.1396,
+     "var_mean": 2784182799952.65,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 1.7401847559710637,
+     "var_max": 3.172114519793238,
+     "var_mean": 2.2764307427644823,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 1.4313384904375974,
+     "var_max": 3.0761808716746084,
+     "var_mean": 1.8691446654376471,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.2": {
+     "var_min": 1.4799900931788923,
+     "var_max": 2.312408620474986,
+     "var_mean": 1.910487356957739,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 44.0
+  },
+  "supernova_explosion_Msun_1_dim64_file_24.hdf5": {
+   "fields": {
+    "density": {
+     "var_min": 0.3824369785324131,
+     "var_max": 0.4373497428088904,
+     "var_mean": 0.4072218469980094,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "pressure": {
+     "var_min": 0.5660821803118143,
+     "var_max": 15.171766861585224,
+     "var_mean": 3.2925416306410167,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "temperature": {
+     "var_min": 497677252345.8275,
+     "var_max": 1565019680635.8867,
+     "var_mean": 1071280388675.3038,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.0": {
+     "var_min": 0.6697835942477792,
+     "var_max": 0.9621698105555618,
+     "var_mean": 0.7912669062407598,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.1": {
+     "var_min": 0.917189747088833,
+     "var_max": 1.3600240509390786,
+     "var_mean": 1.0700536303157584,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    },
+    "velocity.2": {
+     "var_min": 0.8294035360398276,
+     "var_max": 1.1807783092085213,
+     "var_mean": 0.9536253071221362,
+     "frac_below_epslib": 0.0,
+     "frac_below_epsfix": 0.0,
+     "n_frames": 15,
+     "window": [
+      4,
+      33
+     ]
+    }
+   },
+   "sec": 46.7
+  }
+ }
+}
