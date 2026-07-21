@@ -1,0 +1,22 @@
+{
+ "_source": "The Well, arXiv:2412.00568v2, Table 3 (time-averaged rollout VRMSE); yes = any baseline >10 in any rollout window (6:12 or 13:30)",
+ "status": {
+  "rayleigh_taylor_instability": "yes",
+  "rayleigh_benard": "yes",
+  "active_matter": "yes",
+  "euler_multi_quadrants_openBC": "yes",
+  "gray_scott_reaction_diffusion": "yes",
+  "shear_flow": "yes",
+  "supernova_explosion_64": "yes",
+  "turbulent_radiative_layer_2D": "yes",
+  "turbulent_radiative_layer_3D": "yes",
+  "viscoelastic_instability": "no",
+  "turbulence_gravity_cooling": "no",
+  "post_neutron_star_merger": "no",
+  "MHD_64": "no",
+  "acoustic_scattering_inclusions": "no",
+  "helmholtz_staircase": "no",
+  "planetswe": "no",
+  "convective_envelope_rsg": "no"
+ }
+}

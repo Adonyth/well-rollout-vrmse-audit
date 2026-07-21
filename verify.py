@@ -302,6 +302,22 @@ def main() -> int:
     if n_bad:
         print("FAIL: reproduction does not match frozen numbers.json")
         return 1
+
+    # Generalization map self-consistency (separate from the 142 above; the benchmark-wide
+    # denominator-conditioning census is data-only/streamed and its numbers are outside Tier 1,
+    # but the assembled categories in Table tab:map must follow deterministically from the frozen
+    # per-dataset census outputs and the frozen Well Table-3 status -- assemble_map.py re-derives
+    # them and checks cell-for-cell against the packaged MAP.json).
+    import os as _os, subprocess as _sub
+    _asm = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "scripts", "assemble_map.py")
+    if _os.path.exists(_asm):
+        _r = _sub.run([sys.executable, _asm], capture_output=True, text=True,
+                      cwd=_os.path.dirname(_os.path.abspath(__file__)))
+        print(f"[map] {_r.stdout.strip() or _r.stderr.strip()}")
+        if _r.returncode != 0:
+            print("FAIL: benchmark-map categories disagree with the frozen census + Table-3 status")
+            return 1
+
     print("PASS: repro-harness regenerates the frozen P3 values to a relative tolerance of 1e-4 (~4 sig figs).")
     return 0
 
