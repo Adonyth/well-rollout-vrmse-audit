@@ -81,13 +81,18 @@ def main():
         print(f"wrote {mp} ({len(rows)} datasets)")
         return
     frozen = json.load(open(mp))
-    fz = {r["dataset"]: (r["gt10"], r["susceptibility"], r["category"]) for r in frozen}
-    bad = [r["dataset"] for r in rows
-           if fz.get(r["dataset"]) != (r["gt10"], r["susceptibility"], r["category"])]
+
+    def norm(r):
+        # full-row comparison: every stored field, floats to 6 sig figs
+        return {k: (float(f"{v:.6g}") if isinstance(v, float) else v) for k, v in r.items()}
+
+    fz = {r["dataset"]: norm(r) for r in frozen}
+    bad = [r["dataset"] for r in rows if fz.get(r["dataset"]) != norm(r)]
     if bad:
         print("MAP MISMATCH on:", bad); sys.exit(1)
     from collections import Counter
-    print("MAP OK:", dict(Counter(r["category"] for r in rows)), f"({len(rows)} datasets)")
+    print("MAP OK (full rows):", dict(Counter(r["category"] for r in rows)),
+          f"({len(rows)} datasets, every stored field compared)")
 
 
 if __name__ == "__main__":

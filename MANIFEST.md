@@ -217,9 +217,14 @@ baseline cross-check above), not a sample.
 What it does **not** assert is the wider Lane-3 chain (the two library-defect
 deltas — issue #75's epsilon propagation and issue #78's last-batch
 aggregation — the shear-flow device-precision cross-check below, and the
-paper's Appendix regression-anchor reproduction, Table~tab:anchor): those
-are documented with exact source scripts/commands but not part of this
-package's checked exit code.
+paper's Appendix regression-anchor reproduction, Table~tab:anchor). To be
+precise about what is and is not shipped: the issue-#78 last-batch-versus-
+all-batch **counterfactual cells** are among the 142 checks (recomputed here
+from the packaged per-window scalars), but the **real-library reproducers**
+that exhibit each defect inside the audited library itself are not included
+in this package — they are referenced from here by their source-repository
+script names and invocations, and re-running them requires that repository
+plus the pinned upstream library, not this harness alone.
 
 ## Discipline notes carried over from the source repo
 

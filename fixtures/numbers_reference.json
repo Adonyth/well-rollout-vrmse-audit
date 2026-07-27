@@ -943,5 +943,20 @@
     }
    }
   }
+ },
+ "onestep_sampled_max_derived": {
+  "_derivation": "max over all packaged onestep rows of field-mean library-VRMSE (aggregate_results.field_mean_vrmse, EPS_LIB), per model; n = count of packaged onestep rows",
+  "UNetClassic": {
+   "max_lib_vrmse": 6.479,
+   "n_sampled_starts": 220
+  },
+  "UNetConvNext": {
+   "max_lib_vrmse": 3.024,
+   "n_sampled_starts": 5
+  },
+  "FNO": {
+   "max_lib_vrmse": 730.4,
+   "n_sampled_starts": 14
+  }
  }
 }
