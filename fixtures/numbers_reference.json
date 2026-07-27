@@ -776,12 +776,12 @@
     "triggered_audited": 1,
     "artifact_suspect": 5,
     "latent": 3,
-    "genuine_failure": 3,
+    "no_susceptibility_observed": 3,
     "well_conditioned": 5
    },
    "n_gt10_total": 9,
    "n_gt10_susceptible": 6,
-   "n_gt10_genuine": 3,
+   "n_gt10_no_susceptibility": 3,
    "datasets": {
     "rayleigh_taylor_instability": {
      "gt10": "yes",
@@ -901,7 +901,7 @@
      "n_total": 6,
      "frame_stride": 1,
      "susceptibility": "healthy",
-     "category": "genuine_failure"
+     "category": "no_susceptibility_observed"
     },
     "supernova_explosion_64": {
      "gt10": "yes",
@@ -913,7 +913,7 @@
      "n_total": 37,
      "frame_stride": 2,
      "susceptibility": "healthy",
-     "category": "genuine_failure"
+     "category": "no_susceptibility_observed"
     },
     "euler_multi_quadrants_periodicBC": {
      "gt10": "yes",
@@ -925,7 +925,7 @@
      "n_total": 10,
      "frame_stride": 2,
      "susceptibility": "healthy",
-     "category": "genuine_failure"
+     "category": "no_susceptibility_observed"
     },
     "acoustic_scattering_maze": {
      "gt10": "no",

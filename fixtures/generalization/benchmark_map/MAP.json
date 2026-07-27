@@ -127,7 +127,7 @@
   "frac_le_epslib": 0.0,
   "frac_le_epsfix": 0.0,
   "susceptibility": "healthy",
-  "category": "genuine_failure"
+  "category": "no_susceptibility_observed"
  },
  {
   "dataset": "supernova_explosion_64",
@@ -140,7 +140,7 @@
   "frac_le_epslib": 0.0,
   "frac_le_epsfix": 0.0,
   "susceptibility": "healthy",
-  "category": "genuine_failure"
+  "category": "no_susceptibility_observed"
  },
  {
   "dataset": "euler_multi_quadrants_periodicBC",
@@ -153,7 +153,7 @@
   "frac_le_epslib": 0.0,
   "frac_le_epsfix": 0.0,
   "susceptibility": "healthy",
-  "category": "genuine_failure"
+  "category": "no_susceptibility_observed"
  },
  {
   "dataset": "acoustic_scattering_maze",

@@ -56,7 +56,7 @@ def per_dataset(fp, gt10):
     elif floored and not is_gt:
         cat = "latent"
     elif (not floored) and is_gt:
-        cat = "genuine_failure"
+        cat = "no_susceptibility_observed"
     else:
         cat = "well_conditioned"
     return {"dataset": ds, "n_files": len(d.get("files", {})), "n_total": d.get("n_test_files_total"),
@@ -73,7 +73,7 @@ def main():
             if not fp.endswith("MAP.json")]
     rows = [r for r in rows if r]
     order = {"triggered_audited": 0, "artifact_suspect": 1, "latent": 2,
-             "genuine_failure": 3, "well_conditioned": 4}
+             "no_susceptibility_observed": 3, "well_conditioned": 4}
     rows.sort(key=lambda r: (order.get(r["category"], 9), r["min_var"]))
     mp = os.path.join(base, "MAP.json")
     if "--write" in sys.argv:
