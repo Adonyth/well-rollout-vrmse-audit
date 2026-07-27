@@ -51,12 +51,19 @@ def per_dataset(fp, gt10):
     gt = gt10.get(ds, "?")
     floored = suscept in ("severe", "susceptible")
     is_gt = (gt == "yes")
-    if floored and is_gt:
-        cat = "triggered_audited" if ds == "rayleigh_taylor_instability" else "artifact_suspect"
-    elif floored and not is_gt:
-        cat = "latent"
-    elif (not floored) and is_gt:
-        cat = "no_susceptibility_observed"
+    # Only "severe" means the denominator is actually floored under the PUBLISHED pipeline
+    # (eps_lib): those rows carry the artifact's necessary condition. "susceptible" rows have
+    # zero frames below eps_lib -- they would move only if the floor were changed to eps_fix,
+    # a counterfactual, so they are labelled floor-sensitive rather than condition-positive.
+    severe = (suscept == "severe")
+    if severe and is_gt:
+        cat = "triggered_audited" if ds == "rayleigh_taylor_instability" else "library_floored"
+    elif severe and not is_gt:
+        cat = "library_floored_no_headline"
+    elif suscept == "susceptible":
+        cat = "floor_sensitive_gt10" if is_gt else "floor_sensitive_no_gt10"
+    elif is_gt:
+        cat = "no_susceptibility_gt10"
     else:
         cat = "well_conditioned"
     return {"dataset": ds, "n_files": len(d.get("files", {})), "n_total": d.get("n_test_files_total"),
@@ -72,8 +79,9 @@ def main():
     rows = [per_dataset(fp, gt10) for fp in sorted(glob.glob(os.path.join(base, "*.json")))
             if not fp.endswith("MAP.json")]
     rows = [r for r in rows if r]
-    order = {"triggered_audited": 0, "artifact_suspect": 1, "latent": 2,
-             "no_susceptibility_observed": 3, "well_conditioned": 4}
+    order = {"triggered_audited": 0, "library_floored": 1, "library_floored_no_headline": 2,
+             "floor_sensitive_gt10": 3, "floor_sensitive_no_gt10": 4,
+             "no_susceptibility_gt10": 5, "well_conditioned": 6}
     rows.sort(key=lambda r: (order.get(r["category"], 9), r["min_var"]))
     mp = os.path.join(base, "MAP.json")
     if "--write" in sys.argv:

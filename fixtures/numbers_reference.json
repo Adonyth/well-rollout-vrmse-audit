@@ -726,6 +726,8 @@
    "velocity_rmse": 0.007383,
    "velocity_field_std": 8.458e-05,
    "velocity_rmse_over_std": 87.29,
+   "velocity_pred_std": 0.004538,
+   "velocity_pred_std_over_target_std": 53.65,
    "density_rmse": 0.1546,
    "density_field_std": 0.2246,
    "density_rmse_over_std": 0.6884
@@ -738,6 +740,8 @@
    "velocity_rmse": 0.004532,
    "velocity_field_std": 0.0007041,
    "velocity_rmse_over_std": 6.437,
+   "velocity_pred_std": 0.003566,
+   "velocity_pred_std_over_target_std": 5.065,
    "density_rmse": 0.1838,
    "density_field_std": 0.2235,
    "density_rmse_over_std": 0.8224
@@ -774,13 +778,17 @@
    "n_datasets": 17,
    "counts": {
     "triggered_audited": 1,
-    "artifact_suspect": 5,
-    "latent": 3,
-    "no_susceptibility_observed": 3,
+    "library_floored": 2,
+    "library_floored_no_headline": 0,
+    "floor_sensitive_gt10": 3,
+    "floor_sensitive_no_gt10": 3,
+    "no_susceptibility_gt10": 3,
     "well_conditioned": 5
    },
    "n_gt10_total": 9,
-   "n_gt10_susceptible": 6,
+   "n_gt10_library_floored": 3,
+   "n_library_floored_total": 3,
+   "n_gt10_floor_sensitive_only": 3,
    "n_gt10_no_susceptibility": 3,
    "datasets": {
     "rayleigh_taylor_instability": {
@@ -805,7 +813,7 @@
      "n_total": 35,
      "frame_stride": 1,
      "susceptibility": "severe",
-     "category": "artifact_suspect"
+     "category": "library_floored"
     },
     "active_matter": {
      "gt10": "yes",
@@ -817,7 +825,7 @@
      "n_total": 21,
      "frame_stride": 1,
      "susceptibility": "severe",
-     "category": "artifact_suspect"
+     "category": "library_floored"
     },
     "turbulent_radiative_layer_3D": {
      "gt10": "yes",
@@ -829,7 +837,7 @@
      "n_total": 9,
      "frame_stride": 3,
      "susceptibility": "susceptible",
-     "category": "artifact_suspect"
+     "category": "floor_sensitive_gt10"
     },
     "shear_flow": {
      "gt10": "yes",
@@ -841,7 +849,7 @@
      "n_total": 28,
      "frame_stride": 1,
      "susceptibility": "susceptible",
-     "category": "artifact_suspect"
+     "category": "floor_sensitive_gt10"
     },
     "turbulent_radiative_layer_2D": {
      "gt10": "yes",
@@ -853,7 +861,7 @@
      "n_total": 9,
      "frame_stride": 1,
      "susceptibility": "susceptible",
-     "category": "artifact_suspect"
+     "category": "floor_sensitive_gt10"
     },
     "viscoelastic_instability": {
      "gt10": "no",
@@ -865,7 +873,7 @@
      "n_total": 7,
      "frame_stride": 1,
      "susceptibility": "susceptible",
-     "category": "latent"
+     "category": "floor_sensitive_no_gt10"
     },
     "turbulence_gravity_cooling": {
      "gt10": "no",
@@ -877,7 +885,7 @@
      "n_total": 27,
      "frame_stride": 3,
      "susceptibility": "susceptible",
-     "category": "latent"
+     "category": "floor_sensitive_no_gt10"
     },
     "post_neutron_star_merger": {
      "gt10": "no",
@@ -889,7 +897,7 @@
      "n_total": 1,
      "frame_stride": 5,
      "susceptibility": "susceptible",
-     "category": "latent"
+     "category": "floor_sensitive_no_gt10"
     },
     "gray_scott_reaction_diffusion": {
      "gt10": "yes",
@@ -901,7 +909,7 @@
      "n_total": 6,
      "frame_stride": 1,
      "susceptibility": "healthy",
-     "category": "no_susceptibility_observed"
+     "category": "no_susceptibility_gt10"
     },
     "supernova_explosion_64": {
      "gt10": "yes",
@@ -913,7 +921,7 @@
      "n_total": 37,
      "frame_stride": 2,
      "susceptibility": "healthy",
-     "category": "no_susceptibility_observed"
+     "category": "no_susceptibility_gt10"
     },
     "euler_multi_quadrants_periodicBC": {
      "gt10": "yes",
@@ -925,7 +933,7 @@
      "n_total": 10,
      "frame_stride": 2,
      "susceptibility": "healthy",
-     "category": "no_susceptibility_observed"
+     "category": "no_susceptibility_gt10"
     },
     "acoustic_scattering_maze": {
      "gt10": "no",

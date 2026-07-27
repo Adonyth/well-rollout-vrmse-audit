@@ -23,7 +23,7 @@
   "frac_le_epslib": 1.0,
   "frac_le_epsfix": 1.0,
   "susceptibility": "severe",
-  "category": "artifact_suspect"
+  "category": "library_floored"
  },
  {
   "dataset": "active_matter",
@@ -36,7 +36,7 @@
   "frac_le_epslib": 0.7666666666666667,
   "frac_le_epsfix": 1.0,
   "susceptibility": "severe",
-  "category": "artifact_suspect"
+  "category": "library_floored"
  },
  {
   "dataset": "turbulent_radiative_layer_3D",
@@ -49,7 +49,7 @@
   "frac_le_epslib": 0.0,
   "frac_le_epsfix": 0.9,
   "susceptibility": "susceptible",
-  "category": "artifact_suspect"
+  "category": "floor_sensitive_gt10"
  },
  {
   "dataset": "shear_flow",
@@ -62,7 +62,7 @@
   "frac_le_epslib": 0.0,
   "frac_le_epsfix": 0.7333333333333333,
   "susceptibility": "susceptible",
-  "category": "artifact_suspect"
+  "category": "floor_sensitive_gt10"
  },
  {
   "dataset": "turbulent_radiative_layer_2D",
@@ -75,7 +75,7 @@
   "frac_le_epslib": 0.0,
   "frac_le_epsfix": 0.3333333333333333,
   "susceptibility": "susceptible",
-  "category": "artifact_suspect"
+  "category": "floor_sensitive_gt10"
  },
  {
   "dataset": "viscoelastic_instability",
@@ -88,7 +88,7 @@
   "frac_le_epslib": 0.0,
   "frac_le_epsfix": 1.0,
   "susceptibility": "susceptible",
-  "category": "latent"
+  "category": "floor_sensitive_no_gt10"
  },
  {
   "dataset": "turbulence_gravity_cooling",
@@ -101,7 +101,7 @@
   "frac_le_epslib": 0.0,
   "frac_le_epsfix": 1.0,
   "susceptibility": "susceptible",
-  "category": "latent"
+  "category": "floor_sensitive_no_gt10"
  },
  {
   "dataset": "post_neutron_star_merger",
@@ -114,7 +114,7 @@
   "frac_le_epslib": 0.0,
   "frac_le_epsfix": 1.0,
   "susceptibility": "susceptible",
-  "category": "latent"
+  "category": "floor_sensitive_no_gt10"
  },
  {
   "dataset": "gray_scott_reaction_diffusion",
@@ -127,7 +127,7 @@
   "frac_le_epslib": 0.0,
   "frac_le_epsfix": 0.0,
   "susceptibility": "healthy",
-  "category": "no_susceptibility_observed"
+  "category": "no_susceptibility_gt10"
  },
  {
   "dataset": "supernova_explosion_64",
@@ -140,7 +140,7 @@
   "frac_le_epslib": 0.0,
   "frac_le_epsfix": 0.0,
   "susceptibility": "healthy",
-  "category": "no_susceptibility_observed"
+  "category": "no_susceptibility_gt10"
  },
  {
   "dataset": "euler_multi_quadrants_periodicBC",
@@ -153,7 +153,7 @@
   "frac_le_epslib": 0.0,
   "frac_le_epsfix": 0.0,
   "susceptibility": "healthy",
-  "category": "no_susceptibility_observed"
+  "category": "no_susceptibility_gt10"
  },
  {
   "dataset": "acoustic_scattering_maze",
