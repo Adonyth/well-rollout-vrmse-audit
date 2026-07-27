@@ -307,7 +307,7 @@ def main() -> int:
     # denominator-conditioning census is data-only/streamed and its numbers are outside Tier 1,
     # but the assembled categories in Table tab:map must follow deterministically from the frozen
     # per-dataset census outputs and the frozen Well Table-3 status -- assemble_map.py re-derives
-    # them and checks cell-for-cell against the packaged MAP.json).
+    # them and checks every stored field of every row against the packaged MAP.json).
     import os as _os, subprocess as _sub
     _asm = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "scripts", "assemble_map.py")
     if not _os.path.exists(_asm):

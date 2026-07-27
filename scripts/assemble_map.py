@@ -87,6 +87,10 @@ def main():
         return {k: (float(f"{v:.6g}") if isinstance(v, float) else v) for k, v in r.items()}
 
     fz = {r["dataset"]: norm(r) for r in frozen}
+    cur = {r["dataset"] for r in rows}
+    if set(fz) != cur:
+        print("MAP MISMATCH: dataset sets differ; frozen-only:", sorted(set(fz) - cur),
+              "recomputed-only:", sorted(cur - set(fz))); sys.exit(1)
     bad = [r["dataset"] for r in rows if fz.get(r["dataset"]) != norm(r)]
     if bad:
         print("MAP MISMATCH on:", bad); sys.exit(1)

@@ -2,10 +2,9 @@
  "_meta": {
   "sources": {
    "summary_json": "lanes/p3-quant/results/summary.json",
-   "report_numbers_json": "lanes/lane-3/results/report_numbers.json",
-   "check_decomposition_py": "repro-harness/verify.py (imported to derive the 142-check grouping)"
+   "report_numbers_json": "lanes/lane-3/results/report_numbers.json"
   },
-  "note": "Numeric leaves traceable to summary.json / report_numbers.json; the 142-check grouping is derived from verify.py; regenerate via extract_numbers.py."
+  "note": "All leaves traceable to the two source files; regenerate via extract_numbers.py."
  },
  "paper_values": {
   "table2_onestep": {
@@ -697,6 +696,21 @@
   "spatial_mean_baseline": 2,
   "total": 142
  },
+ "onestep_sampled_max_derived": {
+  "_derivation": "max over all packaged onestep rows of field-mean library-VRMSE (aggregate_results.field_mean_vrmse, EPS_LIB), per model; n = count of packaged onestep rows",
+  "UNetClassic": {
+   "max_lib_vrmse": 6.479,
+   "n_sampled_starts": 220
+  },
+  "UNetConvNext": {
+   "max_lib_vrmse": 3.024,
+   "n_sampled_starts": 5
+  },
+  "FNO": {
+   "max_lib_vrmse": 730.4,
+   "n_sampled_starts": 14
+  }
+ },
  "generalization": {
   "method": "data-only spatial-variance census, benchmark rollout window frames 4-33; floors eps_lib=1e-7 (headline) and eps_fix=1e-5 (better-conditioned)",
   "rayleigh_benard": {
@@ -704,7 +718,7 @@
    "n_trajectories_censused": 6,
    "velocity_frac_below_epsfix_Ra1e6": 1.0,
    "velocity_frac_below_epsfix_Ra1e7": 1.0,
-   "velocity_frac_below_epsfix_Ra1e8": 0.63,
+   "velocity_frac_below_epsfix_Ra1e8": 0.633,
    "buoyancy_var_min": 0.043,
    "buoyancy_var_max": 0.102,
    "buoyancy_frac_below_epsfix": 0.0,
@@ -717,9 +731,9 @@
     "cnextunet": 0.6699
    },
    "rollout_gt10_all_four_both_windows_table3": true,
-   "velocity_frac_below_epslib_Ra1e6": 1.0,
-   "velocity_frac_below_epslib_Ra1e7": 0.75,
-   "velocity_frac_below_epslib_Ra1e8": 0.48,
+   "velocity_frac_below_epslib_Ra1e6_mean": 0.992,
+   "velocity_frac_below_epslib_Ra1e7_mean": 0.767,
+   "velocity_frac_below_epslib_Ra1e8_mean": 0.475,
    "velocity_frac_below_epsfix_Ra1e8_min": 0.6,
    "n_test_split_files_total": 35
   },
@@ -942,21 +956,6 @@
      "category": "well_conditioned"
     }
    }
-  }
- },
- "onestep_sampled_max_derived": {
-  "_derivation": "max over all packaged onestep rows of field-mean library-VRMSE (aggregate_results.field_mean_vrmse, EPS_LIB), per model; n = count of packaged onestep rows",
-  "UNetClassic": {
-   "max_lib_vrmse": 6.479,
-   "n_sampled_starts": 220
-  },
-  "UNetConvNext": {
-   "max_lib_vrmse": 3.024,
-   "n_sampled_starts": 5
-  },
-  "FNO": {
-   "max_lib_vrmse": 730.4,
-   "n_sampled_starts": 14
   }
  }
 }
