@@ -716,6 +716,33 @@
    "n_sampled_starts": 14
   }
  },
+ "unetclassic_floor_sweep_derived": {
+  "_derivation": "UNetClassic rollout window means (same aggregation as the reported cells) recomputed at four denominator floors; eps=0 is the metric's definitional limit, mean_f sqrt(MSE_f/Var_f). VRMSE is monotone decreasing in eps.",
+  "window_6_12": {
+   "eps_0_definitional": 91.4592,
+   "eps_1e9": 68.6105,
+   "eps_lib_1e7": 16.4637,
+   "eps_fix_1e5": 1.92743,
+   "velocity_rmse": 0.007383,
+   "velocity_field_std": 8.458e-05,
+   "velocity_rmse_over_std": 87.29,
+   "density_rmse": 0.1546,
+   "density_field_std": 0.2246,
+   "density_rmse_over_std": 0.6884
+  },
+  "window_13_30": {
+   "eps_0_definitional": 16.2284,
+   "eps_1e9": 14.868,
+   "eps_lib_1e7": 6.73812,
+   "eps_fix_1e5": 1.26658,
+   "velocity_rmse": 0.004532,
+   "velocity_field_std": 0.0007041,
+   "velocity_rmse_over_std": 6.437,
+   "density_rmse": 0.1838,
+   "density_field_std": 0.2235,
+   "density_rmse_over_std": 0.8224
+  }
+ },
  "generalization": {
   "method": "data-only spatial-variance census, benchmark rollout window frames 4-33; floors eps_lib=1e-7 (headline) and eps_fix=1e-5 (better-conditioned)",
   "rayleigh_benard": {
