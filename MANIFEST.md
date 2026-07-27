@@ -220,11 +220,17 @@ aggregation — the shear-flow device-precision cross-check below, and the
 paper's Appendix regression-anchor reproduction, Table~tab:anchor). To be
 precise about what is and is not shipped: the issue-#78 last-batch-versus-
 all-batch **counterfactual cells** are among the 142 checks (recomputed here
-from the packaged per-window scalars), but the **real-library reproducers**
-that exhibit each defect inside the audited library itself are not included
-in this package — they are referenced from here by their source-repository
-script names and invocations, and re-running them requires that repository
-plus the pinned upstream library, not this harness alone.
+from the packaged per-window scalars), and the **real-library reproducers**
+that exhibit each defect inside the audited library itself now ship in this
+package as documented, runnable extras:
+
+    python3 scripts/test_vrmse_epsilon.py    # issue #75 — epsilon propagation
+    python3 scripts/test_lastbatch_agg.py    # issue #78 — last-batch aggregation
+
+Both call the real pinned library (`the_well`) and therefore additionally
+require `pip install the_well torch` (heavy dependencies); they run on
+synthetic fixture tensors, print the numeric defect contrast, and are outside
+the offline Tier-1 exit code, which needs NumPy only.
 
 ## Discipline notes carried over from the source repo
 

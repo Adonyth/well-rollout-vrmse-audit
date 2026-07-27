@@ -2,7 +2,12 @@
  "_meta": {
   "sources": {
    "summary_json": "lanes/p3-quant/results/summary.json",
-   "report_numbers_json": "lanes/lane-3/results/report_numbers.json"
+   "report_numbers_json": "lanes/lane-3/results/report_numbers.json",
+   "onestep_fixtures": "repro-harness/fixtures/models/*.json.gz (sampled-start maxima, via aggregate_results.field_mean_vrmse)",
+   "rb_census": "repro-harness/fixtures/generalization/rayleigh_benard_census.json",
+   "well_tables_record": "repro-harness/fixtures/generalization/well_table3_gt10.json (Table-3 >10 status + frozen Table-2 RB row)",
+   "benchmark_map": "repro-harness/fixtures/generalization/benchmark_map/MAP.json",
+   "check_counts": "repro-harness/verify.py (imported to derive the 142-check grouping)"
   },
   "note": "All leaves traceable to the two source files; regenerate via extract_numbers.py."
  },
@@ -63,7 +68,7 @@
     "subset_mean_eps5": 40.01531899910363,
     "interp115_mean_lib": 215.82489526649488,
     "interp115_mean_eps5": 39.2826645550677,
-    "well_conditioned_windows_mean_lib": NaN,
+    "well_conditioned_windows_mean_lib": "non-finite",
     "n_well_conditioned": 0,
     "ill_conditioned_windows_mean_lib": 332.10706556312863,
     "n_ill_conditioned": 14
@@ -77,12 +82,12 @@
     "velocity_only_eps5": 1.55858310294362e+23
    },
    "rollout_13_30": {
-    "lib": NaN,
-    "eps5": NaN,
-    "density_only_lib": NaN,
-    "density_only_eps5": NaN,
-    "velocity_only_lib": NaN,
-    "velocity_only_eps5": NaN
+    "lib": "non-finite",
+    "eps5": "non-finite",
+    "density_only_lib": "non-finite",
+    "density_only_eps5": "non-finite",
+    "velocity_only_lib": "non-finite",
+    "velocity_only_eps5": "non-finite"
    },
    "rollout_6_12_per_trajectory_lib": {
     "rayleigh_taylor_instability_At_25.hdf5:0": 2.9592813456386127e+22,
@@ -99,8 +104,8 @@
    "issue78": {
     "last_batch_window_6_12": 2.203248334295861e+24,
     "all_batch_window_6_12": 1.1164205738761235e+24,
-    "last_batch_window_13_30": NaN,
-    "all_batch_window_13_30": NaN
+    "last_batch_window_13_30": "non-finite",
+    "all_batch_window_13_30": "non-finite"
    },
    "density_only_onestep_start0": {
     "rayleigh_taylor_instability_At_75.hdf5:1": {
@@ -199,7 +204,7 @@
     "subset_mean_eps5": 0.459533404263642,
     "interp115_mean_lib": 1.796370447338665,
     "interp115_mean_eps5": 0.4572078552908556,
-    "well_conditioned_windows_mean_lib": NaN,
+    "well_conditioned_windows_mean_lib": "non-finite",
     "n_well_conditioned": 0,
     "ill_conditioned_windows_mean_lib": 2.706116013903056,
     "n_ill_conditioned": 5
