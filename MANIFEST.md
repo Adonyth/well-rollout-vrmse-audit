@@ -26,7 +26,7 @@ private paths, no credentials.
 | Raw HDF5 field tensors (RT test split) | ~40 GB across 5 objects | `https://sdsc-users.flatironinstitute.org/~polymathic/data/the_well/datasets/rayleigh_taylor_instability/data/test/*.hdf5` | No — streamed via HTTP range GETs by `scripts/fast_reader.py`, never written to disk in bulk |
 | RT model checkpoints | 3 models, ~1.4 GB total | Hugging Face Hub, see table below | No — downloaded on demand into a local `hf-cache/` by `scripts/rt_model_eval.py` (standard `from_pretrained(revision=..., cache_dir=...)`) |
 | Shear-flow FNO checkpoint (device-precision cross-check only) | 1 model | Hugging Face Hub, see "Tier 2 continued" below | No — downloaded on demand by `scripts/shear_checkpoint_eval.py` |
-| Benchmark-wide denominator-conditioning census (paper §generalize, Table `tab:map`) | `fixtures/generalization/benchmark_map/*.json` (per-dataset outputs + `MAP.json`) | `scripts/well_denominator_census.py` (auto-discovering, data-only) over every Well dataset's public test split; assembled by `scripts/assemble_map.py` | Yes — frozen outputs packaged; **not** part of the 142 Tier-1 checks (streamed data-only, no model), re-runnable from the two scripts. The Rayleigh–Bénard detail fixture `fixtures/generalization/rayleigh_benard_census.json` (via `scripts/rb_census.py`) is the same census restricted to the RB Prandtl-1 spread. |
+| Benchmark-wide denominator-conditioning census (paper §generalize, Table `tab:map`) | `fixtures/generalization/benchmark_map/*.json` (per-dataset outputs + `MAP.json`) | `scripts/well_denominator_census.py` (auto-discovering, data-only) over every Well dataset's public test split; assembled by `scripts/assemble_map.py` | Yes — frozen outputs packaged; **not** part of the 142 Tier-1 checks (streamed data-only, no model), re-runnable from the two scripts. Upstream revisions for every censused dataset are frozen in `fixtures/generalization/census_source_revisions.json` (HF repo SHA + lastModified per dataset; per-object ETag/size via the SDSC mirror for the one gated variant), captured 2026-07-27; new census runs record their own `source_revision` and `captured_utc`. The Rayleigh–Bénard detail fixture `fixtures/generalization/rayleigh_benard_census.json` (via `scripts/rb_census.py`) is the same census restricted to the RB Prandtl-1 spread. |
 
 ## Public Well test-split objects (audited, `fixtures/audit/provenance.json`)
 
@@ -57,6 +57,12 @@ its published-table cell for comparison only.)
 
 ## Exact commands (Tier 2 — cold reproduction of the raw fixtures)
 
+These are the invocations that actually generated the packaged fixtures, device flags
+included: the two U-net checkpoints were scored on `mps` (Apple Silicon) and FNO on `cpu`, as
+recorded in `fixtures/models/provenance_<model>.json`. Substituting `--device cpu` reproduces
+them up to the float32 device difference discussed in the paper's boundaries section (measured
+at ~1e-7 relative on the same codebase's shear diagnostic), not bit-for-bit.
+
 Run from `repro-harness/scripts/`. Each command skips output files
 that already exist at the target `--output-dir` (re-running refreshes the
 run-provenance record), streams data over HTTPS,
@@ -75,7 +81,7 @@ python3 rt_audit_pass.py --files 0,1,2,3,4 --output-dir ../results/audit
 # (0=At_0625, 1=At_125, 2=At_25, 3=At_50, 4=At_75). Exact pairs/starts below are
 # the ones actually used to produce the packaged fixtures -- see
 # fixtures/models/provenance_<model>.json for the authoritative record.)
-python3 rt_model_eval.py --model UNetClassic --device cpu \
+python3 rt_model_eval.py --model UNetClassic --device mps \
     --revision 3a13f12900bce9be214d70b411d1a112b10fb493 \
     --pairs "0:0;0:1;1:0;1:1;2:0;2:1;3:0;3:1;4:0;4:1" \
     --onestep-starts 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,19,29,39,59,79,99,114 \
@@ -87,7 +93,7 @@ python3 rt_model_eval.py --model FNO --device cpu \
     --onestep-starts 0,2,5,8,12,20,29 \
     --output-dir ../results/models --cache-dir ../hf-cache
 
-python3 rt_model_eval.py --model UNetConvNext --device cpu \
+python3 rt_model_eval.py --model UNetConvNext --device mps \
     --revision 835c7bcbfdaa302a097e78b6637608cb63d749ad \
     --pairs "4:1" \
     --onestep-starts 0,2,5,12,29 \

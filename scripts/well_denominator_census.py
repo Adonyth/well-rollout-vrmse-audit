@@ -103,9 +103,21 @@ def main():
     picked = pick_spread(sorted(all_files), n_files)
     base = base_override if base_override else RESOLVE.format(ds=ds)
     fs = fsspec.filesystem("http")
+    # Record the upstream revision the run streamed, so a later reader can tell whether the
+    # frozen outputs correspond to the same bytes (the endpoints below are mutable).
+    rev = None
+    try:
+        with urllib.request.urlopen(
+                f"https://huggingface.co/api/datasets/polymathic-ai/{ds}", timeout=45) as _r:
+            _info = json.load(_r)
+        rev = {"sha": _info.get("sha"), "lastModified": _info.get("lastModified")}
+    except Exception as _e:                     # gated or mirrored datasets
+        rev = {"error": str(_e)[:80]}
     out = {"dataset": ds, "n_test_files_total": len(all_files),
            "window_frames": [win0, win1], "frame_stride": fstride,
            "eps_lib": EPS_LIB, "eps_fix": EPS_FIX,
+           "source_revision": rev,
+           "captured_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
            "files_censused": picked, "files": {}}
     for fn in picked:
         t = time.time()

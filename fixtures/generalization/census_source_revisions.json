@@ -1,0 +1,96 @@
+{
+ "_captured_utc": "2026-07-28T02:04:37Z",
+ "_note": "HuggingFace dataset revision at capture time for each censused Well dataset; the census streamed main, so these SHAs identify the tree the frozen outputs correspond to (subject to the boundary stated in the paper).",
+ "datasets": {
+  "MHD_64": {
+   "sha": "ede5ad0479ede939d5b0cc616e45fd9d3cbcb245",
+   "lastModified": "2026-02-25T20:03:13.000Z"
+  },
+  "acoustic_scattering_maze": {
+   "sha": "8df383a3223f40f7ce66fe77b4ff4d7006dbc272",
+   "lastModified": "2025-04-10T07:50:04.000Z"
+  },
+  "active_matter": {
+   "sha": "dc3e9135a75b4e5a0d979086219fc97fe668f7a3",
+   "lastModified": "2025-04-10T07:50:05.000Z"
+  },
+  "convective_envelope_rsg": {
+   "sha": "6eae51fa43b0ae03bf98c64c4b8e1892278d0fab",
+   "lastModified": "2025-04-10T07:50:06.000Z"
+  },
+  "euler_multi_quadrants_periodicBC": {
+   "_source": "HuggingFace repo is gated (401); censused via the SDSC public mirror, per-object ETag/size captured instead of a repo revision",
+   "mirror": "https://sdsc-users.flatironinstitute.org/~polymathic/data/the_well/datasets/euler_multi_quadrants_periodicBC/data/test/",
+   "objects": {
+    "euler_multi_quadrants_periodicBC_gamma_1.13_C3H8_16.hdf5": {
+     "etag": "\"6751b64b-62a206510\"",
+     "bytes": 26476569872,
+     "last_modified": "Thu, 05 Dec 2024 14:18:51 GMT"
+    },
+    "euler_multi_quadrants_periodicBC_gamma_1.365_Dry_air_1000.hdf5": {
+     "etag": "\"6751b883-62a206510\"",
+     "bytes": 26476569872,
+     "last_modified": "Thu, 05 Dec 2024 14:28:19 GMT"
+    },
+    "euler_multi_quadrants_periodicBC_gamma_1.453_H2_-76.hdf5": {
+     "etag": "\"6751ba05-62a206510\"",
+     "bytes": 26476569872,
+     "last_modified": "Thu, 05 Dec 2024 14:34:45 GMT"
+    },
+    "euler_multi_quadrants_periodicBC_gamma_1.76_Ar_-180.hdf5": {
+     "etag": "\"6751bc04-62a206510\"",
+     "bytes": 26476569872,
+     "last_modified": "Thu, 05 Dec 2024 14:43:16 GMT"
+    }
+   }
+  },
+  "gray_scott_reaction_diffusion": {
+   "sha": "913ef5679d5c4b4ccd6fcd52c055509dfbf190f9",
+   "lastModified": "2025-04-10T07:50:08.000Z"
+  },
+  "helmholtz_staircase": {
+   "sha": "a24295051ca7ff772b08c9e1645d965b057c6298",
+   "lastModified": "2025-04-10T07:50:09.000Z"
+  },
+  "planetswe": {
+   "sha": "33eabc3e7e33454644ce5c10aee76b2e22605abd",
+   "lastModified": "2025-04-10T07:50:10.000Z"
+  },
+  "post_neutron_star_merger": {
+   "sha": "721253cd3220d158d3088c0cce4558dd444d1353",
+   "lastModified": "2025-04-10T07:50:12.000Z"
+  },
+  "rayleigh_benard": {
+   "sha": "10e143ebedae8a9b1c699b95d5b1eb8feaae09b5",
+   "lastModified": "2025-04-10T07:50:13.000Z"
+  },
+  "rayleigh_taylor_instability": {
+   "sha": "75166ae3304f95747519ce35c2e03c0c295a2691",
+   "lastModified": "2025-04-10T07:50:15.000Z"
+  },
+  "shear_flow": {
+   "sha": "fc867f856f306905cf94c1f5df978cc518a2048c",
+   "lastModified": "2025-04-10T07:50:17.000Z"
+  },
+  "supernova_explosion_64": {
+   "sha": "319706c855f5701908874426aef4785367160938",
+   "lastModified": "2025-04-10T07:50:19.000Z"
+  },
+  "turbulence_gravity_cooling": {
+   "sha": "0ba58e6bc59ab2a98ad36a62b69e6649d24789fa",
+   "lastModified": "2025-04-10T07:50:20.000Z"
+  },
+  "turbulent_radiative_layer_2D": {
+   "sha": "2ee7756575ff6f90981d0308cbcb6a2ab5995bdc",
+   "lastModified": "2025-04-10T07:50:21.000Z"
+  },
+  "turbulent_radiative_layer_3D": {
+   "sha": "26fe3aa1ce19d374f1f83f1346650d0efba5046d",
+   "lastModified": "2025-12-24T18:26:09.000Z"
+  },
+  "viscoelastic_instability": {
+   "sha": "cf278827760865b35ae89326f919bb85abc49372",
+   "lastModified": "2025-04-10T07:50:23.000Z"
+  }
+ }
+}
