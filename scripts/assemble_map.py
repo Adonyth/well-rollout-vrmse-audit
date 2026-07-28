@@ -66,9 +66,15 @@ def per_dataset(fp, gt10):
         cat = "no_susceptibility_gt10"
     else:
         cat = "well_conditioned"
+    # Continuous conditioning measure: what fraction of the metric's denominator the floor
+    # supplies at this dataset's least-conditioned field, eps/(var+eps). VRMSE depends
+    # smoothly on var+eps -- nothing discontinuous happens at var=eps -- so this share, not
+    # a threshold crossing, is the honest severity axis.
+    floor_share = EPSLIB / (gmin + EPSLIB)
     return {"dataset": ds, "n_files": len(d.get("files", {})), "n_total": d.get("n_test_files_total"),
             "frame_stride": d.get("frame_stride", 1), "gt10": gt,
             "most_susceptible_field": fld, "min_var": gmin,
+            "floor_share_epslib": float(f"{floor_share:.6g}"),
             "frac_le_epslib": b["flib"], "frac_le_epsfix": b["ffix"],
             "susceptibility": suscept, "category": cat}
 
