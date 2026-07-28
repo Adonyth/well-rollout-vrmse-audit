@@ -702,18 +702,42 @@
   "total": 142
  },
  "onestep_sampled_max_derived": {
-  "_derivation": "max over all packaged onestep rows of field-mean library-VRMSE (aggregate_results.field_mean_vrmse, EPS_LIB), per model; n = count of packaged onestep rows",
+  "_derivation": "per model, over all packaged onestep rows: the maximum field-mean VRMSE at each of the four swept floors and the number of sampled starts exceeding ten there (aggregate_results.field_mean_vrmse)",
   "UNetClassic": {
-   "max_lib_vrmse": 6.479,
-   "n_sampled_starts": 220
+   "max_lib": 6.479,
+   "n_above_ten_lib": 0,
+   "max_fix": 0.7916,
+   "n_above_ten_fix": 0,
+   "max_e9": 42.32,
+   "n_above_ten_e9": 39,
+   "max_defn": 107.4,
+   "n_above_ten_defn": 60,
+   "n_sampled_starts": 220,
+   "max_lib_vrmse": 6.479
   },
   "UNetConvNext": {
-   "max_lib_vrmse": 3.024,
-   "n_sampled_starts": 5
+   "max_lib": 3.024,
+   "n_above_ten_lib": 0,
+   "max_fix": 0.4608,
+   "n_above_ten_fix": 0,
+   "max_e9": 13.77,
+   "n_above_ten_e9": 3,
+   "max_defn": 26.06,
+   "n_above_ten_defn": 3,
+   "n_sampled_starts": 5,
+   "max_lib_vrmse": 3.024
   },
   "FNO": {
-   "max_lib_vrmse": 730.4,
-   "n_sampled_starts": 14
+   "max_lib": 730.4,
+   "n_above_ten_lib": 11,
+   "max_fix": 78.7,
+   "n_above_ten_fix": 7,
+   "max_e9": 3904.0,
+   "n_above_ten_e9": 12,
+   "max_defn": 8401.0,
+   "n_above_ten_defn": 12,
+   "n_sampled_starts": 14,
+   "max_lib_vrmse": 730.4
   }
  },
  "unetclassic_floor_sweep_derived": {
@@ -766,7 +790,7 @@
     "unet": 1.486,
     "cnextunet": 0.6699
    },
-   "rollout_gt10_all_four_both_windows_table3": true,
+   "rollout_gt10_flag_table3": true,
    "velocity_frac_below_epslib_Ra1e6_mean": 0.992,
    "velocity_frac_below_epslib_Ra1e7_mean": 0.767,
    "velocity_frac_below_epslib_Ra1e8_mean": 0.475,
@@ -785,6 +809,8 @@
     "no_susceptibility_gt10": 3,
     "well_conditioned": 5
    },
+   "censused_field_frames_min": 18,
+   "censused_field_frames_max": 1980,
    "n_gt10_total": 9,
    "n_gt10_library_floored": 3,
    "n_library_floored_total": 3,
