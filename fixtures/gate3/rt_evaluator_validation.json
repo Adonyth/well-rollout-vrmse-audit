@@ -1,0 +1,67 @@
+{
+ "tol": 1e-05,
+ "worst": 6.575951467689588e-08,
+ "validated": true,
+ "windows": [
+  {
+   "idx": 0,
+   "file": "rayleigh_taylor_instability_At_0625.hdf5",
+   "traj": 0,
+   "start": 0,
+   "lib_vrmse": 32.105812072753906,
+   "our_vrmse": 32.1058136994354,
+   "lib_vrmse_raw": 0.5571619395307548,
+   "our_vrmse_raw": 0.5571619395307548,
+   "d_input": 0.0,
+   "d_target": 0.0,
+   "d_output": 0.0,
+   "d_vrmse": 5.0666262282831444e-08,
+   "d_vrmse_raw": 0.0
+  },
+  {
+   "idx": 383,
+   "file": "rayleigh_taylor_instability_At_125.hdf5",
+   "traj": 1,
+   "start": 38,
+   "lib_vrmse": 0.1346854269504547,
+   "our_vrmse": 0.13468543580730302,
+   "lib_vrmse_raw": 0.13308530833283597,
+   "our_vrmse_raw": 0.13308530833283597,
+   "d_input": 0.0,
+   "d_target": 0.0,
+   "d_output": 0.0,
+   "d_vrmse": 6.575951467689588e-08,
+   "d_vrmse_raw": 0.0
+  },
+  {
+   "idx": 766,
+   "file": "rayleigh_taylor_instability_At_50.hdf5",
+   "traj": 0,
+   "start": 76,
+   "lib_vrmse": 0.22416798770427704,
+   "our_vrmse": 0.22416799068008905,
+   "lib_vrmse_raw": 0.22411832880475696,
+   "our_vrmse_raw": 0.22411832880475696,
+   "d_input": 0.0,
+   "d_target": 0.0,
+   "d_output": 0.0,
+   "d_vrmse": 1.3274919599128189e-08,
+   "d_vrmse_raw": 0.0
+  },
+  {
+   "idx": 1149,
+   "file": "rayleigh_taylor_instability_At_75.hdf5",
+   "traj": 1,
+   "start": 114,
+   "lib_vrmse": 0.41962963342666626,
+   "our_vrmse": 0.4196296123256462,
+   "lib_vrmse_raw": 0.4196189743536438,
+   "our_vrmse_raw": 0.4196189743536438,
+   "d_input": 0.0,
+   "d_target": 0.0,
+   "d_output": 0.0,
+   "d_vrmse": 5.0284866371496594e-08,
+   "d_vrmse_raw": 0.0
+  }
+ ]
+}

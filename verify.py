@@ -320,6 +320,110 @@ def main() -> int:
         print("FAIL: benchmark-map categories disagree with the frozen census + Table-3 status")
         return 1
 
+    # Gate 3 (appendix): the packaged library-equivalence fixture must still say what the
+    # appendix claims -- every compared tensor bit-identical, the metric within tolerance,
+    # and the window/file counts unchanged. This is a consistency gate over the frozen
+    # fixture, not a re-execution: reproducing it from scratch requires network access to
+    # HuggingFace and the SDSC mirror plus the pinned checkpoints, which verify.py does not
+    # assume. scripts/gate3_recheck.py re-runs the live comparison when those are available.
+    _g3 = FIXTURES / "gate3" / "library_equivalence.json"
+    if not _g3.exists():
+        print("FAIL: fixtures/gate3/library_equivalence.json missing -- Gate 3 cannot be checked")
+        return 1
+    g3 = json.loads(_g3.read_text())
+    g3ref = reference.get("gate3_library_equivalence", {})
+    g3_bad = 0
+    # Assert the EXPECTED comparison legs per dataset rather than globbing whichever keys
+    # happen to exist: a missing leg previously passed vacuously while the manuscript claimed
+    # the comparison had been made.
+    _TKEY = {"model_input": "rel_diff_input", "target": "rel_diff_target",
+             "model_output": "rel_diff_output"}
+    for dset, d in sorted(g3["datasets"].items()):
+        declared = d.get("tensors_compared", [])
+        expected = {_TKEY[t] for t in declared}
+        if not expected:
+            print(f"  [FAIL] gate3 {dset}: declares no compared tensors")
+            g3_bad += 1
+        for w in d["windows"]:
+            missing = expected - set(w)
+            if missing:
+                print(f"  [FAIL] gate3 {dset} window {w.get('start')}: missing {sorted(missing)}")
+                g3_bad += 1
+        ref_declared = g3ref.get("datasets", {}).get(dset, {}).get("tensors_compared")
+        if ref_declared is not None and sorted(ref_declared) != sorted(declared):
+            print(f"  [FAIL] gate3 {dset}: tensors_compared {declared} vs numbers.json {ref_declared}")
+            g3_bad += 1
+        tens = [w[k] for w in d["windows"] for k in _TKEY.values() if k in w]
+        worst_t = max(tens)
+        worst_v = max(w["rel_diff_vrmse"] for w in d["windows"])
+        ok = (worst_t == 0.0
+              and worst_v < g3["tolerance"]
+              and d["n_windows"] == g3ref.get("datasets", {}).get(dset, {}).get("n_windows")
+              and d["n_files"] == g3ref.get("datasets", {}).get(dset, {}).get("n_files"))
+        print(f"  [{'OK  ' if ok else 'FAIL'}] gate3 {dset}: {d['n_windows']} windows / "
+              f"{d['n_files']} files, worst tensor rel diff {worst_t:g}, "
+              f"worst VRMSE rel diff {worst_v:.3e}")
+        g3_bad += not ok
+    if g3["summary"]["n_windows_total"] != g3ref.get("n_windows_total"):
+        print("FAIL: gate3 window count disagrees with numbers.json")
+        g3_bad += 1
+    if g3_bad:
+        print("FAIL: Gate 3 library-equivalence fixture no longer supports the appendix claim")
+        return 1
+    print(f"[gate3] library equivalence OK ({g3['summary']['n_windows_total']} windows, "
+          f"all compared tensors bit-identical)")
+
+    # Rayleigh-Benard checkpoint audit (second audited dataset, paper section 'generalize'):
+    # re-derive the cited cells from the packaged per-window scalars and compare with
+    # numbers.json, rather than trusting the stored aggregate.
+    _rb = SCRIPTS / "rb_checkpoint_audit.py"
+    if not _rb.exists():
+        print("FAIL: scripts/rb_checkpoint_audit.py missing -- the RB audit cannot be re-derived")
+        return 1
+    sys.path.insert(0, str(SCRIPTS))
+    import importlib
+    rbmod = importlib.import_module("rb_checkpoint_audit")
+    rb_now = rbmod.build()
+    rb_ref = reference.get("rb_checkpoint_audit", {})
+    rb_bad = 0
+    for model in sorted(rb_now["rollout_windows"]):
+        for win in ("6-12", "13-30"):
+            for floor in ("library", "eps_fix"):
+                got = rb_now["rollout_windows"][model][win][floor]
+                want = dig(rb_ref, f"rollout_windows.{model}.{win}.{floor}")
+                if not sig4_equal(got, want):
+                    print(f"  [FAIL] rb rollout {model} {win} {floor}: {got!r} vs {want!r}")
+                    rb_bad += 1
+        for key in ("library", "ratio_library_over_published"):
+            got = rb_now["onestep"][model][key]
+            want = dig(rb_ref, f"onestep.{model}.{key}")
+            if not sig4_equal(got, want):
+                print(f"  [FAIL] rb onestep {model} {key}: {got!r} vs {want!r}")
+                rb_bad += 1
+        # both floors AND both weightings: the span-weighted figures are the ones the paper
+        # quotes, the unweighted ones are reported alongside them, and a single-floor or
+        # single-weighting assertion is exactly what let an unlabelled ratio reach the abstract
+        for floor in ("library", "eps_fix", "library_unweighted", "eps_fix_unweighted"):
+            for key in ("quiescent_mean", "developed_mean", "ratio"):
+                got = rb_now["quiescent_developed"][model][floor][key]
+                want = dig(rb_ref, f"quiescent_developed.{model}.{floor}.{key}")
+                if not sig4_equal(got, want):
+                    print(f"  [FAIL] rb quiescent/developed {model} {floor}.{key}: "
+                          f"{got!r} vs {want!r}")
+                    rb_bad += 1
+    g10, g10ref = rb_now["gt10_summary"], rb_ref.get("gt10_summary", {})
+    for key in ("n_cells", "n_reproduced_at_library_floor", "n_still_gt10_at_eps_fix"):
+        if g10[key] != g10ref.get(key):
+            print(f"  [FAIL] rb gt10_summary {key}: {g10[key]!r} vs {g10ref.get(key)!r}")
+            rb_bad += 1
+    if rb_bad:
+        print(f"FAIL: Rayleigh-Benard checkpoint audit disagrees with numbers.json ({rb_bad})")
+        return 1
+    print(f"[rb] checkpoint audit OK: {rb_now['protocol']['n_rows']} rows re-derived, "
+          f"{g10['n_reproduced_at_library_floor']}/{g10['n_cells']} published '>10' rollout "
+          f"cells reproduced at the library floor, {g10['n_still_gt10_at_eps_fix']} still "
+          f">10 under the better-conditioned floor")
+
     print("PASS: repro-harness regenerates the frozen P3 values to a relative tolerance of 1e-4 (~4 sig figs).")
     return 0
 

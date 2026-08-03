@@ -1,0 +1,195 @@
+{
+ "datasets": {
+  "rayleigh_benard": {
+   "all_tensors_bit_identical": true,
+   "checkpoint": "polymathic-ai/UNetClassic-rayleigh_benard",
+   "library_source": "HuggingFace",
+   "n_files": 5,
+   "n_windows": 5,
+   "our_source": "HuggingFace",
+   "revision": "b72b1213dade391e4620476d1410c1bbe7103c1d",
+   "tensors_compared": [
+    "model_input",
+    "target",
+    "model_output"
+   ],
+   "windows": [
+    {
+     "eps": 1e-07,
+     "file": "rayleigh_benard_Rayleigh_1e10_Prandtl_1.hdf5",
+     "library_vrmse_raw": 3.470713199624999,
+     "library_vrmse_zscored": 14.506383895874023,
+     "our_vrmse_raw": 3.470713199624999,
+     "our_vrmse_zscored": 14.50638358781993,
+     "rel_diff_input": 0.0,
+     "rel_diff_output": 0.0,
+     "rel_diff_target": 0.0,
+     "rel_diff_vrmse": 2.123576050687106e-08,
+     "rel_diff_vrmse_raw": 0.0,
+     "start": 0,
+     "trajectory": 0
+    },
+    {
+     "eps": 1e-07,
+     "file": "rayleigh_benard_Rayleigh_1e10_Prandtl_2e-1.hdf5",
+     "library_vrmse_raw": 0.13990540264358137,
+     "library_vrmse_zscored": 0.1399056315422058,
+     "our_vrmse_raw": 0.13990540264358137,
+     "our_vrmse_zscored": 0.13990562185582106,
+     "rel_diff_input": 0.0,
+     "rel_diff_output": 0.0,
+     "rel_diff_target": 0.0,
+     "rel_diff_vrmse": 6.923513116003279e-08,
+     "rel_diff_vrmse_raw": 0.0,
+     "start": 195,
+     "trajectory": 4
+    },
+    {
+     "eps": 1e-07,
+     "file": "rayleigh_benard_Rayleigh_1e6_Prandtl_1e-1.hdf5",
+     "library_vrmse_raw": 0.027224350007146233,
+     "library_vrmse_zscored": 0.027224363759160042,
+     "our_vrmse_raw": 0.027224350007146233,
+     "our_vrmse_zscored": 0.02722436392554293,
+     "rel_diff_input": 0.0,
+     "rel_diff_output": 0.0,
+     "rel_diff_target": 0.0,
+     "rel_diff_vrmse": 6.111543619783239e-09,
+     "rel_diff_vrmse_raw": 0.0,
+     "start": 195,
+     "trajectory": 4
+    },
+    {
+     "eps": 1e-07,
+     "file": "rayleigh_benard_Rayleigh_1e7_Prandtl_5e-1.hdf5",
+     "library_vrmse_raw": 3.4768202084142503,
+     "library_vrmse_zscored": 17.323444366455078,
+     "our_vrmse_raw": 3.4768202084142503,
+     "our_vrmse_zscored": 17.323444797171017,
+     "rel_diff_input": 0.0,
+     "rel_diff_output": 0.0,
+     "rel_diff_target": 0.0,
+     "rel_diff_vrmse": 2.4863181377087713e-08,
+     "rel_diff_vrmse_raw": 0.0,
+     "start": 8,
+     "trajectory": 2
+    },
+    {
+     "eps": 1e-07,
+     "file": "rayleigh_benard_Rayleigh_1e9_Prandtl_5e-1.hdf5",
+     "library_vrmse_raw": 0.059322437495060595,
+     "library_vrmse_zscored": 0.05932251736521721,
+     "our_vrmse_raw": 0.059322437495060595,
+     "our_vrmse_zscored": 0.05932251865590431,
+     "rel_diff_input": 0.0,
+     "rel_diff_output": 0.0,
+     "rel_diff_target": 0.0,
+     "rel_diff_vrmse": 2.175711949172444e-08,
+     "rel_diff_vrmse_raw": 0.0,
+     "start": 195,
+     "trajectory": 4
+    }
+   ],
+   "worst_rel_diff_tensor": 0.0,
+   "worst_rel_diff_vrmse": 6.923513116003279e-08,
+   "worst_rel_diff_vrmse_raw": 0.0
+  },
+  "rayleigh_taylor_instability": {
+   "all_tensors_bit_identical": true,
+   "checkpoint": "polymathic-ai/UNetClassic-rayleigh_taylor_instability",
+   "library_source": "HuggingFace",
+   "n_files": 4,
+   "n_windows": 4,
+   "our_source": "SDSC mirror",
+   "revision": "3a13f12900bce9be214d70b411d1a112b10fb493",
+   "tensors_compared": [
+    "model_input",
+    "target",
+    "model_output"
+   ],
+   "windows": [
+    {
+     "eps": 1e-07,
+     "file": "rayleigh_taylor_instability_At_0625.hdf5",
+     "library_vrmse_raw": 0.5571619395307548,
+     "library_vrmse_zscored": 32.105812072753906,
+     "our_vrmse_raw": 0.5571619395307548,
+     "our_vrmse_zscored": 32.1058136994354,
+     "rel_diff_input": 0.0,
+     "rel_diff_output": 0.0,
+     "rel_diff_target": 0.0,
+     "rel_diff_vrmse": 5.0666262282831444e-08,
+     "rel_diff_vrmse_raw": 0.0,
+     "start": 0,
+     "trajectory": 0
+    },
+    {
+     "eps": 1e-07,
+     "file": "rayleigh_taylor_instability_At_125.hdf5",
+     "library_vrmse_raw": 0.13308530833283597,
+     "library_vrmse_zscored": 0.1346854269504547,
+     "our_vrmse_raw": 0.13308530833283597,
+     "our_vrmse_zscored": 0.13468543580730302,
+     "rel_diff_input": 0.0,
+     "rel_diff_output": 0.0,
+     "rel_diff_target": 0.0,
+     "rel_diff_vrmse": 6.575951467689588e-08,
+     "rel_diff_vrmse_raw": 0.0,
+     "start": 38,
+     "trajectory": 1
+    },
+    {
+     "eps": 1e-07,
+     "file": "rayleigh_taylor_instability_At_50.hdf5",
+     "library_vrmse_raw": 0.22411832880475696,
+     "library_vrmse_zscored": 0.22416798770427704,
+     "our_vrmse_raw": 0.22411832880475696,
+     "our_vrmse_zscored": 0.22416799068008905,
+     "rel_diff_input": 0.0,
+     "rel_diff_output": 0.0,
+     "rel_diff_target": 0.0,
+     "rel_diff_vrmse": 1.3274919599128189e-08,
+     "rel_diff_vrmse_raw": 0.0,
+     "start": 76,
+     "trajectory": 0
+    },
+    {
+     "eps": 1e-07,
+     "file": "rayleigh_taylor_instability_At_75.hdf5",
+     "library_vrmse_raw": 0.4196189743536438,
+     "library_vrmse_zscored": 0.41962963342666626,
+     "our_vrmse_raw": 0.4196189743536438,
+     "our_vrmse_zscored": 0.4196296123256462,
+     "rel_diff_input": 0.0,
+     "rel_diff_output": 0.0,
+     "rel_diff_target": 0.0,
+     "rel_diff_vrmse": 5.0284866371496594e-08,
+     "rel_diff_vrmse_raw": 0.0,
+     "start": 114,
+     "trajectory": 1
+    }
+   ],
+   "worst_rel_diff_tensor": 0.0,
+   "worst_rel_diff_vrmse": 6.575951467689588e-08,
+   "worst_rel_diff_vrmse_raw": 0.0
+  }
+ },
+ "description": "End-to-end equivalence of this audit's evaluator against the library's own WellDataset + ZScoreNormalization + DefaultChannelsFirstFormatter path, on the public test split with the pinned public checkpoints. Produced by .gate-work/validate_{rt,rb}_evaluator.py.",
+ "environment_at_assembly": {
+  "numpy": "2.5.1",
+  "platform": "macOS-15.7.8-arm64-arm-64bit",
+  "python": "3.12.12",
+  "the_well": "1.2.0",
+  "torch": "2.13.0"
+ },
+ "metric_eps": 1e-07,
+ "summary": {
+  "all_tensors_bit_identical": true,
+  "n_windows_total": 9,
+  "raw_units_leg_on_all_windows": true,
+  "worst_rel_diff_tensor": 0.0,
+  "worst_rel_diff_vrmse": 6.923513116003279e-08,
+  "worst_rel_diff_vrmse_raw": 0.0
+ },
+ "tolerance": 1e-05
+}

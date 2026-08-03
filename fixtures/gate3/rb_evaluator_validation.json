@@ -1,0 +1,82 @@
+{
+ "tol": 1e-05,
+ "worst": 6.923513116003279e-08,
+ "validated": true,
+ "windows": [
+  {
+   "idx": 0,
+   "file": "rayleigh_benard_Rayleigh_1e10_Prandtl_1.hdf5",
+   "traj": 0,
+   "start": 0,
+   "lib_vrmse": 14.506383895874023,
+   "our_vrmse": 14.50638358781993,
+   "lib_vrmse_raw": 3.470713199624999,
+   "our_vrmse_raw": 3.470713199624999,
+   "d_input": 0.0,
+   "d_target": 0.0,
+   "d_output": 0.0,
+   "d_vrmse": 2.123576050687106e-08,
+   "d_vrmse_raw": 0.0
+  },
+  {
+   "idx": 4899,
+   "file": "rayleigh_benard_Rayleigh_1e10_Prandtl_2e-1.hdf5",
+   "traj": 4,
+   "start": 195,
+   "lib_vrmse": 0.1399056315422058,
+   "our_vrmse": 0.13990562185582106,
+   "lib_vrmse_raw": 0.13990540264358137,
+   "our_vrmse_raw": 0.13990540264358137,
+   "d_input": 0.0,
+   "d_target": 0.0,
+   "d_output": 0.0,
+   "d_vrmse": 6.923513116003279e-08,
+   "d_vrmse_raw": 0.0
+  },
+  {
+   "idx": 9799,
+   "file": "rayleigh_benard_Rayleigh_1e6_Prandtl_1e-1.hdf5",
+   "traj": 4,
+   "start": 195,
+   "lib_vrmse": 0.027224363759160042,
+   "our_vrmse": 0.02722436392554293,
+   "lib_vrmse_raw": 0.027224350007146233,
+   "our_vrmse_raw": 0.027224350007146233,
+   "d_input": 0.0,
+   "d_target": 0.0,
+   "d_output": 0.0,
+   "d_vrmse": 6.111543619783239e-09,
+   "d_vrmse_raw": 0.0
+  },
+  {
+   "idx": 20000,
+   "file": "rayleigh_benard_Rayleigh_1e7_Prandtl_5e-1.hdf5",
+   "traj": 2,
+   "start": 8,
+   "lib_vrmse": 17.323444366455078,
+   "our_vrmse": 17.323444797171017,
+   "lib_vrmse_raw": 3.4768202084142503,
+   "our_vrmse_raw": 3.4768202084142503,
+   "d_input": 0.0,
+   "d_target": 0.0,
+   "d_output": 0.0,
+   "d_vrmse": 2.4863181377087713e-08,
+   "d_vrmse_raw": 0.0
+  },
+  {
+   "idx": 34299,
+   "file": "rayleigh_benard_Rayleigh_1e9_Prandtl_5e-1.hdf5",
+   "traj": 4,
+   "start": 195,
+   "lib_vrmse": 0.05932251736521721,
+   "our_vrmse": 0.05932251865590431,
+   "lib_vrmse_raw": 0.059322437495060595,
+   "our_vrmse_raw": 0.059322437495060595,
+   "d_input": 0.0,
+   "d_target": 0.0,
+   "d_output": 0.0,
+   "d_vrmse": 2.175711949172444e-08,
+   "d_vrmse_raw": 0.0
+  }
+ ]
+}
