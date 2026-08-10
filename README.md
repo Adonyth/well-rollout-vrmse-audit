@@ -89,6 +89,11 @@ repro-harness/
     aggregate_results.py   <- deterministic aggregation: raw scalars -> the 142 enumerated value checks (VRMSE/census/field-split/figure-vs-table/spatial-mean)
     spatial_mean_baseline.py <- trivial spatial-mean-predictor VRMSE baseline (cross-checked by verify.py)
     check_unsourced.py     <- numbers-must-trace-to-numbers.json checker (paper-writing discipline)
+  instrument/              <- normscreen: the standalone conditioning screen (see below)
+    normscreen/            <- the package (numpy only; h5py optional, for HDF5 input)
+    test_against_paper.py  <- checks the screen against this repo's frozen census fixtures
+    test_normalizers.py    <- pins the variance/RMS conventions, eps=0, saturation vs unboundedness
+    examples/pdebench_shocktube.py <- worked example on a second, non-Well benchmark
   fixtures/
     audit/*.json.gz         <- packaged raw census scalars, all 5 public RT test objects (10 traj)
     audit/provenance.json   <- byte counts + ETags for the 5 public HTTP objects fetched
@@ -147,6 +152,35 @@ Lane-3's `report_numbers.json` by the source repo's
 included so a paper chapter draft can be checked the same way the source
 repo checks it: `python3 scripts/check_unsourced.py <chapter.tex>
 fixtures/numbers_reference.json` must print `UNSOURCED: 0`.
+
+## The instrument (`instrument/normscreen`)
+
+The paper's first lesson asks a benchmark to publish, beside each
+variance-normalized score, how much of that score's denominator is the
+stabilizing constant rather than the data. `instrument/` packages exactly that
+check as a standalone tool so the lesson is cheap to act on. It needs no model
+and no training run — point it at an HDF5 or NumPy split and it reports
+`floor_share = eps/(Var+eps)` per field and per frame, under either the
+variance convention (Nash–Sutcliffe family, as here) or the RMS convention
+(as PDEBench's nRMSE). Exit status is non-zero on a positive screen, so it
+composes into CI.
+
+```bash
+cd instrument
+python3 -m normscreen --demo                          # synthetic, no download
+python3 -m normscreen your_data.h5 --auto --spatial-dims 3 --eps 1e-7
+python3 test_against_paper.py                         # vs this repo's frozen census
+python3 test_normalizers.py                           # convention/edge-case pins
+```
+
+`test_against_paper.py` re-applies the conditioning statistic to this repo's
+**stored** variances (`fixtures/generalization/benchmark_map/MAP.json`, 17 rows;
+`fixtures/rb_models/*.json.gz`, 1728 windows) and compares against the **stored**
+shares. It is an internal-consistency check between the instrument and the
+audit's stored inputs, not an independent re-derivation of the census — the
+variance extraction itself is taken as given. Both fixture counts are pinned, and
+a missing or truncated fixture tree fails the suite rather than reporting a pass
+over nothing. See `instrument/README.md` for the API and the scope limits.
 
 ## License
 

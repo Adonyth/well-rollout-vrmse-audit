@@ -1,35 +1,70 @@
 {
  "_source": "The Well, arXiv:2412.00568v2, Table 3 (time-averaged rollout VRMSE); yes = any baseline >10 in any rollout window (6:12 or 13:30)",
- "status": {
-  "rayleigh_taylor_instability": "yes",
-  "rayleigh_benard": "yes",
-  "active_matter": "yes",
-  "gray_scott_reaction_diffusion": "yes",
-  "shear_flow": "yes",
-  "supernova_explosion_64": "yes",
-  "turbulent_radiative_layer_2D": "yes",
-  "turbulent_radiative_layer_3D": "yes",
-  "viscoelastic_instability": "no",
-  "turbulence_gravity_cooling": "no",
-  "post_neutron_star_merger": "no",
-  "MHD_64": "no",
-  "helmholtz_staircase": "no",
-  "planetswe": "no",
-  "convective_envelope_rsg": "no",
-  "euler_multi_quadrants_periodicBC": "yes",
-  "acoustic_scattering_maze": "no"
- },
  "_variant_provenance": {
-  "euler_multi_quadrants_periodicBC": "Table 3's row is labeled 'euler_multi_quadrants'; the benchmark's baselines are the periodic-boundary variant per the paper's own row labels elsewhere: Table 2 and the appendix validation/hyperparameter tables all read 'euler_multi_quadrants (periodic b.c.)' (arXiv:2412.00568v2).",
-  "acoustic_scattering_maze": "Table 3's row is labeled 'acoustic_scattering (maze)' verbatim.",
   "MHD_64": "Table 3's row is labeled 'MHD_64' verbatim (the 256 variant has no published row).",
+  "acoustic_scattering_maze": "Table 3's row is labeled 'acoustic_scattering (maze)' verbatim.",
+  "euler_multi_quadrants_periodicBC": "Table 3's row is labeled 'euler_multi_quadrants'; the benchmark's baselines are the periodic-boundary variant per the paper's own row labels elsewhere: Table 2 and the appendix validation/hyperparameter tables all read 'euler_multi_quadrants (periodic b.c.)' (arXiv:2412.00568v2).",
   "supernova_explosion_64": "Table 3's row is labeled 'supernova_explosion_64' verbatim (the 128 variant has no published row)."
  },
+ "status": {
+  "MHD_64": "no",
+  "acoustic_scattering_maze": "no",
+  "active_matter": "yes",
+  "convective_envelope_rsg": "no",
+  "euler_multi_quadrants_periodicBC": "yes",
+  "gray_scott_reaction_diffusion": "yes",
+  "helmholtz_staircase": "no",
+  "planetswe": "no",
+  "post_neutron_star_merger": "no",
+  "rayleigh_benard": "yes",
+  "rayleigh_taylor_instability": "yes",
+  "shear_flow": "yes",
+  "supernova_explosion_64": "yes",
+  "turbulence_gravity_cooling": "no",
+  "turbulent_radiative_layer_2D": "yes",
+  "turbulent_radiative_layer_3D": "yes",
+  "viscoelastic_instability": "no"
+ },
  "table2_onestep_rayleigh_benard": {
+  "_source": "The Well, arXiv:2412.00568v2, Table 2 (one-step VRMSE), rayleigh_benard row, verbatim",
+  "cnextunet": 0.6699,
   "fno": 0.8395,
   "tfno": 0.6566,
-  "unet": 1.486,
-  "cnextunet": 0.6699,
-  "_source": "The Well, arXiv:2412.00568v2, Table 2 (one-step VRMSE), rayleigh_benard row, verbatim"
+  "unet": 1.486
+ },
+ "table3_rollout_rayleigh_benard": {
+  "_source": "The Well, arXiv:2412.00568v2, Table 3 (time-averaged rollout VRMSE), rayleigh_benard row, read cell-by-cell from the published table: the row carries eight entries, four baselines x two rollout windows, and every one is the censored label '>10'. Frozen per cell because the paper's 'seven of the eight published cells reproduce' premise is a per-cell claim, which the dataset-level 'status' flag above does not entail.",
+  "n_cells": 8,
+  "n_cells_gt10": 8,
+  "window_13_30": {
+   "FNO": ">10",
+   "TFNO": ">10",
+   "UNetClassic": ">10",
+   "UNetConvNext": ">10"
+  },
+  "window_6_12": {
+   "FNO": ">10",
+   "TFNO": ">10",
+   "UNetClassic": ">10",
+   "UNetConvNext": ">10"
+  }
+ },
+ "table3_rollout_rayleigh_taylor": {
+  "_source": "The Well, arXiv:2412.00568v2, Table 3 (time-averaged rollout VRMSE), rayleigh_taylor_instability row, read cell-by-cell (verified 2026-08-03). COLUMN SEMANTICS: Table 3 is MODEL-major with the rollout window as the inner column -- header 'Dataset | FNO | TFNO | U-net | CNextU-net' over a second header repeating '6:12 | 13:30' under each model. The row reads '>10, >10, 6.72, >10, >10, 2.84, >10, 7.43', which under that ordering is TFNO 6.72 at 6:12 and U-net 2.84 at 13:30 -- NOT the window-major reading, which would swap them. Frozen so the Rayleigh-Taylor premise sits at the same evidentiary tier as the Rayleigh-Benard one rather than resting on a hardcoded literal.",
+  "n_cells": 8,
+  "n_cells_finite": 3,
+  "n_cells_gt10": 5,
+  "window_13_30": {
+   "FNO": ">10",
+   "TFNO": ">10",
+   "UNetClassic": "2.84",
+   "UNetConvNext": "7.43"
+  },
+  "window_6_12": {
+   "FNO": ">10",
+   "TFNO": "6.72",
+   "UNetClassic": ">10",
+   "UNetConvNext": ">10"
+  }
  }
 }

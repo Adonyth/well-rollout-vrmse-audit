@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "normscreen"
+version = "0.1.0"
+description = "Conditioning screen for variance-normalized error metrics (Nash-Sutcliffe family)"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "BSD-3-Clause"}
+dependencies = ["numpy>=1.20"]
+
+[project.optional-dependencies]
+hdf5 = ["h5py>=3.0"]
+
+[project.scripts]
+normscreen = "normscreen.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["normscreen*"]

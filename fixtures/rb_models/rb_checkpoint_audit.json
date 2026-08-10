@@ -1,4 +1,132 @@
 {
+ "checkpoint_chronology": {
+  "arxiv_source": "https://arxiv.org/abs/2412.00568",
+  "benchmark_arxiv_v1": "2024-11-30",
+  "benchmark_arxiv_versions": {
+   "v1": "2024-11-30",
+   "v2": "2025-02-21"
+  },
+  "fetched_utc": "2026-08-03T14:58:55Z",
+  "quoted_tables_version": "v2",
+  "quoted_tables_version_date": "2025-02-21",
+  "repos": {
+   "polymathic-ai/FNO-rayleigh_benard": {
+    "dataset": "ai/FNO-rayleigh_benard",
+    "days_after_benchmark_paper": 118,
+    "days_after_quoted_tables_version": 35,
+    "initial_commit": "2025-03-28",
+    "latest_commit": "2025-03-28",
+    "n_commits": 2,
+    "revised_after_upload": false
+   },
+   "polymathic-ai/FNO-rayleigh_taylor_instability": {
+    "dataset": "ai/FNO-rayleigh_taylor_instability",
+    "days_after_benchmark_paper": 118,
+    "days_after_quoted_tables_version": 35,
+    "initial_commit": "2025-03-28",
+    "latest_commit": "2025-03-28",
+    "n_commits": 2,
+    "revised_after_upload": false
+   },
+   "polymathic-ai/TFNO-rayleigh_benard": {
+    "dataset": "ai/TFNO-rayleigh_benard",
+    "days_after_benchmark_paper": 118,
+    "days_after_quoted_tables_version": 35,
+    "initial_commit": "2025-03-28",
+    "latest_commit": "2025-03-28",
+    "n_commits": 2,
+    "revised_after_upload": false
+   },
+   "polymathic-ai/TFNO-rayleigh_taylor_instability": {
+    "dataset": "ai/TFNO-rayleigh_taylor_instability",
+    "days_after_benchmark_paper": 118,
+    "days_after_quoted_tables_version": 35,
+    "initial_commit": "2025-03-28",
+    "latest_commit": "2025-03-28",
+    "n_commits": 2,
+    "revised_after_upload": false
+   },
+   "polymathic-ai/UNetClassic-rayleigh_benard": {
+    "dataset": "ai/UNetClassic-rayleigh_benard",
+    "days_after_benchmark_paper": 118,
+    "days_after_quoted_tables_version": 35,
+    "initial_commit": "2025-03-28",
+    "latest_commit": "2025-03-28",
+    "n_commits": 3,
+    "revised_after_upload": false
+   },
+   "polymathic-ai/UNetClassic-rayleigh_taylor_instability": {
+    "dataset": "ai/UNetClassic-rayleigh_taylor_instability",
+    "days_after_benchmark_paper": 118,
+    "days_after_quoted_tables_version": 35,
+    "initial_commit": "2025-03-28",
+    "latest_commit": "2025-03-28",
+    "n_commits": 3,
+    "revised_after_upload": false
+   },
+   "polymathic-ai/UNetConvNext-rayleigh_benard": {
+    "dataset": "ai/UNetConvNext-rayleigh_benard",
+    "days_after_benchmark_paper": 118,
+    "days_after_quoted_tables_version": 35,
+    "initial_commit": "2025-03-28",
+    "latest_commit": "2025-03-28",
+    "n_commits": 2,
+    "revised_after_upload": false
+   },
+   "polymathic-ai/UNetConvNext-rayleigh_taylor_instability": {
+    "dataset": "ai/UNetConvNext-rayleigh_taylor_instability",
+    "days_after_benchmark_paper": 118,
+    "days_after_quoted_tables_version": 35,
+    "initial_commit": "2025-03-28",
+    "latest_commit": "2025-03-28",
+    "n_commits": 2,
+    "revised_after_upload": false
+   }
+  },
+  "source": "https://huggingface.co/api/models/{repo}/commits/main",
+  "summary": {
+   "all_initial_commits_same_day": true,
+   "any_revised_after_upload": false,
+   "initial_commit_dates": [
+    "2025-03-28"
+   ],
+   "max_days_after_benchmark_paper": 118,
+   "max_days_after_quoted_tables_version": 35,
+   "min_days_after_benchmark_paper": 118,
+   "min_days_after_quoted_tables_version": 35,
+   "n_repos": 8
+  }
+ },
+ "coverage": {
+  "combined": {
+   "file_share": 0.37142857142857144,
+   "files": 13,
+   "of_test_files": 35,
+   "of_test_trajectories": 175,
+   "trajectories": 16,
+   "trajectory_share": 0.09142857142857143
+  },
+  "depth_pass": {
+   "files": 3,
+   "models": 4,
+   "trajectories": 6,
+   "trajectories_per_file": 2
+  },
+  "models_depth_only": [
+   "TFNO",
+   "UNetConvNext"
+  ],
+  "models_on_every_covered_file": [
+   "FNO",
+   "UNetClassic"
+  ],
+  "stratified_pass": {
+   "files": 10,
+   "models": 2,
+   "trajectories": 10,
+   "trajectories_per_file": 1
+  }
+ },
  "gt10_summary": {
   "cell_below_10_at_library_floor": [
    "UNetConvNext 6-12"
@@ -102,6 +230,21 @@
   "TFNO": 0.6566,
   "UNetClassic": 1.486,
   "UNetConvNext": 0.6699
+ },
+ "published_rollout_cells": {
+  "cells": {
+   "FNO 13-30": ">10",
+   "FNO 6-12": ">10",
+   "TFNO 13-30": ">10",
+   "TFNO 6-12": ">10",
+   "UNetClassic 13-30": ">10",
+   "UNetClassic 6-12": ">10",
+   "UNetConvNext 13-30": ">10",
+   "UNetConvNext 6-12": ">10"
+  },
+  "n_cells": 8,
+  "n_published_gt10": 8,
+  "source": "fixtures/generalization/well_table3_gt10.json -> table3_rollout_rayleigh_benard"
  },
  "quiescent_developed": {
   "FNO": {
@@ -315,5 +458,380 @@
    }
   },
   "n_files": 10
+ },
+ "stratified": {
+  "per_file": {
+   "rayleigh_benard_Rayleigh_1e10_Prandtl_1.hdf5": {
+    "cells": {
+     "FNO": {
+      "13-30": {
+       "eps_fix": 1.3907767398698594,
+       "library": 1.40586352941739
+      },
+      "6-12": {
+       "eps_fix": 2.9795944300066766,
+       "library": 8.865931396358505
+      }
+     },
+     "UNetClassic": {
+      "13-30": {
+       "eps_fix": 2.9654491590438057,
+       "library": 2.996196763592666
+      },
+      "6-12": {
+       "eps_fix": 2.400541193080478,
+       "library": 6.443630294480385
+      }
+     }
+    },
+    "floor_share_epslib": 0.9903581145504605,
+    "min_field_variance": 9.735756498462256e-10,
+    "n_quiescent": 4,
+    "n_starts": 42,
+    "quiescent_fraction": 0.09523809523809523,
+    "trajectories": [
+     0
+    ]
+   },
+   "rayleigh_benard_Rayleigh_1e10_Prandtl_5e-1.hdf5": {
+    "cells": {
+     "FNO": {
+      "13-30": {
+       "eps_fix": 1.3074426041981766,
+       "library": 1.3163989040161477
+      },
+      "6-12": {
+       "eps_fix": 2.8015499220855324,
+       "library": 7.424877059919629
+      }
+     },
+     "UNetClassic": {
+      "13-30": {
+       "eps_fix": 2.65027815755844,
+       "library": 2.667784411136119
+      },
+      "6-12": {
+       "eps_fix": 2.1796238448381895,
+       "library": 5.312188985832683
+      }
+     }
+    },
+    "floor_share_epslib": 0.9907007149550964,
+    "min_field_variance": 9.386573467169848e-10,
+    "n_quiescent": 4,
+    "n_starts": 42,
+    "quiescent_fraction": 0.09523809523809523,
+    "trajectories": [
+     0
+    ]
+   },
+   "rayleigh_benard_Rayleigh_1e6_Prandtl_10.hdf5": {
+    "cells": {
+     "FNO": {
+      "13-30": {
+       "eps_fix": 4.2093282952710585,
+       "library": 37.32644248473852
+      },
+      "6-12": {
+       "eps_fix": 4.25947091089606,
+       "library": 37.843666637603505
+      }
+     },
+     "UNetClassic": {
+      "13-30": {
+       "eps_fix": 14.928220944604265,
+       "library": 141.0209626755709
+      },
+      "6-12": {
+       "eps_fix": 3.926964474426311,
+       "library": 37.23034695778982
+      }
+     }
+    },
+    "floor_share_epslib": 0.9999111654214896,
+    "min_field_variance": 8.884247079382452e-12,
+    "n_quiescent": 28,
+    "n_starts": 42,
+    "quiescent_fraction": 0.6666666666666666,
+    "trajectories": [
+     0
+    ]
+   },
+   "rayleigh_benard_Rayleigh_1e6_Prandtl_1e-1.hdf5": {
+    "cells": {
+     "FNO": {
+      "13-30": {
+       "eps_fix": 4.184822685778634,
+       "library": 32.04120278598992
+      },
+      "6-12": {
+       "eps_fix": 4.25619972985269,
+       "library": 37.94586833514465
+      }
+     },
+     "UNetClassic": {
+      "13-30": {
+       "eps_fix": 15.62876715745529,
+       "library": 126.22092264116947
+      },
+      "6-12": {
+       "eps_fix": 4.840203180438678,
+       "library": 47.269973325512
+      }
+     }
+    },
+    "floor_share_epslib": 0.9998941902453047,
+    "min_field_variance": 1.0582095158421834e-11,
+    "n_quiescent": 19,
+    "n_starts": 42,
+    "quiescent_fraction": 0.4523809523809524,
+    "trajectories": [
+     0
+    ]
+   },
+   "rayleigh_benard_Rayleigh_1e7_Prandtl_2e-1.hdf5": {
+    "cells": {
+     "FNO": {
+      "13-30": {
+       "eps_fix": 3.935615821306374,
+       "library": 22.186930471485933
+      },
+      "6-12": {
+       "eps_fix": 4.28914737646638,
+       "library": 38.24274357777665
+      }
+     },
+     "UNetClassic": {
+      "13-30": {
+       "eps_fix": 15.374003874943359,
+       "library": 83.67267809068011
+      },
+      "6-12": {
+       "eps_fix": 4.408849265507979,
+       "library": 42.73936512330928
+      }
+     }
+    },
+    "floor_share_epslib": 0.9997132561692773,
+    "min_field_variance": 2.8682607633048716e-11,
+    "n_quiescent": 15,
+    "n_starts": 42,
+    "quiescent_fraction": 0.35714285714285715,
+    "trajectories": [
+     0
+    ]
+   },
+   "rayleigh_benard_Rayleigh_1e7_Prandtl_5.hdf5": {
+    "cells": {
+     "FNO": {
+      "13-30": {
+       "eps_fix": 4.212746021492915,
+       "library": 34.50050460983508
+      },
+      "6-12": {
+       "eps_fix": 4.26594383396652,
+       "library": 37.77747357947318
+      }
+     },
+     "UNetClassic": {
+      "13-30": {
+       "eps_fix": 14.926738750237746,
+       "library": 126.74309955057548
+      },
+      "6-12": {
+       "eps_fix": 3.7131407355673156,
+       "library": 35.031357715403516
+      }
+     }
+    },
+    "floor_share_epslib": 0.9997273483343677,
+    "min_field_variance": 2.7272602483716235e-11,
+    "n_quiescent": 19,
+    "n_starts": 42,
+    "quiescent_fraction": 0.4523809523809524,
+    "trajectories": [
+     0
+    ]
+   },
+   "rayleigh_benard_Rayleigh_1e8_Prandtl_10.hdf5": {
+    "cells": {
+     "FNO": {
+      "13-30": {
+       "eps_fix": 4.187577738919467,
+       "library": 31.979104699237073
+      },
+      "6-12": {
+       "eps_fix": 4.28388260302265,
+       "library": 37.99523656637073
+      }
+     },
+     "UNetClassic": {
+      "13-30": {
+       "eps_fix": 16.262703446373262,
+       "library": 138.30104015203182
+      },
+      "6-12": {
+       "eps_fix": 4.473204836030276,
+       "library": 43.1222563420598
+      }
+     }
+    },
+    "floor_share_epslib": 0.9992645334703671,
+    "min_field_variance": 7.360078387637544e-11,
+    "n_quiescent": 20,
+    "n_starts": 42,
+    "quiescent_fraction": 0.47619047619047616,
+    "trajectories": [
+     0
+    ]
+   },
+   "rayleigh_benard_Rayleigh_1e8_Prandtl_1e-1.hdf5": {
+    "cells": {
+     "FNO": {
+      "13-30": {
+       "eps_fix": 3.8049481324040246,
+       "library": 19.157519041248598
+      },
+      "6-12": {
+       "eps_fix": 4.370444813420153,
+       "library": 38.670901916045736
+      }
+     },
+     "UNetClassic": {
+      "13-30": {
+       "eps_fix": 16.810308862419433,
+       "library": 86.23583795750444
+      },
+      "6-12": {
+       "eps_fix": 5.857850756066787,
+       "library": 57.04150860848413
+      }
+     }
+    },
+    "floor_share_epslib": 0.9991780328171206,
+    "min_field_variance": 8.226433687318001e-11,
+    "n_quiescent": 14,
+    "n_starts": 42,
+    "quiescent_fraction": 0.3333333333333333,
+    "trajectories": [
+     0
+    ]
+   },
+   "rayleigh_benard_Rayleigh_1e9_Prandtl_1.hdf5": {
+    "cells": {
+     "FNO": {
+      "13-30": {
+       "eps_fix": 2.045620342444408,
+       "library": 4.081928012450187
+      },
+      "6-12": {
+       "eps_fix": 4.28106391869151,
+       "library": 35.76906521103261
+      }
+     },
+     "UNetClassic": {
+      "13-30": {
+       "eps_fix": 5.62656400473858,
+       "library": 11.003772010206964
+      },
+      "6-12": {
+       "eps_fix": 4.471200995409228,
+       "library": 40.34220390054611
+      }
+     }
+    },
+    "floor_share_epslib": 0.9965631260682547,
+    "min_field_variance": 3.448726770881836e-10,
+    "n_quiescent": 8,
+    "n_starts": 42,
+    "quiescent_fraction": 0.19047619047619047,
+    "trajectories": [
+     0
+    ]
+   },
+   "rayleigh_benard_Rayleigh_1e9_Prandtl_2e-1.hdf5": {
+    "cells": {
+     "FNO": {
+      "13-30": {
+       "eps_fix": 1.3536297089612388,
+       "library": 1.4125099792086735
+      },
+      "6-12": {
+       "eps_fix": 4.170615488008446,
+       "library": 25.877868033425155
+      }
+     },
+     "UNetClassic": {
+      "13-30": {
+       "eps_fix": 2.736141993005775,
+       "library": 2.874760716542186
+      },
+      "6-12": {
+       "eps_fix": 3.635498180640982,
+       "library": 21.814168530107544
+      }
+     }
+    },
+    "floor_share_epslib": 0.9972456467794727,
+    "min_field_variance": 2.761960635699238e-10,
+    "n_quiescent": 7,
+    "n_starts": 42,
+    "quiescent_fraction": 0.16666666666666666,
+    "trajectories": [
+     0
+    ]
+   }
+  },
+  "summary": {
+   "calibration_window_6_12": {
+    "max_quiescent_fraction_among_files_with_no_gt10_cell": 0.09523809523809523,
+    "min_quiescent_fraction_among_files_with_all_gt10_cells": 0.16666666666666666,
+    "n_strata": 10,
+    "pearson_p": {
+     "FNO": 0.010541457064411435,
+     "UNetClassic": 0.04459802241054713
+    },
+    "pearson_r": {
+     "FNO": 0.7612031631090896,
+     "UNetClassic": 0.6437263162403594
+    },
+    "predictor": "data-only quiescent fraction of the file's sampled one-step starts",
+    "separates_without_overlap": true,
+    "spearman_p": {
+     "FNO": 0.04345381331180498,
+     "UNetClassic": 0.08734901136026967
+    },
+    "spearman_r": {
+     "FNO": 0.6463534793182504,
+     "UNetClassic": 0.5670837129867669
+    }
+   },
+   "models": [
+    "FNO",
+    "UNetClassic"
+   ],
+   "n_files": 10,
+   "n_models": 2,
+   "n_trajectories": 10,
+   "window_13-30": {
+    "files_with_no_cell_gt10_at_library_floor": [
+     "rayleigh_benard_Rayleigh_1e10_Prandtl_1.hdf5",
+     "rayleigh_benard_Rayleigh_1e10_Prandtl_5e-1.hdf5",
+     "rayleigh_benard_Rayleigh_1e9_Prandtl_2e-1.hdf5"
+    ],
+    "n_cells": 20,
+    "n_gt10_at_eps_fix": 6,
+    "n_gt10_at_library_floor": 13
+   },
+   "window_6-12": {
+    "files_with_no_cell_gt10_at_library_floor": [
+     "rayleigh_benard_Rayleigh_1e10_Prandtl_1.hdf5",
+     "rayleigh_benard_Rayleigh_1e10_Prandtl_5e-1.hdf5"
+    ],
+    "n_cells": 20,
+    "n_gt10_at_eps_fix": 0,
+    "n_gt10_at_library_floor": 16
+   }
+  }
  }
 }

@@ -32,7 +32,9 @@ FIXTURES = HERE / "fixtures"
 REFERENCE = FIXTURES / "numbers_reference.json"
 
 sys.path.insert(0, str(SCRIPTS))
+import gzip  # noqa: E402
 import spatial_mean_baseline  # noqa: E402
+from aggregate_results import field_mean_vrmse as _field_mean_vrmse  # noqa: E402
 
 # (dotted path into recomputed summary.json, dotted path into numbers_reference.json)
 # UNetClassic: the paper's headline one-step/rollout/issue-78 cells (full
@@ -373,6 +375,262 @@ def main() -> int:
     print(f"[gate3] library equivalence OK ({g3['summary']['n_windows_total']} windows, "
           f"all compared tensors bit-identical)")
 
+    # The exit code must be bound to the RELEASED table, not only to the harness-local copy.
+    # verify.py compares against fixtures/numbers_reference.json while its output says
+    # "numbers.json"; if the two ever drift, every [OK] above would be checking the wrong
+    # file. Assert they are leaf-for-leaf identical whenever the released table is present.
+    _released = HERE.parent / "paper" / "extracted" / "numbers.json"
+    if _released.exists():
+        with open(_released, encoding="utf-8") as _f:
+            if json.load(_f) != reference:
+                print(f"FAIL: {REFERENCE} has drifted from the released "
+                      f"paper/extracted/numbers.json -- the checks above are bound to a "
+                      f"stale copy")
+                return 1
+        print("[reference] fixtures/numbers_reference.json is identical to the released "
+              "paper/extracted/numbers.json")
+
+    # Bind the DERIVED blocks and the map block back to the artifacts they were derived
+    # from. Adversarial testing showed the exit code bound 393 of numbers.json's ~1332
+    # leaves: the printed conditioning-map floor shares, the Gate-3 quoted magnitudes, the
+    # census containment/extremes leaves and several *_derived groups could all be perturbed
+    # in numbers.json AND its frozen twin with this harness still exiting 0, because the
+    # reference-identity stage only compares the two copies to each other. Re-derive them
+    # from the packaged sources instead of trusting either copy.
+    map_bad = 0
+    _map_ref = dig(reference, "generalization.benchmark_map.datasets") or {}
+    _map_src = FIXTURES / "generalization" / "benchmark_map" / "MAP.json"
+    if _map_ref and _map_src.exists():
+        with open(_map_src, encoding="utf-8") as _f:
+            _raw = json.load(_f)
+        _map_rows = {r["dataset"]: r for r in _raw} if isinstance(_raw, list) else \
+            _raw.get("datasets", {})
+        for _ds, _row in sorted(_map_ref.items()):
+            _src_row = _map_rows.get(_ds)
+            if _src_row is None:
+                print(f"  [FAIL] map block: {_ds} present in numbers.json, absent from MAP.json")
+                map_bad += 1
+                continue
+            # floor_share_pct is the printed column; it is a percentage of the stored share.
+            def _stored_eq(a, b):
+                # numbers.json stores these leaves ROUNDED, and not all to the same
+                # precision (floor shares at 4 significant figures, window fractions at 3
+                # decimals). Compare the source rounded to whatever precision the stored
+                # value actually carries, so the check is exact rather than tolerance-based.
+                if not (isinstance(a, (int, float)) and isinstance(b, (int, float))):
+                    return a == b
+                a, b = float(a), float(b)
+                for _n in range(1, 13):
+                    if f"{a:.{_n}g}" == f"{a:.12g}":
+                        break
+                return f"{b:.{_n}g}" == f"{a:.{_n}g}"
+
+            if "floor_share_pct" in _row and "floor_share_epslib" in _src_row:
+                if not _stored_eq(_row["floor_share_pct"],
+                                  100.0 * _src_row["floor_share_epslib"]):
+                    print(f"  [FAIL] map block {_ds}.floor_share_pct: {_row['floor_share_pct']!r} "
+                          f"vs 100x MAP.json floor_share_epslib "
+                          f"{100.0 * _src_row['floor_share_epslib']!r}")
+                    map_bad += 1
+            for _k in ("gt10", "susceptibility", "category", "field", "min_var",
+                       "frac_le_epslib", "frac_le_epsfix", "n_files"):
+                _src_k = "most_susceptible_field" if _k == "field" else _k
+                if _k in _row and _src_k in _src_row:
+                    _a, _b = _row[_k], _src_row[_src_k]
+                    if not _stored_eq(_a, _b):
+                        print(f"  [FAIL] map block {_ds}.{_k}: {_a!r} vs MAP.json {_b!r}")
+                        map_bad += 1
+    _g3_ref = reference.get("gate3_library_equivalence", {})
+    _g3_src = FIXTURES / "gate3" / "library_equivalence.json"
+    if _g3_ref and _g3_src.exists():
+        with open(_g3_src, encoding="utf-8") as _f:
+            _g3_raw = json.load(_f)
+        # numbers.json flattens the fixture's summary block; map the leaves explicitly.
+        for _ref_key, _src_path in (("n_windows_total", "summary.n_windows_total"),
+                                    ("worst_rel_diff_vrmse", "summary.worst_rel_diff_vrmse"),
+                                    ("worst_rel_diff_vrmse_raw",
+                                     "summary.worst_rel_diff_vrmse_raw"),
+                                    ("worst_rel_diff_tensor", "summary.worst_rel_diff_tensor"),
+                                    ("all_tensors_bit_identical",
+                                     "summary.all_tensors_bit_identical"),
+                                    ("raw_units_leg_on_all_windows",
+                                     "summary.raw_units_leg_on_all_windows"),
+                                    ("tolerance", "tolerance")):
+            _a, _b = _g3_ref.get(_ref_key), dig(_g3_raw, _src_path)
+            _path = _ref_key
+            _eq = (f"{float(_a):.4g}" == f"{float(_b):.4g}"
+                   if isinstance(_a, (int, float)) and isinstance(_b, (int, float))
+                   else _a == _b)
+            if _a is not None and _b is not None and not _eq:
+                print(f"  [FAIL] gate3 block {_path}: {_a!r} vs fixture {_b!r}")
+                map_bad += 1
+    if map_bad:
+        print(f"FAIL: map / gate3 reference blocks disagree with their sources ({map_bad})")
+        return 1
+    print("[blocks] map and Gate-3 reference blocks re-derived from their packaged sources")
+
+    # Data provenance, asserted the way checkpoint provenance already is. The manuscript
+    # states a bulk-window count, a span, and the three datasets that fall outside it; those
+    # are exactly the kind of hand-typed figures that went wrong once here ("fifteen" for a
+    # window of fourteen), so they are derived from the shipped record instead.
+    _rev_src = FIXTURES / "generalization" / "census_source_revisions.json"
+    if not _rev_src.exists():
+        print(f"FAIL: {_rev_src} missing -- the data-provenance bound cannot be checked")
+        return 1
+    with open(_rev_src, encoding="utf-8") as _f:
+        _rev = json.load(_f)
+    _rev_ds = _rev.get("datasets", {})
+    _BULK_DAY = "2025-04-10"
+    _bulk = sorted(v["lastModified"] for v in _rev_ds.values()
+                   if (v.get("lastModified") or "").startswith(_BULK_DAY))
+    _outside = sorted(k for k, v in _rev_ds.items()
+                      if not (v.get("lastModified") or "").startswith(_BULK_DAY))
+    _span = 0
+    if _bulk:
+        def _secs(t):
+            return int(t[11:13]) * 3600 + int(t[14:16]) * 60 + int(t[17:19])
+        _span = _secs(_bulk[-1]) - _secs(_bulk[0])
+    _prov_bad = 0
+    if len(_rev_ds) != 17:
+        print(f"  [FAIL] census revision record covers {len(_rev_ds)} datasets, expected 17")
+        _prov_bad += 1
+    if len(_bulk) != 14:
+        print(f"  [FAIL] {_BULK_DAY} bulk window holds {len(_bulk)} datasets; the manuscript "
+              f"says fourteen")
+        _prov_bad += 1
+    if _span > 20:
+        print(f"  [FAIL] bulk window spans {_span}s; the manuscript says under twenty seconds")
+        _prov_bad += 1
+    if sorted(_outside) != sorted(["MHD_64", "turbulent_radiative_layer_3D",
+                                   "euler_multi_quadrants_periodicBC"]):
+        print(f"  [FAIL] datasets outside the bulk window are {_outside}; the manuscript "
+              f"names MHD_64, turbulent_radiative_layer_3D and "
+              f"euler_multi_quadrants_periodicBC")
+        _prov_bad += 1
+    _cap = _rev.get("_captured_utc", "")
+    for _k, _v in _rev_ds.items():
+        _lm = _v.get("lastModified")
+        if _lm and _cap and _lm >= _cap:
+            print(f"  [FAIL] {_k} last modified {_lm} is not before the census capture {_cap}")
+            _prov_bad += 1
+    if _prov_bad:
+        print(f"FAIL: data-provenance record disagrees with the manuscript ({_prov_bad})")
+        return 1
+    print(f"[provenance] census source revisions OK: {len(_bulk)}/{len(_rev_ds)} datasets in "
+          f"the {_BULK_DAY} window ({_span}s span); outside it: {', '.join(_outside)}")
+
+    # UNetClassic floor sweep and definitional-limit one-step means. These carry the
+    # abstract's headline ("91.46 ... 1.927", the "factor of about fifty") and the intro's
+    # EddyFormer rebuttal, and were previously neither machine-checked NOR listed among the
+    # things the harness does not check -- the worst of the two states. Re-derived here from
+    # the same packaged per-window scalars the reported cells come from.
+    _sweep_ref = reference.get("unetclassic_floor_sweep_derived", {})
+    _mean_ref = reference.get("onestep_sampled_mean_by_floor_derived", {})
+    sweep_bad = 0
+    if not _sweep_ref or not _mean_ref:
+        print("FAIL: floor-sweep / sampled-mean reference blocks missing")
+        return 1
+    _fixture_rows = {}
+    for _fp in sorted((FIXTURES / "models").glob("*.json.gz")):
+        with gzip.open(_fp, "rt", encoding="utf-8") as _f:
+            for _r in json.load(_f)["rows"]:
+                _fixture_rows.setdefault((_r["model"], _r.get("mode")), []).append(_r)
+    _floors = {"eps_0_definitional": 0.0, "eps_1e9": 1e-9,
+               "eps_lib_1e7": 1e-7, "eps_fix_1e5": 1e-5}
+    for wname, (lo, hi) in (("window_6_12", (6, 12)), ("window_13_30", (13, 30))):
+        sel = [r for r in _fixture_rows.get(("UNetClassic", "rollout"), [])
+               if lo <= r["rollout_step"] <= hi]
+        by_traj = {}
+        for r in sel:
+            by_traj.setdefault((r["file"], r["trajectory"]), []).append(r)
+        for fname, eps in _floors.items():
+            per = [sum(_field_mean_vrmse(r, eps) for r in rs) / len(rs)
+                   for rs in by_traj.values()]
+            got = sum(per) / len(per)
+            want = dig(_sweep_ref, f"{wname}.{fname}")
+            if not sig4_equal(got, want):
+                print(f"  [FAIL] floor sweep UNetClassic {wname} {fname}: {got!r} vs {want!r}")
+                sweep_bad += 1
+    for model in ("UNetClassic", "UNetConvNext", "FNO"):
+        rows_ = _fixture_rows.get((model, "onestep"), [])
+        for fname, eps in (("definitional", 0.0), ("eps_1e9", 1e-9),
+                           ("library", 1e-7), ("eps_fix", 1e-5)):
+            got = sum(_field_mean_vrmse(r, eps) for r in rows_) / len(rows_)
+            want = dig(_mean_ref, f"{model}.{fname}")
+            if not sig4_equal(got, want):
+                print(f"  [FAIL] onestep sampled mean {model} {fname}: {got!r} vs {want!r}")
+                sweep_bad += 1
+    # Two further prose-load-bearing groups that were previously neither asserted nor named
+    # as unasserted: the FNO flat-extrapolation decline (which is the quantitative basis for
+    # the "majority flat-extrapolated" caveat on the one-step table) and the
+    # spatial-displacement field-frame count. A reviewer demonstrated that both could be
+    # perturbed in numbers.json and its frozen twin with this harness still exiting 0,
+    # because the reference-identity stage only compares the two copies to each other.
+    _interp_ref = reference.get("onestep_interp_extrapolation_derived", {})
+    if _interp_ref:
+        _fno = [r for r in _fixture_rows.get(("FNO", "onestep"), [])]
+        _by = {}
+        for _r in _fno:
+            _by.setdefault(_r["input_start"], []).append(_r)
+        for _start, _key in ((20, "fno_lib_at_start_20"), (29, "fno_lib_at_start_29")):
+            if _key in _interp_ref and _start in _by:
+                _vals = [_field_mean_vrmse(_r, 1e-7) for _r in _by[_start]
+                         if _r["file"].endswith("At_75.hdf5") and _r["trajectory"] == 1]
+                if _vals:
+                    _got = sum(_vals) / len(_vals)
+                    if f"{_got:.4g}" != f"{float(_interp_ref[_key]):.4g}":
+                        print(f"  [FAIL] onestep interp {_key}: {_got!r} vs "
+                              f"{_interp_ref[_key]!r}")
+                        sweep_bad += 1
+    _disp_ref = reference.get("spatial_displacement_frames_derived", {})
+    if _disp_ref:
+        _sel = [r for r in _fixture_rows.get(("UNetClassic", "rollout"), [])
+                if 6 <= r["rollout_step"] <= 12]
+        _hit = _tot = 0
+        for _r in _sel:
+            _var, _mse = _r["target_variance_ddof1"], _r["mse"]
+            _pv = _r.get("pred_variance_ddof1") or [0.0] * len(_var)
+            for _i in range(1, len(_var)):          # index 0 is density
+                _tot += 1
+                if math.sqrt(_mse[_i]) > math.sqrt(_var[_i]) + math.sqrt(_pv[_i]):
+                    _hit += 1
+        for _k, _got in (("velocity_field_frames", _tot),
+                         ("velocity_field_frames_exceeding", _hit)):
+            if _k in _disp_ref and _disp_ref[_k] != _got:
+                print(f"  [FAIL] spatial displacement {_k}: {_got!r} vs {_disp_ref[_k]!r}")
+                sweep_bad += 1
+
+    _max_ref = reference.get("onestep_sampled_max_derived", {})
+    for model in ("UNetClassic", "UNetConvNext"):
+        rows_ = _fixture_rows.get((model, "onestep"), [])
+        if not rows_ or not dig(_max_ref, model):
+            continue
+        vals_lib = [_field_mean_vrmse(r, 1e-7) for r in rows_]
+        vals_fix = [_field_mean_vrmse(r, 1e-5) for r in rows_]
+        for key, got in (("max_lib", max(vals_lib)), ("max_fix", max(vals_fix)),
+                         ("max_e9", max(_field_mean_vrmse(r, 1e-9) for r in rows_)),
+                         ("max_defn", max(_field_mean_vrmse(r, 0.0) for r in rows_)),
+                         ("n_sampled_starts", len(rows_)),
+                         ("n_above_ten_e9",
+                          sum(_field_mean_vrmse(r, 1e-9) > 10 for r in rows_)),
+                         ("n_above_ten_defn",
+                          sum(_field_mean_vrmse(r, 0.0) > 10 for r in rows_))):
+            want = dig(_max_ref, f"{model}.{key}")
+            if want is None:
+                continue
+            # These leaves are STORED rounded to four significant figures by the extractor,
+            # so compare at that precision rather than with a 1e-4 relative tolerance.
+            ok = (got == want if isinstance(want, int)
+                  else f"{got:.4g}" == f"{float(want):.4g}")
+            if not ok:
+                print(f"  [FAIL] onestep sampled {model} {key}: {got!r} vs {want!r}")
+                sweep_bad += 1
+    if sweep_bad:
+        print(f"FAIL: floor sweep / sampled means disagree with the reference ({sweep_bad})")
+        return 1
+    print("[sweep] floor sweep + definitional-limit one-step means OK "
+          "(8 sweep cells, 12 sampled means, re-derived from the packaged scalars)")
+
     # Rayleigh-Benard checkpoint audit (second audited dataset, paper section 'generalize'):
     # re-derive the cited cells from the packaged per-window scalars and compare with
     # numbers.json, rather than trusting the stored aggregate.
@@ -411,14 +669,137 @@ def main() -> int:
                     print(f"  [FAIL] rb quiescent/developed {model} {floor}.{key}: "
                           f"{got!r} vs {want!r}")
                     rb_bad += 1
+    # The published-cell denominator behind "seven of eight": asserted against the frozen
+    # per-cell record, so the premise is traceable rather than quoted from prose.
+    pub_now, pub_ref = rb_now.get("published_rollout_cells", {}), rb_ref.get(
+        "published_rollout_cells", {})
+    for key in ("n_cells", "n_published_gt10", "cells"):
+        if pub_now.get(key) != pub_ref.get(key):
+            print(f"  [FAIL] rb published_rollout_cells {key}: "
+                  f"{pub_now.get(key)!r} vs {pub_ref.get(key)!r}")
+            rb_bad += 1
+    if pub_now.get("n_published_gt10") != 8:
+        print("  [FAIL] the 'seven of eight published >10 cells' premise requires 8 "
+              f"published '>10' cells; frozen record has {pub_now.get('n_published_gt10')!r}")
+        rb_bad += 1
+
     g10, g10ref = rb_now["gt10_summary"], rb_ref.get("gt10_summary", {})
     for key in ("n_cells", "n_reproduced_at_library_floor", "n_still_gt10_at_eps_fix"):
         if g10[key] != g10ref.get(key):
             print(f"  [FAIL] rb gt10_summary {key}: {g10[key]!r} vs {g10ref.get(key)!r}")
             rb_bad += 1
+
+    # Stratified pass (Ra x Pr): the cells the paper's generalization claim rests on, the
+    # coverage denominators its scope sentences quote, and the calibration of the data-only
+    # predictor. Asserted here because every one of those is a claim a reader can check.
+    st_now = rb_now.get("stratified", {}).get("summary", {})
+    st_ref = dig(rb_ref, "stratified.summary") or {}
+    if not st_now:
+        print("FAIL: rb stratified pass missing -- the Ra x Pr claim cannot be re-derived")
+        return 1
+    for key in ("n_files", "n_models", "n_trajectories"):
+        if st_now[key] != st_ref.get(key):
+            print(f"  [FAIL] rb stratified {key}: {st_now[key]!r} vs {st_ref.get(key)!r}")
+            rb_bad += 1
+    for win in ("6-12", "13-30"):
+        for key in ("n_cells", "n_gt10_at_library_floor", "n_gt10_at_eps_fix",
+                    "files_with_no_cell_gt10_at_library_floor"):
+            got, want = st_now[f"window_{win}"][key], dig(st_ref, f"window_{win}.{key}")
+            if got != want:
+                print(f"  [FAIL] rb stratified window {win} {key}: {got!r} vs {want!r}")
+                rb_bad += 1
+    # Every PRINTED cell of the stratified table, not just its summary counts. Asserting
+    # only the counts would leave the 40 rollout cells and 10 quiescent shares the paper
+    # prints unchecked, while the paper claims the harness re-derives its cited cells.
+    pf_now = dig(rb_now, "stratified.per_file") or {}
+    pf_ref = dig(rb_ref, "stratified.per_file") or {}
+    if sorted(pf_now) != sorted(pf_ref):
+        print(f"  [FAIL] rb stratified per-file set: {sorted(pf_now)} vs {sorted(pf_ref)}")
+        rb_bad += 1
+    # NOTE: the keys are file names and contain dots, so they cannot go through dig()'s
+    # dotted-path lookup -- index the reference dict directly.
+    for fn in sorted(pf_now):
+        ref_fn = pf_ref.get(fn, {})
+        for key in ("quiescent_fraction", "min_field_variance", "floor_share_epslib"):
+            if not sig4_equal(pf_now[fn][key], ref_fn.get(key)):
+                print(f"  [FAIL] rb stratified {fn} {key}: {pf_now[fn][key]!r} vs "
+                      f"{ref_fn.get(key)!r}")
+                rb_bad += 1
+        for model in sorted(pf_now[fn]["cells"]):
+            for win in ("6-12", "13-30"):
+                for floor in ("library", "eps_fix"):
+                    got = pf_now[fn]["cells"][model][win][floor]
+                    want = dig(ref_fn.get("cells", {}), f"{model}.{win}.{floor}")
+                    if not sig4_equal(got, want):
+                        print(f"  [FAIL] rb stratified {fn} {model} {win} {floor}: "
+                              f"{got!r} vs {want!r}")
+                        rb_bad += 1
+    cal_now, cal_ref = st_now["calibration_window_6_12"], st_ref.get(
+        "calibration_window_6_12", {})
+    for key in ("n_strata", "separates_without_overlap"):
+        if cal_now[key] != cal_ref.get(key):
+            print(f"  [FAIL] rb mechanism-check {key}: {cal_now[key]!r} vs {cal_ref.get(key)!r}")
+            rb_bad += 1
+    for stat in ("pearson_r", "spearman_r", "pearson_p", "spearman_p"):
+        for model in sorted(cal_now[stat]):
+            if not sig4_equal(cal_now[stat][model], dig(cal_ref, f"{stat}.{model}")):
+                print(f"  [FAIL] rb mechanism-check {stat} {model}: {cal_now[stat][model]!r} "
+                      f"vs {dig(cal_ref, f'{stat}.{model}')!r}")
+                rb_bad += 1
+    for key in ("max_quiescent_fraction_among_files_with_no_gt10_cell",
+                "min_quiescent_fraction_among_files_with_all_gt10_cells"):
+        if not sig4_equal(cal_now[key], cal_ref.get(key)):
+            print(f"  [FAIL] rb mechanism-check {key}: {cal_now[key]!r} vs {cal_ref.get(key)!r}")
+            rb_bad += 1
+    cov_now, cov_ref = rb_now.get("coverage", {}), rb_ref.get("coverage", {})
+    for path in ("combined.files", "combined.trajectories", "combined.of_test_files",
+                 "combined.of_test_trajectories", "depth_pass.files",
+                 "depth_pass.trajectories", "depth_pass.models", "stratified_pass.files",
+                 "stratified_pass.trajectories", "stratified_pass.models",
+                 "models_depth_only", "models_on_every_covered_file"):
+        got, want = dig(cov_now, path), dig(cov_ref, path)
+        if got != want:
+            print(f"  [FAIL] rb coverage {path}: {got!r} vs {want!r}")
+            rb_bad += 1
+
+    # Checkpoint chronology: a provenance fact about our own audited artifacts, so it is
+    # checked like a number, not trusted as prose.
+    chron_now = rb_now.get("checkpoint_chronology", {})
+    chron_ref = rb_ref.get("checkpoint_chronology", {})
+    if not chron_now:
+        print("FAIL: checkpoint chronology fixture missing -- "
+              "fixtures/provenance/checkpoint_chronology.json")
+        return 1
+    for path in ("benchmark_arxiv_v1", "quoted_tables_version", "quoted_tables_version_date",
+                 "summary.n_repos", "summary.all_initial_commits_same_day",
+                 "summary.any_revised_after_upload", "summary.initial_commit_dates",
+                 "summary.min_days_after_benchmark_paper",
+                 "summary.max_days_after_benchmark_paper",
+                 "summary.min_days_after_quoted_tables_version",
+                 "summary.max_days_after_quoted_tables_version"):
+        got, want = dig(chron_now, path), dig(chron_ref, path)
+        if got != want:
+            print(f"  [FAIL] checkpoint chronology {path}: {got!r} vs {want!r}")
+            rb_bad += 1
+    if len(chron_now.get("repos", {})) != 8:
+        print(f"  [FAIL] checkpoint chronology covers {len(chron_now.get('repos', {}))} "
+              "repos, expected all 8 audited checkpoints")
+        rb_bad += 1
     if rb_bad:
         print(f"FAIL: Rayleigh-Benard checkpoint audit disagrees with numbers.json ({rb_bad})")
         return 1
+    _c, _s = rb_now["coverage"]["combined"], st_now["window_6-12"]
+    print(f"[rb] stratified pass OK: {_s['n_gt10_at_library_floor']}/{_s['n_cells']} "
+          f"Ra x Pr cells >10 at the library floor (window 6-12), "
+          f"{_s['n_gt10_at_eps_fix']} still >10 under the better-conditioned floor; "
+          f"predictor separates without overlap: "
+          f"{st_now['calibration_window_6_12']['separates_without_overlap']}")
+    print(f"[rb] coverage OK: {_c['files']}/{_c['of_test_files']} test files, "
+          f"{_c['trajectories']}/{_c['of_test_trajectories']} test trajectories")
+    print(f"[chronology] OK: {chron_now['summary']['n_repos']} audited checkpoints, all "
+          f"committed {chron_now['summary']['initial_commit_dates']}, "
+          f"+{chron_now['summary']['min_days_after_quoted_tables_version']}d after the "
+          f"quoted tables' arXiv {chron_now['quoted_tables_version']}")
     print(f"[rb] checkpoint audit OK: {rb_now['protocol']['n_rows']} rows re-derived, "
           f"{g10['n_reproduced_at_library_floor']}/{g10['n_cells']} published '>10' rollout "
           f"cells reproduced at the library floor, {g10['n_still_gt10_at_eps_fix']} still "

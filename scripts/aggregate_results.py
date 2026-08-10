@@ -38,12 +38,70 @@ EPS_LIB = 1e-7
 EPS_REQ = 1e-5
 W1 = (6, 12)   # rollout steps, 1-indexed inclusive
 W2 = (13, 30)
+# Published Rayleigh-Taylor cells, QUOTED from The Well, arXiv:2412.00568v2, read
+# cell-by-cell from the published tables (verified 2026-08-03 against the arXiv HTML of v2).
+# COLUMN SEMANTICS, recorded because they are the thing that can silently invert an
+# assignment: Table 3 is MODEL-major with the rollout window as the inner column --
+# header row 1 is "Dataset | FNO | TFNO | U-net | CNextU-net" and header row 2 repeats
+# "6:12 | 13:30" under each model. The Rayleigh-Taylor row reads
+#   >10, >10, 6.72, >10, >10, 2.84, >10, 7.43
+# which under that ordering is TFNO 6.72 at 6:12 and U-net 2.84 at 13:30 -- not the
+# window-major reading, which would swap them. Table 3's RT row carries no Atwood
+# qualifier while Tables 2 and 5 label theirs "(At = 0.25)"; see sec2_pipeline.
 PAPER = {
+    "_source": ("The Well, arXiv:2412.00568v2. table2_onestep: Table 2 (one-step VRMSE), "
+                "rayleigh_taylor_instability row. table3_*: Table 3 (time-averaged rollout "
+                "VRMSE), model-major columns with 6:12/13:30 inner, row label without an "
+                "Atwood qualifier. table5_validation: Table 5 (validation split), row "
+                "labelled '(At = 0.25)'."),
     "table2_onestep": {"FNO": ">10", "TFNO": ">10", "UNetClassic": ">10", "UNetConvNext": ">10"},
     "table3_6_12": {"FNO": ">10", "TFNO": "6.72", "UNetClassic": ">10", "UNetConvNext": ">10"},
     "table3_13_30": {"FNO": ">10", "TFNO": ">10", "UNetClassic": "2.84", "UNetConvNext": "7.43"},
     "table5_validation": {"FNO": 0.4013, "TFNO": 0.2251, "UNetClassic": 0.6140, "UNetConvNext": 0.3771},
 }
+
+
+def _assert_paper_matches_frozen_record():
+    """Couple the RT published cells to the frozen record, as RB's already are.
+
+    PAPER is a literal; the same cells are frozen in
+    fixtures/generalization/well_table3_gt10.json with their column semantics. A literal that
+    nothing checks is a weaker premise than one that is checked, and the Rayleigh-Taylor
+    claims (Table 2's published column, the 6.72/2.84/7.43 comparisons) are as load-bearing
+    as the Rayleigh-Benard ones. Drift between the two copies now fails loudly.
+    """
+    import json as _json
+    import os as _os
+    fp = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))),
+                       "fixtures", "generalization", "well_table3_gt10.json")
+    if not _os.path.exists(fp):
+        return
+    with open(fp, encoding="utf-8") as f:
+        rec = _json.load(f).get("table3_rollout_rayleigh_taylor")
+    if not rec:
+        return
+    for win_key, paper_key in (("window_6_12", "table3_6_12"),
+                               ("window_13_30", "table3_13_30")):
+        if rec[win_key] != PAPER[paper_key]:
+            raise AssertionError(
+                f"Rayleigh-Taylor published cells disagree between the frozen record and "
+                f"PAPER[{paper_key!r}]: {rec[win_key]} vs {PAPER[paper_key]}")
+    # The record's own summary counts must follow from the cells it lists. Stating them by
+    # hand is how they went wrong once: an earlier revision recorded 6 censored / 2 finite
+    # for a row that is 5 / 3, and because nothing read the integers the pair stayed
+    # self-consistent (they summed to 8) while contradicting the cells above them.
+    _cells = list(rec["window_6_12"].values()) + list(rec["window_13_30"].values())
+    _derived = {"n_cells": len(_cells),
+                "n_cells_gt10": sum(c == ">10" for c in _cells),
+                "n_cells_finite": sum(c != ">10" for c in _cells)}
+    for _k, _v in _derived.items():
+        if rec.get(_k) != _v:
+            raise AssertionError(
+                f"Rayleigh-Taylor frozen record's {_k}={rec.get(_k)!r} does not follow from "
+                f"its own cells (should be {_v})")
+
+
+_assert_paper_matches_frozen_record()
 
 
 def vr(mse: np.ndarray, var: np.ndarray, eps: float) -> np.ndarray:
