@@ -299,7 +299,8 @@ def stratified(rows):
     only there would be assuming the answer. This pass scores the same published rollout
     windows on ten files spanning Ra 1e6-1e10 and Pr 0.1-10, for the two baselines it was run
     for, and reports the cells WITH the data-only quiescent fraction of each file -- so a
-    reader can see both that the headline reproduces broadly and where it stops reproducing.
+    reader can see both where the headline crosses the same censored threshold broadly and
+    where it stops crossing.
     """
     files = sorted({r["file"] for r in rows})
     models = sorted({r["model"] for r in rows})
@@ -407,7 +408,8 @@ def build():
         pf = np.array([per_field_vrmse(r, 1e-7) for r in sel]).mean(axis=0)
         out["per_field_rollout_6_12"][m] = dict(zip(FIELDS, [float(v) for v in pf]))
 
-    # How many of the eight published ">10" rollout cells this audit reproduces, and how many
+    # How many of the eight published ">10" rollout cells this audit lands on the same side
+    # of (a crossing, not a reproduction of the published estimate), and how many
     # survive the better-conditioned floor.
     #
     # The DENOMINATOR of "seven of eight" is a claim about the PUBLISHED table, so it is read
@@ -448,7 +450,7 @@ def build():
     cells = [(m, lab) for m in models for lab in WINDOWS]
     out["gt10_summary"] = {
         "n_cells": len(cells),
-        "n_reproduced_at_library_floor":
+        "n_same_side_crossings_at_library_floor":
             sum(out["rollout_windows"][m][lab]["library"] > 10 for m, lab in cells),
         "n_still_gt10_at_eps_fix":
             sum(out["rollout_windows"][m][lab]["eps_fix"] > 10 for m, lab in cells),
@@ -513,6 +515,6 @@ if __name__ == "__main__":
     print(f"wrote {dest}")
     print(f"  {res['protocol']['n_rows']} rows, {res['protocol']['n_models']} models, "
           f"{res['protocol']['n_trajectories']} trajectories")
-    print(f"  published '>10' rollout cells reproduced at the library floor: "
-          f"{g['n_reproduced_at_library_floor']}/{g['n_cells']}"
+    print(f"  published '>10' rollout cells crossed on the same side at the library floor: "
+          f"{g['n_same_side_crossings_at_library_floor']}/{g['n_cells']}"
           f"  (still >10 under eps=1e-5: {g['n_still_gt10_at_eps_fix']})")

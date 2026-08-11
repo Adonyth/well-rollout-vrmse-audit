@@ -375,6 +375,129 @@ def main() -> int:
     print(f"[gate3] library equivalence OK ({g3['summary']['n_windows_total']} windows, "
           f"all compared tensors bit-identical)")
 
+    # ---- Gate 2: the MULTI-STEP path. Gate 3 drives the library at n_steps_output=1, so
+    # it certifies a single forward pass only; every cell in the reported reproduction gap
+    # is multi-step. This stage asserts the frozen result of the packaged alignment fixture
+    # (scripts/gate2_alignment_fixture.py), which compares the library's own
+    # Trainer.rollout_model against this audit's mirror elementwise over a 5-step
+    # autoregressive rollout. Re-running it live needs the Tier-2 stack (the_well + torch),
+    # so the offline harness checks the frozen copy, as it does for Gate 3.
+    _g2_src = FIXTURES / "gate2" / "alignment_fixture.json"
+    if not _g2_src.exists():
+        print(f"FAIL: Gate 2 fixture missing at {_g2_src}; the appendix claims a packaged "
+              f"multi-step equivalence check")
+        return 1
+    g2 = json.loads(_g2_src.read_text())
+    c2 = g2.get("checks", {})
+    g2_bad = 0
+    # Tolerances are HARD-CODED here, never read from the artifact under test. An earlier
+    # version used g2.get("d_tolerance", ...), which let the fixture declare its own passing
+    # threshold: a hand-written file claiming a 1e9 tolerance passed while reporting an
+    # eight-order-of-magnitude disagreement. An artifact must not set its own bar.
+    G2_EXACT_KEYS = ("A_window_alignment_max_abs_diff",
+                     "B_channel_order_max_abs_diff",
+                     "C_rollout_identity_norm_max_abs_diff")
+    G2_D_TOL = 2e-5          # float32 accumulation bound for the Z-scored leg
+    G2_MIN_STEPS = 13        # must reach the second disputed rollout window
+    for k in G2_EXACT_KEYS:
+        v = c2.get(k)
+        if not isinstance(v, (int, float)) or not math.isfinite(v) or v != 0.0:
+            print(f"  [FAIL] gate2 {k}: {v!r}, expected an exact 0.0")
+            g2_bad += 1
+    _d = c2.get("D_rollout_zscore_norm_max_abs_diff")
+    if not isinstance(_d, (int, float)) or not math.isfinite(_d) or _d < 0.0 or _d > G2_D_TOL:
+        print(f"  [FAIL] gate2 Z-scored rollout max abs diff {_d!r} is not a finite "
+              f"non-negative value within {G2_D_TOL}")
+        g2_bad += 1
+    # Geometry must be internally coherent AND actually reach the disputed windows. A
+    # fixture with 1 frame, history 999 or a 2-step horizon is not evidence about the
+    # cells this paper disputes, whatever it declares.
+    _st, _fr = g2.get("rollout_steps"), g2.get("n_frames")
+    _hi, _gr, _tr = g2.get("history"), g2.get("grid"), g2.get("n_trajectories")
+    geom_ok = (all(isinstance(x, int) for x in (_st, _fr, _hi, _gr, _tr))
+               and _st >= G2_MIN_STEPS and _gr > 1 and _tr > 0 and _hi > 0
+               and _fr >= _hi + _st)
+    if not geom_ok:
+        print(f"  [FAIL] gate2 geometry incoherent or too short: steps={_st!r} "
+              f"frames={_fr!r} history={_hi!r} grid={_gr!r} traj={_tr!r} "
+              f"(need steps>={G2_MIN_STEPS}, frames>=history+steps, grid>1)")
+        g2_bad += 1
+    # The per-step series and the window count are what let the appendix say "exact at every
+    # step" and "all 62 windows" rather than "we sampled a few and wrote down zero".
+    _ps = c2.get("identity_per_step_max_abs_diff") if isinstance(c2, dict) else None
+    _ps = g2.get("identity_per_step_max_abs_diff", _ps)
+    if not (isinstance(_ps, list) and len(_ps) == _st
+            and all(isinstance(x, (int, float)) and math.isfinite(x) and x == 0.0 for x in _ps)):
+        print(f"  [FAIL] gate2 identity per-step series is not {_st!r} exact zeros: "
+              f"{(_ps[:4] if isinstance(_ps, list) else _ps)!r}")
+        g2_bad += 1
+    _nw = g2.get("n_windows_checked")
+    if not (isinstance(_nw, int) and _nw == (_fr - _hi) * _tr if all(
+            isinstance(x, int) for x in (_nw, _fr, _hi, _tr)) else False):
+        print(f"  [FAIL] gate2 checked {_nw!r} windows, not the "
+              f"{(_fr - _hi) * _tr if all(isinstance(x, int) for x in (_fr,_hi,_tr)) else '?'} "
+              f"its own geometry implies")
+        g2_bad += 1
+    _shapes = g2.get("compared_shapes", {})
+    _pred, _ref = _shapes.get("rollout_pred"), _shapes.get("rollout_ref")
+    # The two shapes come from the same library call, so _pred == _ref is true by
+    # construction and carries no information on its own; cross-check them against the
+    # geometry the fixture declares, or [31,1,1,1,1] with grid=8 passes.
+    _geom_ok = (isinstance(_pred, list) and len(_pred) >= 2
+                and _pred[1:1 + 3] == [_gr] * 3) if isinstance(_gr, int) else False
+    if not (isinstance(_pred, list) and _pred == _ref and _pred and _pred[0] == _st
+            and _geom_ok):
+        print(f"  [FAIL] gate2 compared shapes {_pred!r} vs {_ref!r} do not agree with "
+              f"a {_st!r}-step rollout")
+        g2_bad += 1
+    if g2_bad:
+        print("FAIL: Gate 2 fixture no longer supports the appendix's multi-step claim")
+        return 1
+    # ---- window coverage: the abstract's third quantification. Previously unbound -- the
+    # leaf could be perturbed and the exit code did not notice. Re-derived here from the
+    # packaged audit rows rather than trusted, and the census containment leaves with it,
+    # since item 8 claims those are bound and they were not.
+    import gzip as _gz, glob as _gl
+    _lo, _hi = (_wc0 := reference.get("window_coverage_derived", {})).get("window_frames", [4, 33])
+    _fr, _vzfull, _hzfull = [], 0, 0
+    for _fp in sorted(_gl.glob(str(FIXTURES / "audit" / "*.json.gz"))):
+        with _gz.open(_fp, "rt", encoding="utf-8") as _f:
+            _row = json.load(_f)
+        _flds = _row["fields"]
+        _v = {n: [] for n in _flds if "velocity" in n}
+        for _r in _row["rows"]:
+            if _lo <= _r["t"] <= _hi:
+                for _i, _n in enumerate(_flds):
+                    if _n in _v and _i < len(_r["variance_ddof1"]):
+                        _v[_n].append(_r["variance_ddof1"][_i])
+        _tot = len(next(iter(_v.values())))
+        _fr.append(min(sum(1 for x in _v[n] if x <= 1e-7) / _tot
+                       for n in _v if n != "velocity_z"))
+        _vzfull += all(x <= 1e-5 for x in _v.get("velocity_z", []))
+        _hzfull += all(all(x <= 1e-5 for x in _v[n]) for n in _v if n != "velocity_z")
+    _wc = reference.get("window_coverage_derived", {})
+    _wc_bad = 0
+    for _key, _got in (("horizontal_frac_below_epslib_mean", sum(_fr) / len(_fr)),
+                       ("horizontal_frac_below_epslib_min", min(_fr)),
+                       ("horizontal_frac_below_epslib_max", max(_fr)),
+                       ("n_traj_vz_below_epsfix_whole_window", _vzfull),
+                       ("n_traj_horizontal_below_epsfix_whole_window", _hzfull),
+                       ("n_trajectories", len(_fr))):
+        _want = _wc.get(_key)
+        if _want is None or abs(float(_got) - float(_want)) > 1e-9:
+            print(f"  [FAIL] window_coverage {_key}: re-derived {_got!r} vs table {_want!r}")
+            _wc_bad += 1
+    if _wc_bad:
+        print("FAIL: the window-coverage quantifications no longer match the packaged rows")
+        return 1
+    print(f"[coverage] window coverage OK ({len(_fr)} trajectories re-derived: horizontal "
+          f"below the library floor over {sum(_fr)/len(_fr):.2f} of the window on average, "
+          f"vertical below the better-conditioned floor whole-window in {_vzfull})")
+
+    print(f"[gate2] multi-step alignment OK ({g2['rollout_steps']}-step rollout vs the "
+          f"library's own Trainer.rollout_model, spanning both disputed windows; "
+          f"identity norm exact (0.0), Z-scored max abs diff {_d:.3e})")
+
     # The exit code must be bound to the RELEASED table, not only to the harness-local copy.
     # verify.py compares against fixtures/numbers_reference.json while its output says
     # "numbers.json"; if the two ever drift, every [OK] above would be checking the wrong
@@ -393,10 +516,14 @@ def main() -> int:
     # Bind the DERIVED blocks and the map block back to the artifacts they were derived
     # from. Adversarial testing showed the exit code bound 393 of numbers.json's ~1332
     # leaves: the printed conditioning-map floor shares, the Gate-3 quoted magnitudes, the
-    # census containment/extremes leaves and several *_derived groups could all be perturbed
-    # in numbers.json AND its frozen twin with this harness still exiting 0, because the
-    # reference-identity stage only compares the two copies to each other. Re-derive them
-    # from the packaged sources instead of trusting either copy.
+    # and several *_derived groups could all be perturbed in numbers.json AND its frozen twin
+    # with this harness still exiting 0, because the reference-identity stage only compares
+    # the two copies to each other. What follows re-derives the map and Gate-3 blocks from
+    # the packaged sources. NOTE what it does NOT cover: the census containment and extremes
+    # leaves are re-derived by the [coverage] stage above only for the window-coverage
+    # quantifications the abstract quotes; the remaining census_extremes_derived leaves are
+    # still bound only by the reference-identity comparison, and Section 8 lists them among
+    # the values outside the exit code.
     map_bad = 0
     _map_ref = dig(reference, "generalization.benchmark_map.datasets") or {}
     _map_src = FIXTURES / "generalization" / "benchmark_map" / "MAP.json"
@@ -684,7 +811,7 @@ def main() -> int:
         rb_bad += 1
 
     g10, g10ref = rb_now["gt10_summary"], rb_ref.get("gt10_summary", {})
-    for key in ("n_cells", "n_reproduced_at_library_floor", "n_still_gt10_at_eps_fix"):
+    for key in ("n_cells", "n_same_side_crossings_at_library_floor", "n_still_gt10_at_eps_fix"):
         if g10[key] != g10ref.get(key):
             print(f"  [FAIL] rb gt10_summary {key}: {g10[key]!r} vs {g10ref.get(key)!r}")
             rb_bad += 1
@@ -801,8 +928,8 @@ def main() -> int:
           f"+{chron_now['summary']['min_days_after_quoted_tables_version']}d after the "
           f"quoted tables' arXiv {chron_now['quoted_tables_version']}")
     print(f"[rb] checkpoint audit OK: {rb_now['protocol']['n_rows']} rows re-derived, "
-          f"{g10['n_reproduced_at_library_floor']}/{g10['n_cells']} published '>10' rollout "
-          f"cells reproduced at the library floor, {g10['n_still_gt10_at_eps_fix']} still "
+          f"{g10['n_same_side_crossings_at_library_floor']}/{g10['n_cells']} published '>10' rollout "
+          f"cells crossed on the same side at the library floor, {g10['n_still_gt10_at_eps_fix']} still "
           f">10 under the better-conditioned floor")
 
     print("PASS: repro-harness regenerates the frozen P3 values to a relative tolerance of 1e-4 (~4 sig figs).")

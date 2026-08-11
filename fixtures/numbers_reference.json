@@ -1,8 +1,9 @@
 {
  "_meta": {
   "sources": {
-   "summary_json": "lanes/p3-quant/results/summary.json",
-   "report_numbers_json": "lanes/lane-3/results/report_numbers.json",
+   "summary_json": "p3-quant/results/summary.json OR p3-quant/repro-harness/fixtures/summary.json",
+   "report_numbers_json": "lane-3/results/report_numbers.json OR p3-quant/repro-harness/fixtures/lane3_report_numbers.json",
+   "_resolution": "working-tree result files when present, otherwise the harness-packaged copies; the two are leaf-for-leaf identical and the emitted table is byte-identical either way",
    "onestep_fixtures": "repro-harness/fixtures/models/*.json.gz (sampled-start maxima, via aggregate_results.field_mean_vrmse)",
    "rb_census": "repro-harness/fixtures/generalization/rayleigh_benard_census.json",
    "well_tables_record": "repro-harness/fixtures/generalization/well_table3_gt10.json (Table-3 >10 status + frozen Table-2 RB row)",
@@ -1452,7 +1453,7 @@
     "UNetConvNext 6-12"
    ],
    "n_cells": 8,
-   "n_reproduced_at_library_floor": 7,
+   "n_same_side_crossings_at_library_floor": 7,
    "n_still_gt10_at_eps_fix": 1
   },
   "published_rollout_cells": {
@@ -1995,8 +1996,48 @@
  },
  "instrument_agreement": {
   "n_rows": 17,
-  "source": "instrument/test_against_paper.py over fixtures/generalization/benchmark_map/MAP.json",
-  "tolerance": 5e-06,
-  "worst_relative_difference": 3.7146989911606403e-06
+  "rows_reproduced_exactly_at_stored_precision": 17,
+  "withdrawn_worst_relative_difference": 3.7146989911606403e-06,
+  "stored_significant_figures": 6,
+  "independent": false,
+  "source": "normscreen.floor_share recomputed over MAP.json's stored min_var; same expression as assemble_map.py, so this is an internal-consistency check, not an independent re-derivation of the census"
+ },
+ "gap_scaled_crossing": {
+  "unetclassic_rollout_6_12_lib": 16.46372717783901,
+  "gap_factor_unetclassic_13_30_like_for_like": 2.3725780995636963,
+  "scaled_by_unetclassic_gap": 6.939171857342272,
+  "gap_factor_unetconvnext_13_30_split_scaled": 1.0564829518325434,
+  "scaled_by_unetconvnext_split_scaled_gap": 15.583523756139678,
+  "unetconvnext_split_scaled_6_12": 8.624111458234054,
+  "cn_cell_by_unetclassic_gap": 3.634911516640898,
+  "cn_cell_by_unetconvnext_gap": 8.163038923888863,
+  "n_of_four_below_ten": 3,
+  "conclusive": false,
+  "source": "counterfactual from paper_values.table3_13_30, models.UNetClassic.rollout_*.lib and the split-scaled UNetConvNext estimate; the two factors straddle ten, so the counterfactual does not settle whether the crossing would survive"
+ },
+ "window_coverage_derived": {
+  "window_frames": [
+   4,
+   33
+  ],
+  "n_trajectories": 10,
+  "horizontal_frac_below_epslib_mean": 0.72,
+  "horizontal_frac_below_epslib_min": 0.4666666666666667,
+  "horizontal_frac_below_epslib_max": 1.0,
+  "n_traj_horizontal_below_epsfix_whole_window": 10,
+  "n_traj_vz_below_epsfix_whole_window": 6,
+  "source": "repro-harness/fixtures/audit/*.json.gz over the scored window"
+ },
+ "onestep_estimator_spread_derived": {
+  "subset_mean_lib": 1.5185422721957573,
+  "interp115_mean_lib": 0.6170537710381284,
+  "ratio": 2.460956149155314,
+  "source": "models.UNetClassic.onestep; estimator choice at a fixed floor and split"
+ },
+ "gate2_alignment": {
+  "rollout_steps": 31,
+  "identity_rollout_max_abs_diff": 0.0,
+  "zscore_rollout_max_abs_diff": 1.1920928955078125e-07,
+  "source": "repro-harness/fixtures/gate2/alignment_fixture.json"
  }
 }

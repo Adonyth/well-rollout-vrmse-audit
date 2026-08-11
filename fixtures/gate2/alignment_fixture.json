@@ -1,0 +1,65 @@
+{
+ "checks": {
+  "A_window_alignment_max_abs_diff": 0.0,
+  "B_channel_order_max_abs_diff": 0.0,
+  "C_rollout_identity_norm_max_abs_diff": 0.0,
+  "D_rollout_zscore_norm_max_abs_diff": 1.1920928955078125e-07
+ },
+ "compared_shapes": {
+  "rollout_pred": [
+   31,
+   8,
+   8,
+   8,
+   4
+  ],
+  "rollout_ref": [
+   31,
+   8,
+   8,
+   8,
+   4
+  ]
+ },
+ "description": "library WellDataset/formatter/Trainer.rollout_model vs this audit's mirror on a synthesized well-schema fixture; no network, no checkpoint, deterministic toy model",
+ "gate": "gate2_alignment_fixture",
+ "grid": 8,
+ "history": 4,
+ "identity_per_step_max_abs_diff": [
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0
+ ],
+ "n_frames": 35,
+ "n_trajectories": 2,
+ "n_windows_checked": 62,
+ "rollout_steps": 31
+}

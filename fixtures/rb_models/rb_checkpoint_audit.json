@@ -132,7 +132,7 @@
    "UNetConvNext 6-12"
   ],
   "n_cells": 8,
-  "n_reproduced_at_library_floor": 7,
+  "n_same_side_crossings_at_library_floor": 7,
   "n_still_gt10_at_eps_fix": 1
  },
  "onestep": {

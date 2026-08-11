@@ -6,9 +6,33 @@ stabilizing constant rather than by the data. No model required.
 
 ```
 pip install -e .
-normscreen your_data.h5 --auto --spatial-dims 3 --eps 1e-7            # variance-normalized
-normscreen your_data.h5 --auto --spatial-dims 1 --eps 0 --normalizer rms   # RMS-normalized
+# declare the layout: how many LEADING axes, e.g. [trajectory, time, x, y, z] -> 2
+normscreen your_data.h5 --auto --spatial-dims 3 --eps 1e-7 --leading-axes 2 --component-axis -1
+# or screen every field whole:
+normscreen your_data.h5 --auto --spatial-dims 3 --eps 1e-7 --no-split-components
+# a floorless RMS-normalized metric (PDEBench-style):
+normscreen your_data.h5 --auto --spatial-dims 1 --eps 0 --normalizer rms --no-split-components
 ```
+
+**The screen never infers the component axis from rank, and neither should you.** A scalar
+stored `[trajectory, time, y, x]` and a vector stored `[time, y, x, component]` have the same
+rank; so do a two-leading-axis scalar and a one-leading-axis vector. Splitting the wrong one
+takes the variance over the wrong axes and can report a degenerate field as clean — the exact
+failure this tool exists to catch. So there are three safe ways to say what you have, and the
+screen refuses rather than guess if you use none of them:
+
+| you have | say |
+|---|---|
+| one layout for every field | `--leading-axes K --component-axis -1` |
+| scalars and vectors in one file | `component_axis={"velocity": -1}` (Python API) |
+| no component axes at all | `--no-split-components` |
+
+A single `--component-axis` with no `--leading-axes` is **never** accepted when any field
+could be split: rank-uniformity is not unambiguity, since a file of scalars stored
+`[trajectory, time, y, x]` is uniform and still ambiguous. And `--leading-axes` on its own is
+not enough either — a count of leading axes does not say *which* axis holds the components,
+and assuming the last one splits a channel-first store along a spatial axis. Give both, or use
+the per-field mapping, or screen whole.
 
 ## The problem it screens for
 
@@ -27,8 +51,8 @@ on data with different variability are not comparable to one another (Schaefli &
 
 Machine-learning benchmarking has imported the estimator without importing the caveat.
 The additive `eps` — there only to prevent division by zero — silently becomes the
-dominant term wherever the target is quiescent, and the reported number then measures the
-constant rather than the model. The numerical-analysis literature meets this regime with the
+dominant term wherever the target is quiescent. The reported number still moves with the
+model's error, but its scale is then set by the constant rather than by the data. The numerical-analysis literature meets this regime with the
 mixed tolerance `atol + rtol·|y|`. A fixed `eps` is an *analogue* of that construction, not an
 instance of it: the solver scale is additive, `sqrt(eps) + sqrt(Var)`, while a floored
 variance denominator is a root-sum-square, `sqrt(eps + Var)`. They differ by the cross term
@@ -64,13 +88,22 @@ reports whichever your metric actually uses.
 | well-conditioned | < 0.01 | the score means what it appears to mean |
 | floor-sensitive | 0.01 – 0.50 | the constant is material |
 | floor-dominated | 0.50 – 0.90 | the constant supplies most of the denominator |
-| floor-determined | ≥ 0.90 | the score is essentially a function of `eps` |
+| floor-determined | ≥ 0.90 | the score still tracks the error, but its scale is set by `eps` |
 
-Plus, per field: min/median/max variance, the fraction of frames that are floor-dominated,
+Plus, per field: min/median/max variance, the fraction of frames that are
+floor-determined (share >= 0.90) and the fraction at or below the floor (Var <= eps),
 and an `eps` sweep giving the factor by which any fixed error's score moves between
 candidate floors.
 
-Exit status is `1` on a positive screen, so it composes into CI.
+Exit status is `1` on anything you should not read as a clean screen: a floor-determined
+denominator; a zero denominator under a floorless metric (unbounded, not merely saturated);
+a non-finite denominator (undefined — NaN/inf input, or too few spatial points to form a
+variance); and an **incomplete** screen, where the tool had to guess that a field's extra axis
+was a leading index rather than components. An asserted whole-screen (`--no-split-components`,
+or a per-field `None`) is not incomplete — you told it what the layout is — but the report
+still says which fields it did not screen per component. So it composes into CI without
+certifying data it could not actually score, and without silently certifying data it only
+partly screened.
 
 ## What it does *not* claim
 
@@ -88,16 +121,21 @@ the source arrays, so it is an internal-consistency check rather than an indepen
 reproduction of the census:
 
 ```
-17 rows agree, 0 disagree (tolerance 5e-06)
-worst relative difference 3.714699e-06  vs numbers.json 3.714699e-06  -> OK
-1728 per-window variances: worst floor share 0.999908, floor-dominated in 39.8% of windows
+17 rows reproduced exactly at the stored precision, 0 disagree
+1728 per-window variances: worst floor share 0.999908, floor-determined (share>=0.90) in 39.8% of windows
 PASS
 ```
 
-Both fixture counts (17 rows, 1728 windows) are pinned, so a missing or partially
-fetched fixture tree fails the suite instead of passing over nothing. The worst-case
-relative agreement is pinned against the audit's number table, so the figure printed in
-the paper cannot drift from the code that produces it without this test going red.
+**What this does not establish.** `normscreen.floor_share` and the census assembler evaluate
+the same expression, `eps/(Var+eps)`, and the fixture stores the result at six significant
+figures. Comparing them is a regression check that binds the two together — it would catch a
+change in either — but it is not independent corroboration of the statistic, and it takes the
+variance extraction as given. An earlier version of this file quoted a "worst-case relative
+agreement of 3.715e-6"; that number was the `%.6g` rounding of the single tightest row and would
+have been `0.0` had the fixture stored full precision. It is withdrawn.
+
+Both fixture counts (17 rows, 1728 windows) are pinned, so a missing or partially fetched
+fixture tree fails the suite instead of passing over nothing.
 
 `test_normalizers.py` pins the two-convention behaviour, including the `RMS² = Var + mean²`
 identity, the `eps = 0` case (floor share is 0, never NaN), and saturation-versus-

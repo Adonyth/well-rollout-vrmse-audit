@@ -1,0 +1,780 @@
+{
+  "environment": {
+    "disk": {
+      "lane3_artifacts_bytes_du": 77864960,
+      "lane3_combined_bytes_du": 1408040960,
+      "lane3_limit_bytes": 3221225472,
+      "lane3_venv_bytes_du": 1330176000,
+      "shared_pool_bytes_du": 10550784000,
+      "shared_pool_limit_bytes": 16106127360
+    },
+    "packages": {
+      "aiohttp": "3.14.1",
+      "fsspec": "2024.10.0",
+      "h5py": "3.16.0",
+      "neuraloperator": "0.3.0",
+      "numpy": "2.5.1",
+      "safetensors": "0.8.0",
+      "the_well": "1.2.0",
+      "torch": "2.13.0"
+    }
+  },
+  "fno_parameter_audit": {
+    "bytes_fetched_for_count": 1792,
+    "components": {
+      "lifting": 37248,
+      "projection": 34052,
+      "skip_weights": 65536,
+      "spectral_biases": 512,
+      "spectral_weights": 18874368
+    },
+    "distance_above_lower_band": 4011716,
+    "distance_below_upper_band": 988284,
+    "model_id": "polymathic-ai/FNO-turbulent_radiative_layer_2D",
+    "paper_spec": {
+      "blocks": 4,
+      "hidden_channels": 128,
+      "modes": 16,
+      "parameter_band_real_scalars": [
+        15000000,
+        20000000
+      ],
+      "scope": "approximately 15-20M for 2D baselines; Appendix E.1-E.2",
+      "source": "https://proceedings.neurips.cc/paper_files/paper/2024/file/4f9a5acd91ac76569f2fe291b1f4772b-Paper-Datasets_and_Benchmarks_Track.pdf"
+    },
+    "revision": "49357c80caeecf58a34964c648f8660db5764422",
+    "stored_real_f32_scalars": 19011716,
+    "verdict": "NO_PARAMETER_DEFICIT_FOR_PINNED_CHECKPOINT",
+    "visible_arithmetic": {
+      "byte_closure": "8 + 1,784 + 19,011,716*4 = 76,048,656",
+      "lifting": "256*16 + 256 + 128*256 + 128 = 37,248",
+      "projection": "256*128 + 256 + 4*256 + 4 = 34,052",
+      "skip_weights": "4 * 128 * 128 = 65,536",
+      "spectral_biases": "4 * 128 = 512",
+      "spectral_weights": "4 * 128 * 128 * 16 * 9 * 2 = 18,874,368",
+      "total": "18,874,368 + 512 + 65,536 + 37,248 + 34,052 = 19,011,716"
+    },
+    "weights_bytes": 76048656
+  },
+  "rt": {
+    "summary": {
+      "access_date": "2026-07-12",
+      "access_mode": "HTTP Range through fsspec; full HDF5 not materialized",
+      "constituent_runtime_seconds": 1464.0771898750004,
+      "dataset": "rayleigh_taylor_instability",
+      "early_fraction_variance_le_1e-7_by_field": {
+        "density": 0.0,
+        "velocity_x": 1.0,
+        "velocity_y": 1.0,
+        "velocity_z": 1.0
+      },
+      "hypothesis_verdict": "PARTIAL_DENOMINATOR_PREMISE_ONLY",
+      "interpretation_boundary": "Persistence is a deterministic diagnostic, not the published FNO. Both trajectories of the first file test the denominator premise, but they do not attribute the paper's >10 score to that premise.",
+      "issue_75_requested_epsilon": 1e-05,
+      "library_fallback_epsilon": 1e-07,
+      "n_per_time_rows": 944,
+      "n_trajectories": 2,
+      "near_zero_operationalization": "variance <= 1e-7, fixed to the library fallback epsilon; selected after a five-timepoint access pilot and therefore descriptive, not preregistered",
+      "outputs": {
+        "per_time": "rt_per_time.csv",
+        "plot": "rt_variance_vrmse.png",
+        "windows": "rt_window_summary.csv"
+      },
+      "remote_bytes": 7985979776,
+      "remote_etag": "\"675215c1-1dc006180\"",
+      "remote_last_modified": "Thu, 05 Dec 2024 21:06:09 GMT",
+      "remote_url": "https://sdsc-users.flatironinstitute.org/~polymathic/data/the_well/datasets/rayleigh_taylor_instability/data/test/rayleigh_taylor_instability_At_75.hdf5",
+      "trajectories": [
+        0,
+        1
+      ],
+      "window_definitions_inclusive": [
+        [
+          1,
+          5
+        ],
+        [
+          6,
+          12
+        ],
+        [
+          13,
+          30
+        ],
+        [
+          31,
+          60
+        ],
+        [
+          61,
+          90
+        ],
+        [
+          91,
+          118
+        ]
+      ]
+    },
+    "window_table": [
+      {
+        "field": "density",
+        "fraction_variance_le_1e-7": "0.0",
+        "mean_default_to_requested_ratio": "1.0000271665584717",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "10",
+        "persistence_vrmse_default_max": "0.013961643760636208",
+        "persistence_vrmse_default_mean": "0.00922459532984955",
+        "persistence_vrmse_requested_1e-5_max": "0.013961265961841702",
+        "persistence_vrmse_requested_1e-5_mean": "0.009224344968823102",
+        "variance_max": "0.18292453596767932",
+        "variance_median": "0.1820954219433158",
+        "variance_min": "0.18173908438288658",
+        "window_inclusive": "1:5"
+      },
+      {
+        "field": "velocity_x",
+        "fraction_variance_le_1e-7": "1.0",
+        "mean_default_to_requested_ratio": "9.993134772529176",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "10",
+        "persistence_vrmse_default_max": "0.015245799571529857",
+        "persistence_vrmse_default_mean": "0.010899536989073325",
+        "persistence_vrmse_requested_1e-5_max": "0.0015268505023726627",
+        "persistence_vrmse_requested_1e-5_mean": "0.0010907455701509576",
+        "variance_max": "4.319337380462641e-10",
+        "variance_median": "9.879275703292751e-11",
+        "variance_min": "7.823337648613191e-12",
+        "window_inclusive": "1:5"
+      },
+      {
+        "field": "velocity_y",
+        "fraction_variance_le_1e-7": "1.0",
+        "mean_default_to_requested_ratio": "9.992588566831826",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "10",
+        "persistence_vrmse_default_max": "0.016184651755978306",
+        "persistence_vrmse_default_mean": "0.011237727826993001",
+        "persistence_vrmse_requested_1e-5_max": "0.0016211849064150991",
+        "persistence_vrmse_requested_1e-5_mean": "0.0011246803925131926",
+        "variance_max": "4.873364682432275e-10",
+        "variance_median": "9.962232752875341e-11",
+        "variance_min": "7.575352365351367e-12",
+        "window_inclusive": "1:5"
+      },
+      {
+        "field": "velocity_z",
+        "fraction_variance_le_1e-7": "1.0",
+        "mean_default_to_requested_ratio": "9.568444532079923",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "10",
+        "persistence_vrmse_default_max": "0.29586125587754203",
+        "persistence_vrmse_default_mean": "0.09364930531481325",
+        "persistence_vrmse_requested_1e-5_max": "0.030922064272817126",
+        "persistence_vrmse_requested_1e-5_mean": "0.00979313365532002",
+        "variance_max": "1.1681280332690177e-08",
+        "variance_median": "8.977433748621664e-09",
+        "variance_min": "7.949914550274869e-09",
+        "window_inclusive": "1:5"
+      },
+      {
+        "field": "density",
+        "fraction_variance_le_1e-7": "0.0",
+        "mean_default_to_requested_ratio": "1.0000273175164298",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "14",
+        "persistence_vrmse_default_max": "0.004642932157588778",
+        "persistence_vrmse_default_mean": "0.0033122116844073765",
+        "persistence_vrmse_requested_1e-5_max": "0.004642805590395555",
+        "persistence_vrmse_requested_1e-5_mean": "0.003312121225171254",
+        "variance_max": "0.18157597700609696",
+        "variance_median": "0.1812028774608842",
+        "variance_min": "0.18085992341623622",
+        "window_inclusive": "6:12"
+      },
+      {
+        "field": "velocity_x",
+        "fraction_variance_le_1e-7": "1.0",
+        "mean_default_to_requested_ratio": "9.914160187822485",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "14",
+        "persistence_vrmse_default_max": "0.040649974236935005",
+        "persistence_vrmse_default_mean": "0.019282448291711607",
+        "persistence_vrmse_requested_1e-5_max": "0.004189529537113265",
+        "persistence_vrmse_requested_1e-5_mean": "0.0019521896346450416",
+        "variance_max": "6.287685195076597e-09",
+        "variance_median": "1.1520005361505335e-09",
+        "variance_min": "2.736520045655855e-10",
+        "window_inclusive": "6:12"
+      },
+      {
+        "field": "velocity_y",
+        "fraction_variance_le_1e-7": "1.0",
+        "mean_default_to_requested_ratio": "9.90660307718265",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "14",
+        "persistence_vrmse_default_max": "0.04297907039408142",
+        "persistence_vrmse_default_mean": "0.02000369662914463",
+        "persistence_vrmse_requested_1e-5_max": "0.004445978592897875",
+        "persistence_vrmse_requested_1e-5_mean": "0.002028290694671192",
+        "variance_max": "7.084911929475685e-09",
+        "variance_median": "1.2044771210356921e-09",
+        "variance_min": "2.644251381639291e-10",
+        "window_inclusive": "6:12"
+      },
+      {
+        "field": "velocity_z",
+        "fraction_variance_le_1e-7": "1.0",
+        "mean_default_to_requested_ratio": "9.463697251509567",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "14",
+        "persistence_vrmse_default_max": "0.07306406027492308",
+        "persistence_vrmse_default_mean": "0.034756203935763924",
+        "persistence_vrmse_requested_1e-5_max": "0.008246057441507759",
+        "persistence_vrmse_requested_1e-5_mean": "0.0037172419429881546",
+        "variance_max": "2.7728458476074784e-08",
+        "variance_median": "9.458948684299908e-09",
+        "variance_min": "7.77964162816149e-09",
+        "window_inclusive": "6:12"
+      },
+      {
+        "field": "density",
+        "fraction_variance_le_1e-7": "0.0",
+        "mean_default_to_requested_ratio": "1.0000274879849644",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "36",
+        "persistence_vrmse_default_max": "0.029876711837428092",
+        "persistence_vrmse_default_mean": "0.007053574614974263",
+        "persistence_vrmse_requested_1e-5_max": "0.029875886986034453",
+        "persistence_vrmse_requested_1e-5_mean": "0.0070533804393396364",
+        "variance_max": "0.1807597974229117",
+        "variance_median": "0.18007475583206595",
+        "variance_min": "0.17928504183552518",
+        "window_inclusive": "13:30"
+      },
+      {
+        "field": "velocity_x",
+        "fraction_variance_le_1e-7": "0.7222222222222222",
+        "mean_default_to_requested_ratio": "7.757168525442712",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "36",
+        "persistence_vrmse_default_max": "0.16707768935697906",
+        "persistence_vrmse_default_mean": "0.0747316278829257",
+        "persistence_vrmse_requested_1e-5_max": "0.06306592389105128",
+        "persistence_vrmse_requested_1e-5_mean": "0.01402376491555453",
+        "variance_max": "1.5449144815015961e-06",
+        "variance_median": "3.4977008604705714e-08",
+        "variance_min": "2.084860118872143e-09",
+        "window_inclusive": "13:30"
+      },
+      {
+        "field": "velocity_y",
+        "fraction_variance_le_1e-7": "0.7222222222222222",
+        "mean_default_to_requested_ratio": "7.689100356739036",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "36",
+        "persistence_vrmse_default_max": "0.158906836014431",
+        "persistence_vrmse_default_mean": "0.07474707058501127",
+        "persistence_vrmse_requested_1e-5_max": "0.061200205834436576",
+        "persistence_vrmse_requested_1e-5_mean": "0.014210054720105737",
+        "variance_max": "1.6241815282597176e-06",
+        "variance_median": "3.6971697566096584e-08",
+        "variance_min": "2.037388134300725e-09",
+        "window_inclusive": "13:30"
+      },
+      {
+        "field": "velocity_z",
+        "fraction_variance_le_1e-7": "0.4722222222222222",
+        "mean_default_to_requested_ratio": "6.271662827923482",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "36",
+        "persistence_vrmse_default_max": "0.16983596955021044",
+        "persistence_vrmse_default_mean": "0.09575335356755087",
+        "persistence_vrmse_requested_1e-5_max": "0.11296637540591142",
+        "persistence_vrmse_requested_1e-5_mean": "0.027382869249559336",
+        "variance_max": "9.716781526402045e-06",
+        "variance_median": "1.1488409954290067e-07",
+        "variance_min": "1.0555988079651911e-08",
+        "window_inclusive": "13:30"
+      },
+      {
+        "field": "density",
+        "fraction_variance_le_1e-7": "0.0",
+        "mean_default_to_requested_ratio": "1.0000289737247756",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "60",
+        "persistence_vrmse_default_max": "0.13756149185823294",
+        "persistence_vrmse_default_mean": "0.06446980392755462",
+        "persistence_vrmse_requested_1e-5_max": "0.13755688541866776",
+        "persistence_vrmse_requested_1e-5_mean": "0.06446785541226446",
+        "variance_max": "0.17943909999134844",
+        "variance_median": "0.17740450258241786",
+        "variance_min": "0.13904922163563832",
+        "window_inclusive": "31:60"
+      },
+      {
+        "field": "velocity_x",
+        "fraction_variance_le_1e-7": "0.0",
+        "mean_default_to_requested_ratio": "2.1157837338958894",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "60",
+        "persistence_vrmse_default_max": "0.3696697847963277",
+        "persistence_vrmse_default_mean": "0.21236099663818653",
+        "persistence_vrmse_requested_1e-5_max": "0.3607365153118335",
+        "persistence_vrmse_requested_1e-5_mean": "0.16138074700678065",
+        "variance_max": "0.00019734241762432955",
+        "variance_median": "9.747434050828566e-06",
+        "variance_min": "1.0655980689820014e-07",
+        "window_inclusive": "31:60"
+      },
+      {
+        "field": "velocity_y",
+        "fraction_variance_le_1e-7": "0.0",
+        "mean_default_to_requested_ratio": "2.1159282433117172",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "60",
+        "persistence_vrmse_default_max": "0.37494069389613865",
+        "persistence_vrmse_default_mean": "0.2134815696422501",
+        "persistence_vrmse_requested_1e-5_max": "0.3649470241299117",
+        "persistence_vrmse_requested_1e-5_mean": "0.162150576972166",
+        "variance_max": "0.00018922081547731876",
+        "variance_median": "9.44772756298009e-06",
+        "variance_min": "1.0696645022221656e-07",
+        "window_inclusive": "31:60"
+      },
+      {
+        "field": "velocity_z",
+        "fraction_variance_le_1e-7": "0.0",
+        "mean_default_to_requested_ratio": "1.541258975360035",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "60",
+        "persistence_vrmse_default_max": "0.2488947574443688",
+        "persistence_vrmse_default_mean": "0.15788567271688878",
+        "persistence_vrmse_requested_1e-5_max": "0.24710689003268116",
+        "persistence_vrmse_requested_1e-5_mean": "0.13415541238771572",
+        "variance_max": "0.0006815892997346749",
+        "variance_median": "6.123210570546595e-05",
+        "variance_min": "3.0073508776882385e-07",
+        "window_inclusive": "31:60"
+      },
+      {
+        "field": "density",
+        "fraction_variance_le_1e-7": "0.0",
+        "mean_default_to_requested_ratio": "1.0000385657928528",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "60",
+        "persistence_vrmse_default_max": "0.23336927914670133",
+        "persistence_vrmse_default_mean": "0.1559875803023978",
+        "persistence_vrmse_requested_1e-5_max": "0.2333603656192636",
+        "persistence_vrmse_requested_1e-5_mean": "0.15598156384362474",
+        "variance_max": "0.17531323971279023",
+        "variance_median": "0.1337902900191092",
+        "variance_min": "0.08593284784998297",
+        "window_inclusive": "61:90"
+      },
+      {
+        "field": "velocity_x",
+        "fraction_variance_le_1e-7": "0.0",
+        "mean_default_to_requested_ratio": "1.0292227917684862",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "60",
+        "persistence_vrmse_default_max": "0.41055316310461676",
+        "persistence_vrmse_default_mean": "0.3455040319228458",
+        "persistence_vrmse_requested_1e-5_max": "0.408457147332791",
+        "persistence_vrmse_requested_1e-5_mean": "0.33742164382419254",
+        "variance_max": "0.0009620533118237486",
+        "variance_median": "0.00030307913234148",
+        "variance_min": "2.9030171293935723e-05",
+        "window_inclusive": "61:90"
+      },
+      {
+        "field": "velocity_y",
+        "fraction_variance_le_1e-7": "0.0",
+        "mean_default_to_requested_ratio": "1.029649681348313",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "60",
+        "persistence_vrmse_default_max": "0.4326815330599901",
+        "persistence_vrmse_default_mean": "0.3545485852685171",
+        "persistence_vrmse_requested_1e-5_max": "0.4302087901120469",
+        "persistence_vrmse_requested_1e-5_mean": "0.34613353081970927",
+        "variance_max": "0.0008586350383197308",
+        "variance_median": "0.00029509619347923156",
+        "variance_min": "2.974759373700807e-05",
+        "window_inclusive": "61:90"
+      },
+      {
+        "field": "velocity_z",
+        "fraction_variance_le_1e-7": "0.0",
+        "mean_default_to_requested_ratio": "1.0065920495117224",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "60",
+        "persistence_vrmse_default_max": "0.2896285080497197",
+        "persistence_vrmse_default_mean": "0.228543653599063",
+        "persistence_vrmse_requested_1e-5_max": "0.28902617772388234",
+        "persistence_vrmse_requested_1e-5_mean": "0.2271767511251714",
+        "variance_max": "0.002372668400714723",
+        "variance_median": "0.0008009089213780562",
+        "variance_min": "0.0001974993582246632",
+        "window_inclusive": "61:90"
+      },
+      {
+        "field": "density",
+        "fraction_variance_le_1e-7": "0.0",
+        "mean_default_to_requested_ratio": "1.0000682704723167",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "56",
+        "persistence_vrmse_default_max": "0.32340746197881093",
+        "persistence_vrmse_default_mean": "0.2208595606272188",
+        "persistence_vrmse_requested_1e-5_max": "0.32337648345132414",
+        "persistence_vrmse_requested_1e-5_mean": "0.22084457722414588",
+        "variance_max": "0.12650619798312268",
+        "variance_median": "0.07283578119759172",
+        "variance_min": "0.050811171806070594",
+        "window_inclusive": "91:118"
+      },
+      {
+        "field": "velocity_x",
+        "fraction_variance_le_1e-7": "0.0",
+        "mean_default_to_requested_ratio": "1.0092775772297704",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "56",
+        "persistence_vrmse_default_max": "0.5070383360970372",
+        "persistence_vrmse_default_mean": "0.41860494738846404",
+        "persistence_vrmse_requested_1e-5_max": "0.5046298630189451",
+        "persistence_vrmse_requested_1e-5_mean": "0.41498760087858116",
+        "variance_max": "0.0010471990264156916",
+        "variance_median": "0.0006853162209178619",
+        "variance_min": "0.0003298426302721929",
+        "window_inclusive": "91:118"
+      },
+      {
+        "field": "velocity_y",
+        "fraction_variance_le_1e-7": "0.0",
+        "mean_default_to_requested_ratio": "1.0090947050176304",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "56",
+        "persistence_vrmse_default_max": "0.49655612055087056",
+        "persistence_vrmse_default_mean": "0.4141523574317109",
+        "persistence_vrmse_requested_1e-5_max": "0.49425498570527093",
+        "persistence_vrmse_requested_1e-5_mean": "0.4106559364206988",
+        "variance_max": "0.0010609229900796068",
+        "variance_median": "0.0006484786817926712",
+        "variance_min": "0.0003415472043573107",
+        "window_inclusive": "91:118"
+      },
+      {
+        "field": "velocity_z",
+        "fraction_variance_le_1e-7": "0.0",
+        "mean_default_to_requested_ratio": "1.0040756482372033",
+        "n_trajectories": "2",
+        "n_trajectory_transitions": "56",
+        "persistence_vrmse_default_max": "0.3487498415259693",
+        "persistence_vrmse_default_mean": "0.2896328256013159",
+        "persistence_vrmse_requested_1e-5_max": "0.34796610429157415",
+        "persistence_vrmse_requested_1e-5_mean": "0.2885323645817178",
+        "variance_max": "0.002425633054005536",
+        "variance_median": "0.0013463368383407127",
+        "variance_min": "0.0008081522244338965",
+        "window_inclusive": "91:118"
+      }
+    ]
+  },
+  "schema": {
+    "access_date": "2026-07-12",
+    "access_mode": "HTTP Range metadata read; no HDF5 object materialized",
+    "objects": {
+      "rayleigh_taylor_instability": {
+        "content_length": 7985979776,
+        "dimensions": {
+          "time": {
+            "dtype": "float32",
+            "shape": [
+              119
+            ]
+          },
+          "x": {
+            "dtype": "float32",
+            "shape": [
+              128
+            ]
+          },
+          "y": {
+            "dtype": "float32",
+            "shape": [
+              128
+            ]
+          },
+          "z": {
+            "dtype": "float32",
+            "shape": [
+              128
+            ]
+          }
+        },
+        "etag": "\"675215c1-1dc006180\"",
+        "fields": {
+          "t0_fields": {
+            "datasets": {
+              "density": {
+                "chunks": null,
+                "dtype": "float32",
+                "shape": [
+                  2,
+                  119,
+                  128,
+                  128,
+                  128
+                ]
+              }
+            },
+            "field_names": [
+              "density"
+            ]
+          },
+          "t1_fields": {
+            "datasets": {
+              "velocity": {
+                "chunks": null,
+                "dtype": "float32",
+                "shape": [
+                  2,
+                  119,
+                  128,
+                  128,
+                  128,
+                  3
+                ]
+              }
+            },
+            "field_names": [
+              "velocity"
+            ]
+          },
+          "t2_fields": {
+            "datasets": {},
+            "field_names": []
+          }
+        },
+        "last_modified": "Thu, 05 Dec 2024 21:06:09 GMT",
+        "root_attributes": {
+          "At": 0.75,
+          "dataset_name": "rayleigh_taylor_instability",
+          "grid_type": "cartesian",
+          "n_spatial_dims": 3,
+          "n_trajectories": 2,
+          "simulation_parameters": [
+            "At"
+          ]
+        },
+        "url": "https://sdsc-users.flatironinstitute.org/~polymathic/data/the_well/datasets/rayleigh_taylor_instability/data/test/rayleigh_taylor_instability_At_75.hdf5"
+      },
+      "shear_flow": {
+        "content_length": 2097218176,
+        "dimensions": {
+          "time": {
+            "dtype": "float64",
+            "shape": [
+              200
+            ]
+          },
+          "x": {
+            "dtype": "float32",
+            "shape": [
+              256
+            ]
+          },
+          "y": {
+            "dtype": "float32",
+            "shape": [
+              512
+            ]
+          }
+        },
+        "etag": "\"67522711-7d010280\"",
+        "fields": {
+          "t0_fields": {
+            "datasets": {
+              "pressure": {
+                "chunks": null,
+                "dtype": "float32",
+                "shape": [
+                  4,
+                  200,
+                  256,
+                  512
+                ]
+              },
+              "tracer": {
+                "chunks": null,
+                "dtype": "float32",
+                "shape": [
+                  4,
+                  200,
+                  256,
+                  512
+                ]
+              }
+            },
+            "field_names": [
+              "tracer",
+              "pressure"
+            ]
+          },
+          "t1_fields": {
+            "datasets": {
+              "velocity": {
+                "chunks": null,
+                "dtype": "float32",
+                "shape": [
+                  4,
+                  200,
+                  256,
+                  512,
+                  2
+                ]
+              }
+            },
+            "field_names": [
+              "velocity"
+            ]
+          },
+          "t2_fields": {
+            "datasets": {},
+            "field_names": []
+          }
+        },
+        "last_modified": "Thu, 05 Dec 2024 22:20:01 GMT",
+        "root_attributes": {
+          "Reynolds": 100000.0,
+          "Schmidt": 2.0,
+          "dataset_name": "shear_flow",
+          "grid_type": "cartesian",
+          "n_spatial_dims": 2,
+          "n_trajectories": 4,
+          "simulation_parameters": [
+            "Reynolds",
+            "Schmidt"
+          ]
+        },
+        "url": "https://sdsc-users.flatironinstitute.org/~polymathic/data/the_well/datasets/shear_flow/data/test/shear_flow_Reynolds_1e5_Schmidt_2e0.hdf5"
+      }
+    }
+  },
+  "shear": {
+    "mps_cpu_one_window_robustness": {
+      "absolute_difference": 1.0393959692933663e-07,
+      "cpu": 1.2834761155023555,
+      "mps": 1.2834762194419524,
+      "relative_difference": 8.098288365004317e-08
+    },
+    "summary": {
+      "access_date": "2026-07-12",
+      "access_mode": "HTTP Range; full HDF5 not materialized",
+      "comparability_limits": [
+        "one Flatiron registry test file versus the paper's 28-file test split",
+        "official test surfaces conflict: paper Table 2 is 1.189 versus HF dataset card 0.1567; model-card 0.4450 matches paper Table 5 validation, not test",
+        "checkpoint does not bind an exact historical data/code revision",
+        "issue #49 reports that some HF baselines reflect normalization or pre-release orientation states, without identifying this shear checkpoint specifically"
+      ],
+      "comparability_verdict": "NOT_PAPER_COMPARABLE_SINGLE_FILE_DIAGNOSTIC",
+      "dataset": "shear_flow",
+      "dataset_card_revision": "fc867f856f306905cf94c1f5df978cc518a2048c",
+      "device": "mps",
+      "diff_subset_minus_hf_dataset_card": 3.7031426778008787,
+      "diff_subset_minus_hf_model_card_validation": 3.4148426778008787,
+      "diff_subset_minus_paper_table2": 2.6708426778008785,
+      "field_mean_raw_vrmse": {
+        "pressure": 5.400299934795888,
+        "tracer": 1.0276786334172916,
+        "velocity_x": 1.0264475158172925,
+        "velocity_y": 7.984944627173043
+      },
+      "field_order": [
+        "tracer",
+        "pressure",
+        "velocity_x",
+        "velocity_y"
+      ],
+      "hdf5_root_attributes": {
+        "Reynolds": 100000.0,
+        "Schmidt": 2.0,
+        "dataset_name": "shear_flow",
+        "grid_type": "cartesian",
+        "n_spatial_dims": 2,
+        "n_trajectories": 4,
+        "simulation_parameters": [
+          "Reynolds",
+          "Schmidt"
+        ]
+      },
+      "hf_dataset_card_test_vrmse": 0.1567,
+      "hf_model_card_validation_vrmse": 0.445,
+      "history_steps": 4,
+      "independent_raw_vrmse_mean": 3.8598426778008785,
+      "max_windows_per_trajectory": null,
+      "model_id": "polymathic-ai/FNO-shear_flow",
+      "model_revision": "9ff091f47bb547c3a91b6ee3804028e4f6609888",
+      "model_trainable_parameter_numel": 19011716,
+      "n_evaluated_samples": 784,
+      "n_field_scores": 3136,
+      "normalization_mean": [
+        0.0023845001123845577,
+        -1.2309999686266337e-09,
+        0.0023845001123845577,
+        -1.7307999655713502e-07
+      ],
+      "normalization_std": [
+        0.3582800030708313,
+        0.08205199986696243,
+        0.4019399881362915,
+        0.10420999675989151
+      ],
+      "output": "shear_per_window.csv",
+      "paper_table2_test_vrmse": 1.189,
+      "primary_metric_space": "raw physical space; matches the_well 1.2.0 Trainer denormalization before validation metrics",
+      "remote_bytes": 2097218176,
+      "remote_etag": "\"67522711-7d010280\"",
+      "remote_last_modified": "Thu, 05 Dec 2024 22:20:01 GMT",
+      "remote_url": "https://sdsc-users.flatironinstitute.org/~polymathic/data/the_well/datasets/shear_flow/data/test/shear_flow_Reynolds_1e5_Schmidt_2e0.hdf5",
+      "runtime_seconds": 388.2530197500005,
+      "sensitivity_normalized_space_vrmse_mean": 12.440868222477045,
+      "torch_version": "2.13.0",
+      "trajectory_limit": 4,
+      "window_stride": 1
+    }
+  },
+  "source_defects": {
+    "issue_75": {
+      "amplification_ratio": 10.0,
+      "correct_default_vrmse": 31.622776601683796,
+      "correct_vrmse": 3.1622776601683795,
+      "library_default_vrmse": 31.622776601683796,
+      "library_vrmse": 31.622776601683796,
+      "requested_epsilon": 1e-05,
+      "silently_used_epsilon": 1e-07,
+      "the_well_version": "1.2.0",
+      "verdict": "ISSUE_75_REPRODUCED_NONDEFAULT_EPSILON"
+    },
+    "issue_78": {
+      "correct_all_batch_curve": [
+        5.0,
+        7.0
+      ],
+      "curve_mean_difference": 4.0,
+      "first_batch": [
+        1.0,
+        3.0
+      ],
+      "library_scalar_loss_all_batches": 6.0,
+      "library_time_curve": [
+        9.0,
+        11.0
+      ],
+      "second_batch": [
+        9.0,
+        11.0
+      ],
+      "the_well_version": "1.2.0",
+      "verdict": "ISSUE_78_TIME_CURVE_LAST_BATCH_REPRODUCED"
+    }
+  }
+}
