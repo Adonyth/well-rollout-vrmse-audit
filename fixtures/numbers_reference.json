@@ -791,7 +791,9 @@
    "velocity_pred_std_over_target_std": 53.65,
    "density_rmse": 0.1546,
    "density_field_std": 0.2246,
-   "density_rmse_over_std": 0.6884
+   "density_rmse_over_std": 0.6884,
+   "ratio_released_floors": 8.542,
+   "ratio_definitional_to_eps_fix": 47.45
   },
   "window_13_30": {
    "eps_0_definitional": 16.2284,
@@ -805,7 +807,9 @@
    "velocity_pred_std_over_target_std": 5.065,
    "density_rmse": 0.1838,
    "density_field_std": 0.2235,
-   "density_rmse_over_std": 0.8224
+   "density_rmse_over_std": 0.8224,
+   "ratio_released_floors": 5.32,
+   "ratio_definitional_to_eps_fix": 12.81
   }
  },
  "generalization": {

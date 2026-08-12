@@ -189,7 +189,7 @@ def _exit_status(rep) -> int:
     """Exit 1 on anything a caller should not treat as a clean screen.
 
     That is three conditions, not one: a floor-determined denominator; a zero denominator
-    under a floorless metric (unbounded, not merely saturated); and a non-finite
+    under a floorless metric (unbounded rather than merely amplified by at most 1/sqrt(eps)); and a non-finite
     denominator, which is undefined rather than well conditioned and must not exit clean.
     """
     degenerate = any(f.frames_zero_denominator for f in rep.fields)

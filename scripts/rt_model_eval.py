@@ -23,7 +23,6 @@ trajectory 1.
 from __future__ import annotations
 
 import argparse
-import gzip
 import json
 import sys
 import time
@@ -42,6 +41,7 @@ sys.path.insert(0, str(HERE))
 from independent_metrics import spatial_mse, spatial_sample_variance  # noqa: E402
 
 from fast_reader import FileLayout, discover_layout, read_frames  # noqa: E402
+from io_contract import write_rows  # noqa: E402
 
 BASE = (
     "https://sdsc-users.flatironinstitute.org/~polymathic/data/the_well/"
@@ -287,8 +287,7 @@ def main() -> None:
             args.model, model, device, layout, fname, traj, means, stds,
             args.rollout_steps, starts, log,
         )
-        with gzip.open(out_path, "wt", encoding="utf-8") as handle:
-            json.dump({"rows": rows, "fields": FIELDS}, handle)
+        write_rows(str(out_path), {"rows": rows, "fields": FIELDS})
         log(f"  wrote {out_path.name}")
         if device.type == "mps":
             torch.mps.empty_cache()

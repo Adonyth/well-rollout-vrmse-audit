@@ -515,8 +515,8 @@ def main() -> int:
               "paper/extracted/numbers.json")
 
     # Bind the DERIVED blocks and the map block back to the artifacts they were derived
-    # from. Adversarial testing showed the exit code bound 393 of numbers.json's ~1332
-    # leaves: the printed conditioning-map floor shares, the Gate-3 quoted magnitudes, the
+    # from. Adversarial testing showed the exit code bound only part of numbers.json's
+    # leaves: the printed conditioning-map floor shares, the Gate-3 quoted magnitudes
     # and several *_derived groups could all be perturbed in numbers.json AND its frozen twin
     # with this harness still exiting 0, because the reference-identity stage only compares
     # the two copies to each other. What follows re-derives the map and Gate-3 blocks from

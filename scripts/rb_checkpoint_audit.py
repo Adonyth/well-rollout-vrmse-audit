@@ -32,7 +32,6 @@ Published RB comparison cells are QUOTED from the benchmark paper, not recompute
   Table 3 (test, rollout windows 6-12 and 13-30): ">10" for all four baselines, both windows
 """
 import glob
-import gzip
 import math
 import json
 import os

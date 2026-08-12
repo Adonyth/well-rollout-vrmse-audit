@@ -102,7 +102,8 @@ and an `eps` sweep giving the factor by which any fixed error's score moves betw
 candidate floors.
 
 Exit status is `1` on anything you should not read as a clean screen: a floor-determined
-denominator; a zero denominator under a floorless metric (unbounded, not merely saturated);
+denominator; a zero denominator under a floorless metric (infinite, not merely
+amplified by at most 1/sqrt(eps));
 a non-finite denominator (undefined — NaN/inf input, or too few spatial points to form a
 variance); and an **incomplete** screen, where the tool had to guess that a field's extra axis
 was a leading index rather than components. An asserted whole-screen (`--no-split-components`,

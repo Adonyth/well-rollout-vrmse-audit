@@ -14,8 +14,11 @@ so the denominator is the RMS of the target (second moment about ZERO), not its 
   * RMS^2 = Var + mean^2, so a field oscillating slightly about a large offset has a
     healthy RMS and a degenerate variance. The two benchmarks' normalizers therefore
     disagree about which fields are scoreable -- neither choice is universally safer.
-  * With no floor, the failure mode is UNBOUNDEDNESS rather than saturation. A floored
-    metric caps at 1/sqrt(eps); a floorless one does not cap at all.
+  * With no floor, the failure mode is UNBOUNDEDNESS rather than saturation. A floor
+    bounds the AMPLIFICATION of a fixed error at 1/sqrt(eps); it does not bound the
+    score, which still grows with the model's error (at eps=1e-7 and Var=0, MSE=1e4
+    scores 3.162e5, well past 1/sqrt(eps)=3162). A floorless metric is infinite there
+    for any non-zero error. test_normalizers.py pins both properties.
 
 This example downloads one small public PDEBench file and screens it under both
 conventions. It needs no model and no PDEBench install.

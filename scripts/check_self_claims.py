@@ -15,7 +15,7 @@ None of those is a wrong result. Each is the package asserting something untrue
 about itself, which is the exact failure mode the paper is about, so it is worth a
 machine check rather than a reviewer's attention.
 
-Four families are checkable without judgement:
+Ten families are checkable without judgement:
 
   paths     -- every repo-relative path named in the prose or in a docstring resolves,
                at the location it names when it names one
@@ -258,8 +258,11 @@ def check_counts() -> list[str]:
         for pattern, actual, what in (
             (r"MAP\.json`?,? (\d+) rows", n_map, "rows in MAP.json"),
             (r"(\d+) rows reproduced", n_map, "rows in MAP.json"),
+            (r"\((\d+) rows, [\d,]+ windows\)", n_map, "rows in MAP.json"),
             (r"json\.gz`?,? (\d+) windows", n_win, "packaged RB windows"),
             (r"(\d+) per-window variances", n_win, "packaged RB windows"),
+            (r"\(\d+ rows, ([\d,]+) windows\)", n_win, "packaged RB windows"),
+            (r"\(12 runs, ([\d,]+) rows\)", n_win, "packaged RB rows"),
 
         ):
             for c in re.findall(pattern, text):
@@ -282,8 +285,14 @@ def check_counts() -> list[str]:
     # The headline check count, derived from verify.py's own constants the same way
     # extract_numbers.py derives it -- so the prose is bound to the code, not merely
     # to the other prose surface. Changing 142 to 999 on both surfaces used to pass.
-    n_claimed = {int(m) for m in re.findall(r"(\d{2,4}) (?:enumerated )?value checks", readme)}
-    n_claimed |= {int(m) for m in re.findall(r"the (\d{2,4}) Tier-1 checks", man)}
+    n_claimed: set[int] = set()
+    for text in (readme, man):
+        for pat in (r"(\d{2,4}) (?:enumerated )?value checks",
+                    r"the (\d{2,4}) Tier-1 checks",
+                    r"asserts\*? (\d{2,4}) value checks",
+                    r"each of the (\d{2,4}) enumerated",
+                    r"among the (\d{2,4}) checks"):
+            n_claimed |= {int(m) for m in re.findall(pat, text)}
     if n_claimed:
         derived = _derive_check_total()
         if derived is None:
@@ -314,6 +323,49 @@ def _conditional_stages() -> set[str]:
         if tags:
             out.add(tags[0])
     return out
+
+
+def check_own_counts() -> list[str]:
+    """The guard's statements about its OWN size must equal its own tables.
+
+    It shipped "Four families" over ten, "the five below" over eight, and "eleven
+    real past discrepancies" on two prose surfaces over thirteen entries -- four
+    false self-descriptions inside the artifact whose sole purpose is catching false
+    self-descriptions, on surfaces it sweeps, all passing.
+    """
+    _WORDS = {"three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8,
+              "nine": 9, "ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13,
+              "fourteen": 14, "fifteen": 15, "sixteen": 16}
+    src = (ROOT / "scripts" / "check_self_claims.py").read_text(encoding="utf-8")
+    doc = src.split('"""')[1] if '"""' in src else ""
+    n_fam = len(re.findall(r"^  [a-z]+ *-- ", doc, re.M))
+    n_mut = len(_MUTATIONS)
+    bad = []
+
+    m = re.search(r"^([A-Za-z]+) families are checkable", doc, re.M)
+    if not m:
+        bad.append("check_self_claims.py: docstring no longer states its family count")
+    elif _WORDS.get(m.group(1).lower()) != n_fam:
+        bad.append(f"check_self_claims.py: docstring says {m.group(1)!r} families; it lists {n_fam}")
+
+    for rel in ("README.md", "MANIFEST.md"):
+        text = (ROOT / rel).read_text(encoding="utf-8")
+        for w in re.findall(r"--validate-guard`? reintroduces ([a-z]+) real", text):
+            if _WORDS.get(w) != n_mut:
+                bad.append(f"{rel}: says --validate-guard reintroduces {w!r} discrepancies; "
+                           f"the table holds {n_mut}")
+    # and the manuscript, one level up, when present
+    tex = ROOT.parent / "paper" / "tex" / "sec7_boundaries.tex"
+    if tex.exists():
+        t = tex.read_text(encoding="utf-8")
+        for w in re.findall(r"holds ([a-z]+) rule families", t):
+            if _WORDS.get(w) != n_fam:
+                bad.append(f"sec7_boundaries.tex: says {w!r} rule families; the guard has {n_fam}")
+        for w in re.findall(r"reintroduces ([a-z]+) real past discrepancies", t):
+            if _WORDS.get(w) != n_mut:
+                bad.append(f"sec7_boundaries.tex: says {w!r} reintroduced discrepancies; "
+                           f"the table holds {n_mut}")
+    return bad
 
 
 def check_stage_tags() -> list[str]:
@@ -412,6 +464,26 @@ def check_cli_examples() -> list[str]:
     return bad
 
 
+def check_saturation_claim() -> list[str]:
+    """No shipped surface may say a floored score is capped.
+
+    `sqrt(MSE/(Var+eps))` grows without limit in the model's error; what a floor
+    bounds is the amplification of a FIXED error. The claim survived a round in the
+    worked example after being corrected in the README and the test, because nothing
+    checked for it -- and there it asserted the negation of the package's own test.
+    """
+    bad: list[str] = []
+    pat = re.compile(r"(?:score|metric)[^.\n]{0,60}\bcaps?\b(?![a-z])|caps at\s*`?1/sqrt", re.I)
+    for path in sorted(list(ROOT.rglob("*.py")) + list(ROOT.rglob("*.md"))):
+        if "__pycache__" in str(path) or path.name == "check_self_claims.py":
+            continue
+        for i, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+            if pat.search(line) and "amplification" not in line.lower():
+                bad.append(f"{path.relative_to(ROOT)}:{i}: says a floored score is capped; "
+                           f"the score is unbounded in the error, the amplification is not")
+    return bad
+
+
 def check_numeric_examples() -> list[str]:
     """Numeric examples in prose and docstrings must evaluate to what they claim.
 
@@ -488,7 +560,8 @@ def check_io_contract() -> list[str]:
             bad.append("scripts/io_contract.py: write_rows/read_rows do not round-trip")
         with gzip.open(path, "rt", encoding="utf-8") as fh:
             json.load(fh)  # raises BadGzipFile if the writer stopped compressing
-    for rel in ("scripts/rb_model_eval.py", "scripts/rb_checkpoint_audit.py"):
+    for rel in ("scripts/rb_model_eval.py", "scripts/rb_checkpoint_audit.py",
+                "scripts/rt_model_eval.py"):
         src = (ROOT / rel).read_text(encoding="utf-8")
         if "io_contract" not in src:
             bad.append(f"{rel}: does not use scripts/io_contract.py, so the row-file "
@@ -508,6 +581,7 @@ _WITHDRAWN = [
     ("class reproduced", "reproduces / is reproduced"),
     ("predicting-the-mean", "predicting the mean"),
     ("deepest near-zero-variance", "deepest near-zero-variance"),
+    ("entirely denominator", "attribution of the *published*"),
 ]
 _MARKER = "WITHDRAWN"
 
@@ -520,6 +594,11 @@ def check_withdrawal_markers() -> list[str]:
     occurrences were not, including the provenance identity the manuscript exists to
     deny. Checked in both directions: every fragment must still be declared by the
     banner, and every occurrence in the body must carry the marker.
+
+    **Limit, stated because a reviewer defeated the rule with it.** This matches literal
+    fragments. A withdrawn claim restated in different words passes. The rule keeps a
+    ledger honest against edits and regressions; it cannot certify that no paraphrase of
+    a withdrawn claim survives, and nothing here should be read as claiming it does.
     """
     p = ROOT.parent / "RT-QUANT.md"
     if not p.exists():
@@ -554,13 +633,77 @@ def check_producer_targets() -> list[str]:
         if path.name == "check_self_claims.py":
             continue  # its mutation table names the defect it checks for
         src = path.read_text(encoding="utf-8")
-        for m in re.finditer(r'["\'](\.gate-work[^"\']*)["\']', src):
+        for m in re.finditer(r'["\']((?:/|~|\.\./|\.gate-work)[^"\']*)["\']', src):
+            cand = m.group(1)
             line = src[:m.start()].count("\n") + 1
             ctx = src.splitlines()[line - 1]
             if ctx.lstrip().startswith("#"):
                 continue          # naming the old path in a comment is not a default
-            bad.append(f"scripts/{path.name}:{line}: defaults to writing {m.group(1)!r}, "
+            if not re.search(r"\b(out|output|dest|path|dir|_OUT)\w*\s*=|environ\.get|makedirs|open\(", ctx):
+                continue          # not a write target
+            if cand.startswith("../") and (path.parent.parent / cand[3:]).exists():
+                continue          # inside the submission tree, e.g. ../hf-cache for downloads
+            bad.append(f"scripts/{path.name}:{line}: defaults to writing {cand!r}, "
                        f"which is outside the package")
+    return bad
+
+
+# Fixtures whose producer the MANIFEST names. Each entry is checked in BOTH
+# directions: the MANIFEST must attribute the fixture to that script, and the
+# script's own default output must be that fixture. Re-attributing a fixture to a
+# different *shipped* script used to pass, because the named file existed.
+_PRODUCERS = {
+    "fixtures/generalization/rayleigh_benard_census.json": ("rb_census.py", "_OUT"),
+    "fixtures/generalization/benchmark_map": ("well_denominator_census.py", "_OUT_DIR"),
+}
+
+
+def check_producer_relations() -> list[str]:
+    """A producer relation the MANIFEST asserts must be one the script performs."""
+    import importlib.util
+    import types
+
+    bad: list[str] = []
+    man = (ROOT / "MANIFEST.md").read_text(encoding="utf-8")
+    for fixture, (script, const) in sorted(_PRODUCERS.items()):
+        if f"scripts/{script}" not in man:
+            bad.append(f"MANIFEST.md: no longer names scripts/{script} as a producer")
+            continue
+        # the MANIFEST must not attribute this fixture to some *other* shipped script
+        for m in re.finditer(re.escape(pathlib.Path(fixture).name) + r"[^|\n]{0,160}?`scripts/([a-z0-9_]+\.py)`", man):
+            if m.group(1) != script:
+                bad.append(f"MANIFEST.md: attributes {fixture} to scripts/{m.group(1)}; "
+                           f"the script that writes it is scripts/{script}")
+        spec = importlib.util.spec_from_file_location(f"_p3_prod_{script}", ROOT / "scripts" / script)
+        if spec is None or spec.loader is None:
+            continue
+        mod = importlib.util.module_from_spec(spec)
+        for dep in ("fsspec", "h5py", "torch", "yaml", "requests"):
+            sys.modules.setdefault(dep, types.ModuleType(dep))
+        try:
+            spec.loader.exec_module(mod)
+        except Exception as exc:
+            bad.append(f"scripts/{script}: cannot import to check its output path ({exc})")
+            continue
+        actual = getattr(mod, const, None)
+        if actual is None:
+            bad.append(f"scripts/{script}: no {const}; cannot bind its output to the MANIFEST")
+        elif pathlib.Path(str(actual)).resolve() != (ROOT / fixture).resolve():
+            bad.append(f"scripts/{script}: writes {actual!r}, but the MANIFEST attributes "
+                       f"{fixture} to it")
+    return bad
+
+
+def check_quoted_sizes() -> list[str]:
+    """Byte totals quoted in the prose must be the tree's actual byte totals."""
+    bad: list[str] = []
+    total = sum(f.stat().st_size for f in (ROOT / "fixtures").rglob("*")
+                if f.is_file() and f.name != "summary.json")
+    for rel in ("README.md", "MANIFEST.md"):
+        text = (ROOT / rel).read_text(encoding="utf-8")
+        for m in re.findall(r"([\d,]{6,}) bytes in total", text):
+            if int(m.replace(",", "")) != total:
+                bad.append(f"{rel}: quotes {m} bytes for the fixtures tree; it is {total:,}")
     return bad
 
 
@@ -607,10 +750,12 @@ def check_deps() -> list[str]:
 
 
 def run() -> tuple[int, list[str]]:
-    findings = (check_paths() + check_counts() + check_stage_tags()
+    findings = (check_paths() + check_counts() + check_own_counts() + check_stage_tags()
                 + check_transcript_order() + check_cli_examples()
-                + check_numeric_examples() + check_io_contract()
+                + check_numeric_examples() + check_saturation_claim()
+                + check_io_contract()
                 + check_withdrawal_markers() + check_producer_targets()
+                + check_producer_relations() + check_quoted_sizes()
                 + check_command_placeholders()
                 + check_deps())
     n = len(PROSE) + len(CODE)
@@ -632,7 +777,8 @@ _MUTATIONS = [
     ("a producer string naming a script that was never shipped",
      "MANIFEST.md", "scripts/gate3_assemble.py", "scripts/gate3_build_fixture.py"),
     # Added after two independent reviewers defeated the first version of this guard
-    # with mutations it was not written to catch. Each of the five below passed then.
+    # with mutations it was not written to catch; every entry below the first five is one
+# that a reviewer used to defeat an earlier version of this guard.
     ("the enumerated check total changed on every prose surface at once",
      "README.md", "142 value checks", "143 value checks"),
     ("a real filename claimed under a directory it does not live in",
@@ -647,6 +793,11 @@ _MUTATIONS = [
      "verify.py", "over a 31-step", "over a 5-step"),
     ("a documented command left with an abbreviated identifier",
      "MANIFEST.md", "7d351350eaf68caba1eac1e545cd6661251dd1fd", "7d351350eaf6..."),
+    ("an unmarked restatement of a withdrawn claim in the packaged ledger",
+     "../RT-QUANT.md", "are the paper-run models \u27e6WITHDRAWN", "are the paper-run models \u2014 note"),
+    ("a shipped surface claiming a floored score is capped",
+     "instrument/examples/pdebench_shocktube.py", "bounds the AMPLIFICATION of a fixed error at",
+     "caps at"),
     ("a shipped script defaulting to a write outside the package",
      "scripts/rb_census.py", 'os.environ.get("RB_CENSUS_OUT", os.path.join(',
      'os.environ.get("RB_CENSUS_OUT", ".gate-work/out.json") or os.path.join('),
@@ -661,10 +812,17 @@ def validate_guard_fires() -> int:
     missed = []
     for label, rel, old, new in _MUTATIONS:
         with tempfile.TemporaryDirectory() as td:
-            d = pathlib.Path(td) / "pkg"
-            shutil.copytree(ROOT, d,
-                            ignore=shutil.ignore_patterns("__pycache__", "*.pyc", ".git"))
-            f = d / rel
+            # Copy the SUBMISSION TREE, not just the package. The markers rule reads
+            # RT-QUANT.md from one level up, so copying ROOT alone left that rule
+            # silently disabled in every mutation run while the validator still
+            # reported a full pass -- the one family with a failure history was the
+            # one family --validate-guard could not fail on.
+            root = pathlib.Path(td) / "lane"
+            ignore = shutil.ignore_patterns("__pycache__", "*.pyc", ".git", "hf-cache",
+                                            ".gate-work", "results", "tmp", "*.pdf")
+            shutil.copytree(ROOT.parent, root, ignore=ignore)
+            d = root / ROOT.name
+            f = (root / rel[len("../"):]) if rel.startswith("../") else (d / rel)
             src = f.read_text(encoding="utf-8")
             if old not in src:
                 missed.append(f"{label}: anchor {old!r} no longer in {rel}")
@@ -695,11 +853,12 @@ def main() -> int:
         for f in findings:
             print(f"  - {f}")
         return 1
-    print(f"[selfclaims] OK over {n} surfaces: no named path is missing, no pinned count "
-          f"disagrees with the tree, no advertised invocation names a flag its parser "
-          f"rejects, the row-file writer and reader round-trip, and the numeric examples "
-          f"evaluate as written. This is one-directional: it does not check that "
-          f"everything shipped is described, only that what is described is true.")
+    print(f"[selfclaims] OK over {n} surfaces: ten rule families found nothing. Each binds "
+          f"a NAMED set, not a universal -- the counts checked are the ones enumerated in "
+          f"the module docstring, the producer rule the relations listed there, the marker "
+          f"rule literal fragments (a paraphrase of a withdrawn claim passes). It is also "
+          f"one-directional: it checks that what the package says is true, never that "
+          f"everything the package ships is said.")
     return 0
 
 
