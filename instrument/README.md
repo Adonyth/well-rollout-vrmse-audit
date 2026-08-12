@@ -160,7 +160,8 @@ data-only screen costs seconds and would have caught it.
 ```python
 from normscreen import screen_fields, floor_share
 
-report = screen_fields({"density": rho, "velocity_x": vx}, eps=1e-7, n_spatial=3)
+report = screen_fields({"density": rho, "velocity_x": vx}, eps=1e-7, n_spatial=3,
+                       component_axis=None)   # or component_axis={"velocity": -1}
 print(report.text())
 report.to_dict()                 # JSON-serializable
 floor_share(var=1e-11, eps=1e-7) # 0.99989

@@ -2007,13 +2007,12 @@
   "gap_factor_unetclassic_13_30_like_for_like": 2.3725780995636963,
   "scaled_by_unetclassic_gap": 6.939171857342272,
   "gap_factor_unetconvnext_13_30_split_scaled": 1.0564829518325434,
-  "scaled_by_unetconvnext_split_scaled_gap": 15.583523756139678,
   "unetconvnext_split_scaled_6_12": 8.624111458234054,
-  "cn_cell_by_unetclassic_gap": 3.634911516640898,
   "cn_cell_by_unetconvnext_gap": 8.163038923888863,
-  "n_of_four_below_ten": 3,
-  "conclusive": false,
-  "source": "counterfactual from paper_values.table3_13_30, models.UNetClassic.rollout_*.lib and the split-scaled UNetConvNext estimate; the two factors straddle ten, so the counterfactual does not settle whether the crossing would survive"
+  "n_reported_crossings_among_these_cells": 1,
+  "n_crossings_reversed_like_for_like": 1,
+  "crossing_survives_like_for_like": false,
+  "source": "counterfactual from paper_values.table3_13_30 and models.*.rollout_*.lib. Applied like for like -- each checkpoint's own gap factor against its own cell -- the one reported crossing (UNetClassic, 16.46) does not survive: 16.46/2.3726 = 6.939. Two earlier framings of this block, a 'straddle' reading and a 'three of four below ten' count, are withdrawn; see the boundaries section."
  },
  "window_coverage_derived": {
   "window_frames": [
@@ -2033,6 +2032,20 @@
   "interp115_mean_lib": 0.6170537710381284,
   "ratio": 2.460956149155314,
   "source": "models.UNetClassic.onestep; estimator choice at a fixed floor and split"
+ },
+ "forward_cost_envelope_derived": {
+  "per_forward_seconds": {
+   "UNetClassic_mps": 5.1,
+   "UNetConvNext_mps": 53.7,
+   "FNO_mps": 200.0,
+   "FNO_cpu": 44.5,
+   "UNetClassic_cpu": 336.0
+  },
+  "min_seconds": 5.1,
+  "max_seconds": 336.0,
+  "envelope_span": 65.88235294117648,
+  "unetconvnext_over_unetclassic_same_device": 10.529411764705884,
+  "source": "probe_forward_times.py docstring, parsed"
  },
  "gate2_alignment": {
   "rollout_steps": 31,

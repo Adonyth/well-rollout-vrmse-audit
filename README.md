@@ -8,7 +8,7 @@ DMLR review — full author attribution intended and preserved
 
 ## One command
 
-Install the Tier 1 dependency first (a single package, `numpy`; a clean
+Install the Tier 1 dependency first (a single package, `numpy>=2.0`; a clean
 shell without it will raise `ModuleNotFoundError: No module named 'numpy'`
 on the next step):
 
@@ -58,6 +58,8 @@ independent derivation of the same quantity in
 $ python3 verify.py
 ...
 [3/3] 142 match, 0 mismatch.
+[map] ...   [gate3] ...   [coverage] ...   [gate2] ...   [blocks] ...
+[provenance] ...   [sweep] ...   [rb] ... x3   [chronology] ...
 PASS: repro-harness regenerates the frozen P3 values to a relative tolerance of 1e-4 (~4 sig figs).
 ```
 
@@ -107,7 +109,7 @@ repro-harness/
 
 **Tier 1 (what `verify.py` runs today):** the raw per-frame/per-window
 scalars (MSE, target/prediction variance — never raw field tensors) are
-packaged in `fixtures/` (~280 KB). `verify.py` re-derives the 142 enumerated value checks
+packaged in `fixtures/` (~1 MB in total, of which the RT per-frame/per-window scalars are ~280 KB; the rest is the Rayleigh-Benard checkpoint rows, the benchmark-wide census, and the Gate-2/Gate-3/provenance fixtures). `verify.py` re-derives the 142 enumerated value checks
 from those scalars via `aggregate_results.py` and diffs against the
 frozen paper numbers. This is a genuine recomputation, not a file diff: the
 aggregation (eps variants, rollout window means, one-step interpolation,

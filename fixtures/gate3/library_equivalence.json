@@ -174,7 +174,7 @@
    "worst_rel_diff_vrmse_raw": 0.0
   }
  },
- "description": "End-to-end equivalence of this audit's evaluator against the library's own WellDataset + ZScoreNormalization + DefaultChannelsFirstFormatter path, on the public test split with the pinned public checkpoints. Produced by .gate-work/validate_{rt,rb}_evaluator.py.",
+ "description": "End-to-end equivalence of this audit's evaluator against the library's own WellDataset + ZScoreNormalization + DefaultChannelsFirstFormatter path, on the public test split with the pinned public checkpoints. Produced by scripts/gate3_recheck_rt.py and scripts/gate3_recheck_rb.py.",
  "environment_at_assembly": {
   "numpy": "2.5.1",
   "platform": "macOS-15.7.8-arm64-arm-64bit",

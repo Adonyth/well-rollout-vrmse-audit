@@ -18,6 +18,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
 import os
 import sys
@@ -171,7 +172,7 @@ def main() -> None:
                              means, stds, args.rollout_steps, starts)
 
     stem = args.file.replace(".hdf5", "")
-    out = os.path.join(args.output_dir, f"{args.model}_{stem}.json")
+    out = os.path.join(args.output_dir, f"{args.model}_{stem}.json.gz")
     json.dump({"rows": all_rows, "fields": FIELDS,
                "provenance": {"repo": repo, "revision": args.revision, "device": args.device,
                               "dataset_url": url, "history": HISTORY,

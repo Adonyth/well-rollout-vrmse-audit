@@ -327,7 +327,8 @@ def main() -> int:
     # and the window/file counts unchanged. This is a consistency gate over the frozen
     # fixture, not a re-execution: reproducing it from scratch requires network access to
     # HuggingFace and the SDSC mirror plus the pinned checkpoints, which verify.py does not
-    # assume. scripts/gate3_recheck.py re-runs the live comparison when those are available.
+    # assume. scripts/gate3_recheck_rt.py and scripts/gate3_recheck_rb.py re-run the live comparison
+    # when those are available.
     _g3 = FIXTURES / "gate3" / "library_equivalence.json"
     if not _g3.exists():
         print("FAIL: fixtures/gate3/library_equivalence.json missing -- Gate 3 cannot be checked")

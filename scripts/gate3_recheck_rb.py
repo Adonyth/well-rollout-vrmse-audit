@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """DEFINITIVE end-to-end validation of our RB evaluator against the library's own path.
 
-Fixes the harness defect found in same_window_test.py: WellDataset(use_normalization=True)
+Fixes a harness defect found during evaluator validation: WellDataset(use_normalization=True)
 is a NO-OP unless normalization_type is also passed (datasets.py:332 -> self.norm = None).
 With ZScoreNormalization supplied, the library normalizes exactly as our evaluator does.
 

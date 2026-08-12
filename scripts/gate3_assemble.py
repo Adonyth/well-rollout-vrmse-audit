@@ -91,7 +91,7 @@ def main() -> int:
             "End-to-end equivalence of this audit's evaluator against the library's own "
             "WellDataset + ZScoreNormalization + DefaultChannelsFirstFormatter path, on the "
             "public test split with the pinned public checkpoints. Produced by "
-            ".gate-work/validate_{rt,rb}_evaluator.py."),
+            "scripts/gate3_recheck_rt.py and scripts/gate3_recheck_rb.py."),
         "tolerance": TOLERANCE,
         "metric_eps": METRIC_EPS,
         "environment_at_assembly": environment(),

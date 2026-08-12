@@ -1,6 +1,6 @@
 # Tier 1 (verify.py — actually re-executed to produce this harness's evidence):
 # pure-Python aggregation of the packaged raw fixtures. No network, no GPU.
-numpy>=1.26
+numpy>=2.0   # rb_checkpoint_audit uses np.trapezoid, a NumPy 2.0 addition
 
 # Tier 2 (cold-start from public sources — documented in README.md, not
 # required to run verify.py). Uncomment / pip install separately if you want

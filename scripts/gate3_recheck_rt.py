@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """End-to-end validation of the RT evaluator -- the one carrying the paper's core numbers.
 
-Same construction as validate_rb_evaluator.py, applied to rayleigh_taylor_instability.
+Same construction as gate3_recheck_rb.py, applied to rayleigh_taylor_instability.
 This is the check that matters most: the paper's floor sweep, class split and rollout cells
 are all computed from rt_model_eval.py's mse/variance rows. If its forward path disagrees
 with the library's own, those numbers are wrong.
