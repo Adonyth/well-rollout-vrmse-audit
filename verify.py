@@ -933,6 +933,20 @@ def main() -> int:
           f"cells crossed on the same side at the library floor, {g10['n_still_gt10_at_eps_fix']} still "
           f">10 under the better-conditioned floor")
 
+    # Self-descriptions. Every other stage checks a number against the data that
+    # produced it; this one checks the prose, the docstrings and the packaged
+    # producer strings against the tree they describe. Ten discrepancies of this
+    # class were found by hand before it existed, none of them a wrong number and
+    # all of them the package asserting something untrue about itself.
+    _sc = subprocess.run([sys.executable, str(HERE / "scripts" / "check_self_claims.py")],
+                         capture_output=True, text=True, cwd=str(HERE))
+    if _sc.returncode != 0:
+        print(_sc.stdout.strip() or _sc.stderr.strip())
+        print("FAIL: the package describes itself inaccurately (see above)")
+        return 1
+    _msg = _sc.stdout.strip().splitlines()[-1].replace("[selfclaims] ", "", 1)
+    print(f"[selfclaims] {_msg}")
+
     print("PASS: repro-harness regenerates the frozen P3 values to a relative tolerance of 1e-4 (~4 sig figs).")
     return 0
 

@@ -58,8 +58,9 @@ independent derivation of the same quantity in
 $ python3 verify.py
 ...
 [3/3] 142 match, 0 mismatch.
-[map] ...   [gate3] ...   [coverage] ...   [gate2] ...   [blocks] ...
-[provenance] ...   [sweep] ...   [rb] ... x3   [chronology] ...
+[reference] ...   [map] ...   [gate3] ...   [coverage] ...   [gate2] ...
+[blocks] ...   [provenance] ...   [sweep] ...   [rb] ... x3
+[chronology] ...   [selfclaims] ...
 PASS: repro-harness regenerates the frozen P3 values to a relative tolerance of 1e-4 (~4 sig figs).
 ```
 
@@ -91,6 +92,8 @@ repro-harness/
     aggregate_results.py   <- deterministic aggregation: raw scalars -> the 142 enumerated value checks (VRMSE/census/field-split/figure-vs-table/spatial-mean)
     spatial_mean_baseline.py <- trivial spatial-mean-predictor VRMSE baseline (cross-checked by verify.py)
     check_unsourced.py     <- numbers-must-trace-to-numbers.json checker (paper-writing discipline)
+    check_self_claims.py   <- checks the package's prose/docstrings against the tree they describe
+                              (`--validate-guard` reintroduces five real discrepancies and requires each to be caught)
   instrument/              <- normscreen: the standalone conditioning screen (see below)
     normscreen/            <- the package (numpy only; h5py optional, for HDF5 input)
     test_against_paper.py  <- checks the screen against this repo's frozen census fixtures
