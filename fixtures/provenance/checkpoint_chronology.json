@@ -10,74 +10,82 @@
  "quoted_tables_version_date": "2025-02-21",
  "repos": {
   "polymathic-ai/FNO-rayleigh_benard": {
-   "dataset": "ai/FNO-rayleigh_benard",
+   "dataset": "rayleigh_benard",
    "days_after_benchmark_paper": 118,
    "days_after_quoted_tables_version": 35,
    "initial_commit": "2025-03-28",
    "latest_commit": "2025-03-28",
+   "model": "FNO",
    "n_commits": 2,
    "revised_after_upload": false
   },
   "polymathic-ai/FNO-rayleigh_taylor_instability": {
-   "dataset": "ai/FNO-rayleigh_taylor_instability",
+   "dataset": "rayleigh_taylor_instability",
    "days_after_benchmark_paper": 118,
    "days_after_quoted_tables_version": 35,
    "initial_commit": "2025-03-28",
    "latest_commit": "2025-03-28",
+   "model": "FNO",
    "n_commits": 2,
    "revised_after_upload": false
   },
   "polymathic-ai/TFNO-rayleigh_benard": {
-   "dataset": "ai/TFNO-rayleigh_benard",
+   "dataset": "rayleigh_benard",
    "days_after_benchmark_paper": 118,
    "days_after_quoted_tables_version": 35,
    "initial_commit": "2025-03-28",
    "latest_commit": "2025-03-28",
+   "model": "TFNO",
    "n_commits": 2,
    "revised_after_upload": false
   },
   "polymathic-ai/TFNO-rayleigh_taylor_instability": {
-   "dataset": "ai/TFNO-rayleigh_taylor_instability",
+   "dataset": "rayleigh_taylor_instability",
    "days_after_benchmark_paper": 118,
    "days_after_quoted_tables_version": 35,
    "initial_commit": "2025-03-28",
    "latest_commit": "2025-03-28",
+   "model": "TFNO",
    "n_commits": 2,
    "revised_after_upload": false
   },
   "polymathic-ai/UNetClassic-rayleigh_benard": {
-   "dataset": "ai/UNetClassic-rayleigh_benard",
+   "dataset": "rayleigh_benard",
    "days_after_benchmark_paper": 118,
    "days_after_quoted_tables_version": 35,
    "initial_commit": "2025-03-28",
    "latest_commit": "2025-03-28",
+   "model": "UNetClassic",
    "n_commits": 3,
    "revised_after_upload": false
   },
   "polymathic-ai/UNetClassic-rayleigh_taylor_instability": {
-   "dataset": "ai/UNetClassic-rayleigh_taylor_instability",
+   "dataset": "rayleigh_taylor_instability",
    "days_after_benchmark_paper": 118,
    "days_after_quoted_tables_version": 35,
    "initial_commit": "2025-03-28",
    "latest_commit": "2025-03-28",
+   "model": "UNetClassic",
    "n_commits": 3,
    "revised_after_upload": false
   },
   "polymathic-ai/UNetConvNext-rayleigh_benard": {
-   "dataset": "ai/UNetConvNext-rayleigh_benard",
+   "dataset": "rayleigh_benard",
    "days_after_benchmark_paper": 118,
    "days_after_quoted_tables_version": 35,
    "initial_commit": "2025-03-28",
    "latest_commit": "2025-03-28",
+   "model": "UNetConvNext",
    "n_commits": 2,
    "revised_after_upload": false
   },
   "polymathic-ai/UNetConvNext-rayleigh_taylor_instability": {
-   "dataset": "ai/UNetConvNext-rayleigh_taylor_instability",
+   "dataset": "rayleigh_taylor_instability",
    "days_after_benchmark_paper": 118,
    "days_after_quoted_tables_version": 35,
    "initial_commit": "2025-03-28",
    "latest_commit": "2025-03-28",
+   "model": "UNetConvNext",
    "n_commits": 2,
    "revised_after_upload": false
   }

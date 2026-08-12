@@ -10,15 +10,21 @@ with the public GitHub issue/PR trail this paper documents
 Everything this harness touches is **public**: The Well's RT test-split HDF5
 objects (CC-BY-4.0) served over plain HTTPS by Flatiron/SDSC, and
 `polymathic-ai/*` model checkpoints on the Hugging Face Hub (under whatever
-license their model repositories declare). **Eight checkpoints are evaluated in
-total**, and the chronology table below covers all eight: three on
-Rayleigh–Taylor (FNO, UNetClassic, UNetConvNext — TFNO appears in `the_well`'s
-own published RT table only and was never timed or scored here, see note below),
-four on Rayleigh–Bénard (FNO, TFNO, UNetClassic, UNetConvNext), and one
-shear-flow FNO for the device-precision cross-check (Tier 2 continued, below).
-The RT set is the case study; the Rayleigh–Bénard set is the second dataset
-behind Tables `tab:rbcheckpoint` and `tab:rbstratified`. No private data, no
-private paths, no credentials.
+license their model repositories declare). **Eight checkpoints are scored here**:
+three on Rayleigh–Taylor (FNO, UNetClassic, UNetConvNext), four on
+Rayleigh–Bénard (FNO, TFNO, UNetClassic, UNetConvNext), and one shear-flow FNO
+for the device-precision cross-check (Tier 2 continued, below). The RT set is the
+case study; the Rayleigh–Bénard set is the second dataset behind Tables
+`tab:rbcheckpoint` and `tab:rbstratified`.
+
+**The chronology fixture covers a different eight**, and the two should not be
+conflated: it records the upload history of every public checkpoint for the two
+*audited datasets* — the 4×2 cross-product of FNO/TFNO/UNetClassic/UNetConvNext
+with RT and RB. So it **includes** `TFNO-rayleigh_taylor_instability`, which
+appears in `the_well`'s own published RT table but was never timed or scored
+here, and **excludes** the shear-flow checkpoint, which belongs to neither
+audited dataset. The union of the two sets is nine checkpoint identities.
+No private data, no private paths, no credentials.
 
 ## What's packaged vs. what's fetched fresh
 
@@ -30,12 +36,14 @@ private paths, no credentials.
 | Raw HDF5 field tensors (RT test split) | ~40 GB across 5 objects | `https://sdsc-users.flatironinstitute.org/~polymathic/data/the_well/datasets/rayleigh_taylor_instability/data/test/*.hdf5` | No — streamed via HTTP range GETs by `scripts/fast_reader.py`, never written to disk in bulk |
 | RT model checkpoints | 3 models, ~1.4 GB total | Hugging Face Hub, see table below | No — downloaded on demand into a local `hf-cache/` by `scripts/rt_model_eval.py` (standard `from_pretrained(revision=..., cache_dir=...)`) |
 | Shear-flow FNO checkpoint (device-precision cross-check only) | 1 model | Hugging Face Hub, see "Tier 2 continued" below | No — downloaded on demand by `scripts/shear_checkpoint_eval.py` |
-| Benchmark-wide denominator-conditioning census (paper §generalize, Table `tab:map`) | `fixtures/generalization/benchmark_map/*.json` (per-dataset outputs + `MAP.json`) | `scripts/well_denominator_census.py` (auto-discovering, data-only) over every Well dataset's public test split; assembled by `scripts/assemble_map.py` | Yes — frozen outputs packaged; **not** part of the 142 Tier-1 checks (streamed data-only, no model), re-runnable from the two scripts. Upstream revisions for every censused dataset are frozen in `fixtures/generalization/census_source_revisions.json` (HF repo SHA + lastModified per dataset; per-object ETag/size via the SDSC mirror for the one gated variant), captured 2026-07-27; new census runs record their own `source_revision` and `captured_utc`. The Rayleigh–Bénard detail fixture `fixtures/generalization/rayleigh_benard_census.json` (via `scripts/rb_census.py`) is the same census restricted to the RB Prandtl-1 spread. |
+| Benchmark-wide denominator-conditioning census (paper §generalize, Table `tab:map`) | `fixtures/generalization/benchmark_map/*.json` (per-dataset outputs + `MAP.json`) | `scripts/well_denominator_census.py` (auto-discovering, data-only) over every Well dataset's public test split; assembled by `scripts/assemble_map.py` | Yes — frozen outputs packaged; **not** part of the 142 Tier-1 checks (streamed data-only, no model), re-runnable from the two scripts. Upstream revisions for every censused dataset are frozen in `fixtures/generalization/census_source_revisions.json` (HF repo SHA + lastModified per dataset; per-object ETag/size via the SDSC mirror for the one gated variant), captured 2026-07-28T02:04:37Z; new census runs record their own `source_revision` and `captured_utc`. The Rayleigh–Bénard detail fixture `fixtures/generalization/rayleigh_benard_census.json` (via `scripts/rb_census.py`) is the same census restricted to the RB Prandtl-1 spread. |
 | Rayleigh–Bénard checkpoint audit (paper §generalize, Table `tab:rbcheckpoint`) | `fixtures/rb_models/*.json.gz` (12 runs, 1728 per-window rows) + `fixtures/rb_spread/*.json.gz` (20 runs, sampling control), aggregated to `fixtures/rb_models/rb_checkpoint_audit.json` by `scripts/rb_checkpoint_audit.py` | `scripts/rb_model_eval.py` against the four public RB checkpoints over the public test split (three Rayleigh numbers at Prandtl 1, two trajectories each; 30-step rollout + 42-point one-step grid), raw physical units | Yes — packaged (~480 KB, pure statistics). `verify.py`'s `[rb]` stage **re-derives** every cited cell from the packaged rows (not from the stored aggregate) and compares against `numbers.json`: rollout windows at both floors, one-step estimates and published ratios, the quiescent/developed split, and the `>10` cell counts. |
 | Rayleigh–Bénard **stratified** pass (paper §generalize, Table `tab:rbstratified`) | The same `fixtures/rb_spread/*.json.gz` (10 files × 2 baselines × 1 trajectory, spanning Ra 1e6–1e10 and Pr 0.1–10), aggregated by `scripts/rb_checkpoint_audit.py`'s `stratified()` into `rb_checkpoint_audit.json` → `stratified` | `scripts/rb_model_eval.py`, identical protocol to the depth pass; scored on the published rollout windows rather than used only as a one-step file-mix control | Yes — packaged. `verify.py` re-derives the 20 (file, model) cells per window, the `>10` counts at both floors, the coverage denominators (13/35 files, 16/175 trajectories) and the exploratory mechanism check of the data-only quiescent-share predictor (the paper declines to call it a calibration) (Pearson, Spearman, and the no-overlap separation), and compares each against `numbers.json`. The predictor is asserted model-independent: `quiescent_fraction()` raises if the two models' start grids or target variances differ on any file. |
-| Audited-checkpoint upload chronology (paper §boundaries, Table `tab:chronology`) | `fixtures/provenance/checkpoint_chronology.json` | `scripts/fetch_checkpoint_chronology.py` reads the model hub's commit API for all 8 audited checkpoints and the benchmark's arXiv submission history (v1 2024-11-30, v2 2025-02-21 — v2 is the version whose Tables 2/3 the paper quotes, so the 35-day interval is the operative one) | Yes — frozen output packaged; `verify.py`'s `[chronology]` stage asserts the paper's dates, both day-counts, the 8-repo coverage and the "no repository revised after upload" fact against the frozen copy. The fetch itself needs network, so the offline harness checks the frozen copy rather than re-fetching. |
+| Audited-checkpoint upload chronology (paper §boundaries, Table `tab:chronology`) | `fixtures/provenance/checkpoint_chronology.json` | `scripts/fetch_checkpoint_chronology.py` reads the model hub's commit API for all 8 public checkpoints of the two audited datasets (see the note above: not the same eight as the scored set) and the benchmark's arXiv submission history (v1 2024-11-30, v2 2025-02-21 — v2 is the version whose Tables 2/3 the paper quotes, so the 35-day interval is the operative one) | Yes — frozen output packaged; `verify.py`'s `[chronology]` stage asserts the paper's dates, both day-counts, the 8-repo coverage and the "no repository revised after upload" fact against the frozen copy. The fetch itself needs network, so the offline harness checks the frozen copy rather than re-fetching. |
 | Multi-step alignment (paper appendix, Gate 2) | `fixtures/gate2/alignment_fixture.json` | `scripts/gate2_alignment_fixture.py` — synthesizes a well-schema fixture locally and drives the library's own `WellDataset`/formatter/`Trainer.rollout_model` against this audit's mirror over a 31-step rollout; no network, no checkpoint, deterministic toy model | Yes — packaged. `verify.py`'s `[gate2]` stage asserts the frozen result against tolerances fixed in the verifier (never read from the fixture), plus the horizon, the internal coherence of the geometry, the compared tensor shapes and the per-step series. Missing fixture is a hard failure. |
 | Library end-to-end equivalence (paper appendix, Gate 3) | `fixtures/gate3/library_equivalence.json`, assembled deterministically by `scripts/gate3_assemble.py` from the two per-dataset outputs `fixtures/gate3/r{t,b}_evaluator_validation.json` | `scripts/gate3_recheck_rt.py` and `scripts/gate3_recheck_rb.py` drive the library's own `WellDataset` + `ZScoreNormalization` + `DefaultChannelsFirstFormatter` over the public test split against the pinned public checkpoints, and compare, window by window against this audit's evaluator, the model input, target and raw model output, plus VRMSE in both raw-physical units (the convention every reported cell uses; exact agreement) and the library's Z-scored units (worst case 6.924e-8) | Yes — frozen outputs packaged and asserted by `verify.py`'s `[gate3]` stage (counts, bit-identity of every compared tensor, metric within 1e-5). Re-running the *live* comparison needs network access to Hugging Face and the SDSC mirror plus the two checkpoints, so `verify.py` checks the frozen fixture rather than re-executing it; the two scripts reproduce it where those are available. Nine windows: five Rayleigh–Bénard (Ra 1e6–1e10, Pr 0.1–1) and four Rayleigh–Taylor (four of five Atwood files). Because the RT evaluator reads the SDSC mirror while the library streams Hugging Face, this fixture also records that the two published sources are bit-identical on those windows. |
+| Frozen transcription of the published `>10` cells (every threshold-crossing claim) | `fixtures/generalization/well_table3_gt10.json` | Transcribed by hand from arXiv:2412.00568v2 Tables 2/3, with a column-semantics note recording exactly what each quoted column means | Yes — packaged, and it **gates the exit code twice**: `scripts/assemble_map.py` exits if it is missing, and `scripts/aggregate_results.py` raises on any drift between it and the paper's quoted cells. It is the one input in this package that is a transcription rather than a computation, so a reader checking one thing against the source should check this. |
+| The package's own self-descriptions (`[selfclaims]` stage) | `scripts/check_self_claims.py` | Written after reviewers found sixteen discrepancies by hand in this package's prose, docstrings and packaged producer strings | Yes — packaged, and it gates the exit code. It checks paths, pinned counts, stage order and conditionality, advertised CLI invocations, worked numeric examples, the row-file I/O contract, withdrawal markers, producer targets and the dependency floor. `--validate-guard` reintroduces eleven real past discrepancies and requires each to be caught. It is **one-directional**: it checks that what the package says is true, not that everything it ships is described. |
 | Conditioning screen released with the paper (paper §lessons, "An instrument for Lesson 1") | `instrument/` — the `normscreen` package, its two test suites, and a worked example on a second benchmark | Extracted from this audit's own conditioning statistic; numpy-only, `h5py` optional for HDF5 input | Yes — packaged as source. It is **not** part of the 142 Tier-1 checks: it is a tool, not a fixture. `instrument/test_against_paper.py` validates it against the packaged census (`fixtures/generalization/benchmark_map/MAP.json`, 17 rows; `fixtures/rb_models/*.json.gz`, 1728 windows) by re-applying the statistic to the **stored** variances and comparing with the **stored** shares — an internal-consistency check, not an independent re-derivation. Both counts are pinned, so a missing or truncated fixture tree fails rather than passing over nothing. `instrument/examples/pdebench_shocktube.py` fetches one small public PDEBench file (DaRUS doi:10.18419/darus-2986, ~4.9 MB, CC-BY) and is the only part that needs network. |
 
 ## Public Well test-split objects (audited, `fixtures/audit/provenance.json`)
@@ -111,6 +119,45 @@ python3 rt_model_eval.py --model UNetConvNext --device mps \
 
 # Aggregate everything into every metric variant + counterfactual
 P3_RESULTS_DIR=../results python3 aggregate_results.py
+# Pass B (Rayleigh-Benard) -- the second audited dataset. Reconstructed here from the
+# packaged fixtures' own provenance blocks (repo, revision, device) and rows (trajectories,
+# rollout horizon, one-step grid), which are the authoritative record; an earlier version of
+# this manifest gave no command line for this script at all.
+#
+# Depth pass: four baselines x three Prandtl-1 files x two trajectories.
+for MODEL_REV in "FNO 9975702db32232c3dce6dd9cfc45dfc049523c39" \
+                 "TFNO 7d351350eaf68caba1eac1e545cd6661251dd1fd" \
+                 "UNetClassic b72b1213dade391e4620476d1410c1bbe7103c1d" \
+                 "UNetConvNext c5fa0f7a50aca21b65fed95e0f7e8d1097eb2b8b"; do
+  set -- $MODEL_REV
+  for RA in 1e6 1e7 1e8; do
+    python3 rb_model_eval.py --model "$1" --revision "$2" \
+        --file "rayleigh_benard_Rayleigh_${RA}_Prandtl_1.hdf5" \
+        --trajectories 0,1 --rollout-steps 30 \
+        --onestep-starts 4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,59,64,74,84,94,104,114,124,134,144,154,164,174,184,194,199 \
+        --output-dir ../fixtures/rb_models --cache-dir ../hf-cache
+  done
+done
+
+# Stratified pass: two baselines x ten further files x one trajectory, identical protocol.
+for MODEL_REV in "FNO 9975702db32232c3dce6dd9cfc45dfc049523c39" \
+                 "UNetClassic b72b1213dade391e4620476d1410c1bbe7103c1d"; do
+  set -- $MODEL_REV
+  for F in Rayleigh_1e6_Prandtl_1e-1 Rayleigh_1e6_Prandtl_10 Rayleigh_1e7_Prandtl_2e-1 \
+           Rayleigh_1e7_Prandtl_5 Rayleigh_1e8_Prandtl_1e-1 Rayleigh_1e8_Prandtl_10 \
+           Rayleigh_1e9_Prandtl_1 Rayleigh_1e9_Prandtl_2e-1 Rayleigh_1e10_Prandtl_1 \
+           Rayleigh_1e10_Prandtl_5e-1; do
+    python3 rb_model_eval.py --model "$1" --revision "$2" \
+        --file "rayleigh_benard_${F}.hdf5" \
+        --trajectories 0 --rollout-steps 30 \
+        --onestep-starts 4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,59,64,74,84,94,104,114,124,134,144,154,164,174,184,194,199 \
+        --output-dir ../fixtures/rb_spread --cache-dir ../hf-cache
+  done
+done
+
+# Aggregate both passes into the packaged fixture verify.py's [rb] stage re-derives from:
+python3 rb_checkpoint_audit.py
+
 ```
 
 **Note:** the FNO command above uses exactly two pairs -- `4:1` (At\_75

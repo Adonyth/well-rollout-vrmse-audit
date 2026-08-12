@@ -7,8 +7,11 @@ test split, against the pinned public checkpoints. gate3_recheck_rt.py and
 gate3_recheck_rb.py produce the per-dataset window comparisons; this script folds them into
 the single fixture that verify.py asserts and that extract_numbers.py reads.
 
-Deterministic: sorted keys, fixed indent, no timestamps -- so re-running it on unchanged
-inputs reproduces the packaged fixture byte for byte.
+Deterministic given a fixed environment: sorted keys, fixed indent, no timestamps. It does
+record `environment_at_assembly` (platform, interpreter, and the numpy/torch/the_well
+versions), so re-running on unchanged inputs reproduces the packaged fixture byte for byte
+on the machine that produced it, and differs only in that block elsewhere. Everything
+`verify.py` asserts is outside that block.
 """
 import json, os, sys
 

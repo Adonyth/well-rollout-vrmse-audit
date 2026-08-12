@@ -57,12 +57,20 @@ independent derivation of the same quantity in
 ```
 $ python3 verify.py
 ...
+[map] ...   [gate3] ...   [coverage] ...   [gate2] ...
 [3/3] 142 match, 0 mismatch.
-[reference] ...   [map] ...   [gate3] ...   [coverage] ...   [gate2] ...
-[blocks] ...   [provenance] ...   [sweep] ...   [rb] ... x3
-[chronology] ...   [selfclaims] ...
+[blocks] ...   [provenance] ...   [sweep] ...   [rb] ... x2
+[chronology] ...   [rb] ...   [selfclaims] ...
 PASS: repro-harness regenerates the frozen P3 values to a relative tolerance of 1e-4 (~4 sig figs).
 ```
+
+One further stage, `[reference]`, prints between `[gate2]` and `[blocks]` **only inside
+the source repository**, where it asserts that this package's frozen
+`fixtures/numbers_reference.json` is leaf-for-leaf identical to the released
+`paper/extracted/numbers.json`. That path is outside this package by design, so a
+standalone clone does not print the line and does not check it: the frozen copy is the
+comparison target here, and its agreement with the manuscript's copy is asserted where
+both are present, not here. Everything else above runs in a clone.
 
 This is what stands behind the paper's coverage-tier claim in
 `sec7_boundaries.tex`: the wider Lane-3 chain (the two library-defect deltas
@@ -81,19 +89,30 @@ repro-harness/
   env-lock-full.txt        <- full pinned pip freeze from the original Tier-2 run
   verify.py               <- one-command reproduction + check (run this)
   scripts/
-    fast_reader.py         <- HTTP-range HDF5 reader for public Well test objects
-    independent_metrics.py <- the_well-independent VRMSE/variance reference implementation (numpy only)
-    rt_audit_pass.py       <- Pass A: denominator/census audit (streams public data)
-    rt_model_eval.py       <- Pass B: checkpoint eval (streams public data + public HF models;
-                               --revision is required and drift-checked before scoring)
-    shear_checkpoint_eval.py <- device-precision cross-check source (second public Well
-                               dataset; see MANIFEST.md "Tier 2 continued"; not re-executed
-                               while assembling this harness)
-    aggregate_results.py   <- deterministic aggregation: raw scalars -> the 142 enumerated value checks (VRMSE/census/field-split/figure-vs-table/spatial-mean)
-    spatial_mean_baseline.py <- trivial spatial-mean-predictor VRMSE baseline (cross-checked by verify.py)
-    check_unsourced.py     <- numbers-must-trace-to-numbers.json checker (paper-writing discipline)
-    check_self_claims.py   <- checks the package's prose/docstrings against the tree they describe
-                              (`--validate-guard` reintroduces five real discrepancies and requires each to be caught)
+    verify-time (pure numpy, no network)
+      aggregate_results.py     <- raw scalars -> the 142 enumerated value checks
+      independent_metrics.py   <- the_well-independent VRMSE/variance reference implementation
+      io_contract.py           <- the one place a per-window row file's storage is decided
+      rb_checkpoint_audit.py   <- re-derives every Rayleigh-Benard cell from the packaged rows
+      assemble_map.py          <- assembles the 17-dataset conditioning map from per-dataset census outputs
+      spatial_mean_baseline.py <- trivial spatial-mean-predictor VRMSE baseline
+      gate3_assemble.py        <- assembles the Gate-3 fixture from the two per-dataset outputs
+      check_self_claims.py     <- checks the package's prose/docstrings against the tree they describe
+                                  (`--validate-guard` reintroduces eleven real discrepancies, each must be caught)
+      check_unsourced.py       <- numbers-must-trace-to-numbers.json checker (paper-writing discipline)
+      test_lastbatch_agg.py    <- reproduces the issue-#78 last-batch aggregation defect
+      test_vrmse_epsilon.py    <- reproduces the issue-#75 floor defect
+    Tier-2 producers (network + torch + the_well; not run by verify.py)
+      fast_reader.py           <- HTTP-range HDF5 reader for public Well test objects
+      rt_audit_pass.py         <- Pass A: Rayleigh-Taylor denominator/census audit
+      rt_model_eval.py         <- Pass B: Rayleigh-Taylor checkpoint eval (--revision required, drift-checked)
+      rb_model_eval.py         <- the same for Rayleigh-Benard, writing via io_contract
+      rb_census.py             <- the RB Prandtl-1 conditioning census
+      well_denominator_census.py <- the benchmark-wide, data-only census over every Well dataset
+      fetch_checkpoint_chronology.py <- checkpoint upload history from the model hub's commit API
+      gate2_alignment_fixture.py <- Gate 2: multi-step alignment on a locally synthesized fixture
+      gate3_recheck_rt.py / gate3_recheck_rb.py <- Gate 3: library-native re-check on real artifacts
+      shear_checkpoint_eval.py <- device-precision cross-check on a second Well dataset
   instrument/              <- normscreen: the standalone conditioning screen (see below)
     normscreen/            <- the package (numpy only; h5py optional, for HDF5 input)
     test_against_paper.py  <- checks the screen against this repo's frozen census fixtures
@@ -102,17 +121,25 @@ repro-harness/
   fixtures/
     audit/*.json.gz         <- packaged raw census scalars, all 5 public RT test objects (10 traj)
     audit/provenance.json   <- byte counts + ETags for the 5 public HTTP objects fetched
-    models/*.json.gz        <- packaged raw per-window MSE/variance, 3 models
+    models/*.json.gz        <- packaged raw per-window MSE/variance, 3 RT models
     models/provenance_*.json<- HF checkpoint identity (repo id + commit sha + param count)
+    rb_models/*.json.gz     <- the Rayleigh-Benard depth pass (12 runs, 1728 rows) + its aggregate
+    rb_spread/*.json.gz     <- the RB stratified pass / sampling control (20 runs)
+    generalization/         <- the 17-dataset conditioning map, the RB detail census, the frozen
+                               transcription of the published ">10" cells, and the source revisions
+    gate2/, gate3/          <- the two frozen verification-gate fixtures
+    provenance/             <- the checkpoint upload chronology
+    lane3_report_numbers.json <- the wider chain's number set, carried for provenance only:
+                               nothing in this package reads it (see MANIFEST.md)
     numbers_reference.json  <- frozen copy of paper/extracted/numbers.json (comparison target)
-    summary.json             <- (written by verify.py / aggregate_results.py; not committed input)
+    summary.json            <- (written by verify.py / aggregate_results.py; not committed input)
 ```
 
 ## Two tiers
 
 **Tier 1 (what `verify.py` runs today):** the raw per-frame/per-window
 scalars (MSE, target/prediction variance — never raw field tensors) are
-packaged in `fixtures/` (~1 MB in total, of which the RT per-frame/per-window scalars are ~280 KB; the rest is the Rayleigh-Benard checkpoint rows, the benchmark-wide census, and the Gate-2/Gate-3/provenance fixtures). `verify.py` re-derives the 142 enumerated value checks
+packaged in `fixtures/` (927,505 bytes in total, of which the RT per-frame/per-window scalars are 240,823; the rest is the Rayleigh-Benard checkpoint rows, the benchmark-wide census, and the Gate-2/Gate-3/provenance fixtures). `verify.py` re-derives the 142 enumerated value checks
 from those scalars via `aggregate_results.py` and diffs against the
 frozen paper numbers. This is a genuine recomputation, not a file diff: the
 aggregation (eps variants, rollout window means, one-step interpolation,
@@ -124,7 +151,8 @@ themselves were produced by streaming the public Well RT test-split HDF5
 objects over HTTPS (`scripts/fast_reader.py`, exact-byte-offset ranged GETs)
 and running the pinned `polymathic-ai/*` Hugging Face checkpoints --- three
 Rayleigh-Taylor checkpoints (FNO, UNetClassic, UNetConvNext) via
-`scripts/rt_model_eval.py`, plus a shear-flow FNO cross-check via
+`scripts/rt_model_eval.py`, four Rayleigh-Benard checkpoints via
+`scripts/rb_model_eval.py`, plus a shear-flow FNO cross-check via
 `scripts/shear_checkpoint_eval.py`. `MANIFEST.md` gives the exact commands, exact
 `--pairs`/`--onestep-starts` arguments, and exact source URLs/HF commit
 shas used to produce the packaged fixtures, so a reviewer can regenerate
@@ -173,15 +201,16 @@ composes into CI.
 ```bash
 cd instrument
 python3 -m normscreen --demo                          # synthetic, no download
-python3 -m normscreen your_data.h5 --auto --spatial-dims 3 --eps 1e-7
+python3 -m normscreen your_data.h5 --auto --spatial-dims 3 --eps 1e-7 --leading-axes 2 --component-axis -1
 python3 test_against_paper.py                         # vs this repo's frozen census
 python3 test_normalizers.py                           # convention/edge-case pins
 ```
 
 `test_against_paper.py` re-applies the conditioning statistic to this repo's
 **stored** variances (`fixtures/generalization/benchmark_map/MAP.json`, 17 rows;
-`fixtures/rb_models/*.json.gz`, 1728 windows) and compares against the **stored**
-shares. It is an internal-consistency check between the instrument and the
+`fixtures/rb_models/*.json.gz`, 1728 windows). For the map it compares against the
+**stored** shares; the Rayleigh-Benard rows store no shares, so there it recomputes them
+from the stored variances and compares against counts pinned in the test file. It is an internal-consistency check between the instrument and the
 audit's stored inputs, not an independent re-derivation of the census — the
 variance extraction itself is taken as given. Both fixture counts are pinned, and
 a missing or truncated fixture tree fails the suite rather than reporting a pass

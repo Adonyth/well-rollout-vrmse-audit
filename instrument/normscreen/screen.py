@@ -38,9 +38,9 @@ which cells to check, not which cells are wrong.
 
 USAGE
 -----
-    normscreen data.h5 --fields density velocity_x velocity_y
-    normscreen data.h5 --auto --eps 1e-7 --json report.json
-    normscreen --npy field.npy --spatial-dims 3
+    normscreen data.h5 --fields density velocity_x velocity_y --no-split-components
+    normscreen data.h5 --auto --eps 1e-7 --json report.json --no-split-components
+    normscreen field.npy --spatial-dims 3 --leading-axes 1 --component-axis -1
 
 Accepts HDF5, NumPy .npy/.npz, or any array via the Python API. No dependency on any
 particular benchmark's layout.
@@ -86,6 +86,12 @@ def floor_share(var: np.ndarray | float, eps: float) -> np.ndarray | float:
     floor_share = eps / (Var + eps).  0 means the data carries the denominator;
     1 means the constant does.
 
+    `eps` must be non-negative. A negative stabilizer is not a floor: it shrinks the
+    denominator, so it *amplifies* rather than bounds, and it produces a negative
+    share that reads as a healthier-than-healthy screen. An earlier version accepted
+    it and reported "the denominator is carried by the data everywhere here" for
+    eps = -1e-7. It is rejected.
+
     With eps == 0 the metric has no stabilizing constant, so the constant's share is
     0 wherever the denominator is positive -- and at Var == 0 the expression is 0/0.
     That case is not "half floored": it is a metric dividing by exactly zero, which is
@@ -94,6 +100,9 @@ def floor_share(var: np.ndarray | float, eps: float) -> np.ndarray | float:
     in eps_sweep and through the eps==0 verdict, rather than propagating a NaN that
     would silently poison a max() or a band lookup.
     """
+    if eps < 0:
+        raise ValueError(f"eps must be non-negative; got {eps!r}. A negative "
+                         f"stabilizer shrinks the denominator instead of flooring it.")
     var = np.asarray(var, dtype=np.float64)
     if eps == 0:
         return np.zeros_like(var) if var.ndim else 0.0

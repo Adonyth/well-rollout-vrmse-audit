@@ -15,15 +15,30 @@ None of those is a wrong result. Each is the package asserting something untrue
 about itself, which is the exact failure mode the paper is about, so it is worth a
 machine check rather than a reviewer's attention.
 
-Three families are checkable without judgement:
+Four families are checkable without judgement:
 
-  paths   -- every repo-relative path named in the prose or in a docstring exists
-  counts  -- every quantity the prose pins (fixture rows, check counts) is measured
-  stages  -- the README transcript lists every stage that gates the exit code
-  deps    -- the declared dependency floor admits the APIs the scripts actually call
+  paths     -- every repo-relative path named in the prose or in a docstring resolves,
+               at the location it names when it names one
+  counts    -- the fixture counts the prose pins, and the enumerated check total,
+               recomputed from the tree and from verify.py's own constants
+  stages    -- the README transcript lists, in print order, every stage that gates the
+               exit code, and says so where a stage is conditional
+  cli       -- every invocation the package advertises uses flags its parser accepts
+               and declares a layout where the instrument requires one
+  numbers   -- the worked numeric examples evaluate to the values they claim
+  io        -- the row-file writer and reader round-trip and are single-sourced
+  markers   -- a ledger claiming its withdrawals are marked inline has them marked
+  producers -- no shipped script defaults to writing outside the package
+  commands  -- no documented command carries an abbreviated or placeholder value
+  deps      -- the declared dependency floor admits the APIs the scripts call
 
-Anything requiring judgement (is this description *apt*?) is out of scope; this
-catches the mechanical half, which is where all ten of the found discrepancies lay.
+**What this does not do.** It is one-directional: it checks that what the package
+says is true, never that everything the package ships is said. It cannot judge whether
+a description is *apt*. The dependency rule knows about one API, not the dependency
+graph. The count rules bind the quantities named below, not every number in the prose.
+Reviewers found ten discrepancies of this class by hand before it existed and six more
+after its first version, so read a pass as "these families are clean", not as
+"the package is honest about itself".
 
 Run standalone (`python3 scripts/check_self_claims.py`) or via `verify.py`.
 """
@@ -41,11 +56,14 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # Prose surfaces. Docstrings/comments in .py are swept separately (below), because
 # their path-like tokens are not backticked.
 PROSE = ["README.md", "MANIFEST.md", "instrument/README.md"]
-CODE = sorted(str(p.relative_to(ROOT)) for p in ROOT.glob("scripts/*.py")) + [
-    "verify.py",
-    "instrument/test_against_paper.py",
-    "instrument/test_normalizers.py",
-]
+CODE = sorted(
+    str(p.relative_to(ROOT))
+    for p in list(ROOT.glob("scripts/*.py"))
+    + list(ROOT.glob("instrument/*.py"))
+    + list(ROOT.glob("instrument/normscreen/*.py"))
+    + list(ROOT.glob("instrument/examples/*.py"))
+    + [ROOT / "verify.py"]
+)
 
 # A backticked token is treated as a path claim when it looks like one: it has a
 # known suffix, or a directory separator, and no spaces or shell metacharacters.
@@ -98,6 +116,12 @@ EXTERNAL = {
     "summary.json",
     # the reader's own inputs, in usage examples
     "your_data.h5", "chapter.tex",
+    # one level up in the submission tree, swept by check_withdrawal_markers
+    "RT-QUANT.md",
+    # another project's files, named in the worked example's provenance note
+    "metrics.py",
+    # files the *reader* creates by running an advertised command
+    "out.json", "report.json",
 }
 # .tex chapters live in the paper repo; this package ships none.
 _EXTERNAL_SUFFIX = (".tex",)
@@ -116,19 +140,37 @@ def _exists(tok: str) -> bool:
     return False
 
 
-def _resolve(tok: str) -> bool:
-    """A named file exists if it is at that path, or its basename is in the tree.
+def _resolve(tok: str, surface: str = "") -> bool:
+    """Resolve a named file.
 
-    Prose and docstrings name scripts by basename (``aggregate_results.py``) far
-    more often than by full path, and both forms are the same claim: *this file
-    is part of the package*.
+    A bare basename (``aggregate_results.py``) is a claim that the file is *in the
+    package*, and is satisfied anywhere in the tree -- prose names scripts that way
+    far more often than by full path. A token that carries a directory component
+    (``scripts/aggregate_results.py``) is a claim about *that* location and must
+    resolve there. An earlier version fell back to the basename in both cases, so a
+    real filename under a directory it does not live in -- the verifier placed inside
+    the fixtures tree, the manifest inside the scripts tree -- passed as a valid claim.
     """
     if _exists(tok):
         return True
-    base = tok.rsplit("/", 1)[-1]
-    if "*" in base:
-        return any(ROOT.rglob(base))
-    return any(ROOT.rglob(base))
+    if "/" in tok:
+        # A path may be written relative to the package root, relative to the
+        # directory of the file that names it (the instrument's README says
+        # the worked example by its path under that README's own directory), or
+        # relative to the submission tree one
+        # level up, with the harness directory as the leading component. All three
+        # are the same claim; none of them licenses a wrong directory.
+        if tok.startswith("repro-harness/") and _exists(tok[len("repro-harness/"):]):
+            return True
+        here = (ROOT / surface).parent if surface else ROOT
+        while True:
+            if (here / tok).exists():
+                return True
+            if here == ROOT or ROOT not in here.parents:
+                break
+            here = here.parent
+        return False
+    return any(ROOT.rglob(tok))
 
 
 def check_paths() -> list[str]:
@@ -162,9 +204,37 @@ def check_paths() -> list[str]:
                     continue
                 if cand.startswith(("paper/", "the_well/", "~", "hf-cache/", "lanes/", "lane-3/")):
                     continue
-                if not _resolve(cand):
+                if not _resolve(cand, rel):
                     bad.append(f"{rel}: names `{cand}`, which is nowhere in the package")
     return bad
+
+
+def _g2_steps() -> int:
+    """The Gate-2 horizon, read from the fixture rather than from any prose."""
+    return int(json.loads((ROOT / "fixtures/gate2/alignment_fixture.json")
+                          .read_text(encoding="utf-8"))["rollout_steps"])
+
+
+def _derive_check_total() -> int | None:
+    """Recompute the enumerated check total from verify.py's own constants."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("_p3_verify_selfclaims", ROOT / "verify.py")
+    if spec is None or spec.loader is None:
+        return None
+    mod = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(mod)
+    except Exception:
+        return None
+    try:
+        return (len(mod.CHECKS)
+                + len(mod.FIELDSPLIT_CHECKS)
+                + len(mod.AUDIT_TRAJ_KEYS) * 5
+                + len(mod.AUDIT_TRAJ_KEYS) * 4
+                + len(mod.SPATIAL_MEAN_BASELINE_WINDOWS))
+    except AttributeError:
+        return None
 
 
 def check_counts() -> list[str]:
@@ -182,32 +252,68 @@ def check_counts() -> list[str]:
 
     # Both counts are pinned in `instrument/test_against_paper.py` as well, so the
     # prose, the test and the tree are held to one number rather than to each other.
-    for surface, text in (("instrument/README.md", inst), ("README.md", readme), ("MANIFEST.md", man)):
+    vpy = (ROOT / "verify.py").read_text(encoding="utf-8")
+    for surface, text in (("instrument/README.md", inst), ("README.md", readme),
+                          ("MANIFEST.md", man), ("verify.py", vpy)):
         for pattern, actual, what in (
             (r"MAP\.json`?,? (\d+) rows", n_map, "rows in MAP.json"),
             (r"(\d+) rows reproduced", n_map, "rows in MAP.json"),
             (r"json\.gz`?,? (\d+) windows", n_win, "packaged RB windows"),
             (r"(\d+) per-window variances", n_win, "packaged RB windows"),
+
         ):
             for c in re.findall(pattern, text):
                 if int(c) != actual:
                     bad.append(f"{surface}: claims {c} {what}; the tree holds {actual}")
 
-    # The headline check count must equal what aggregate_results actually emits.
+    # The Gate-2 horizon, wherever a surface states it. Scoped by context: the
+    # Rayleigh-Benard protocol also says "30-step rollout" and is a different number.
+    g2 = _g2_steps()
+    for surface, text in (("README.md", readme), ("MANIFEST.md", man),
+                          ("verify.py", (ROOT / "verify.py").read_text(encoding="utf-8"))):
+        for m in re.finditer(r"(\d+)-step[\s\n#]*(?:autoregressive )?rollout", text):
+            ctx = text[max(0, m.start() - 260):m.end() + 260]
+            if "rollout_model" not in ctx and "Gate 2" not in ctx and "gate2" not in ctx:
+                continue
+            if int(m.group(1)) != g2:
+                bad.append(f"{surface}: states a {m.group(1)}-step Gate-2 rollout; "
+                           f"the fixture records {g2}")
+
+    # The headline check count, derived from verify.py's own constants the same way
+    # extract_numbers.py derives it -- so the prose is bound to the code, not merely
+    # to the other prose surface. Changing 142 to 999 on both surfaces used to pass.
     n_claimed = {int(m) for m in re.findall(r"(\d{2,4}) (?:enumerated )?value checks", readme)}
     n_claimed |= {int(m) for m in re.findall(r"the (\d{2,4}) Tier-1 checks", man)}
     if n_claimed:
-        vp = (ROOT / "verify.py").read_text(encoding="utf-8")
-        m = re.search(r'\[3/3\] \{n_ok\}', vp)
-        if m is None:
-            bad.append("verify.py: cannot locate the check-count print to cross-check the prose")
+        derived = _derive_check_total()
+        if derived is None:
+            bad.append("verify.py: cannot import its check constants to bind the prose count")
         else:
-            # verify.py prints the measured count; agreement is asserted at run time
-            # by the caller passing n_ok in. Here we only require internal agreement
-            # among the prose surfaces themselves.
-            if len(n_claimed) > 1:
-                bad.append(f"prose surfaces disagree on the check count: {sorted(n_claimed)}")
+            for c in sorted(n_claimed):
+                if c != derived:
+                    bad.append(f"prose claims {c} value checks; verify.py's own constants "
+                               f"produce {derived}")
     return bad
+
+
+def _conditional_stages() -> set[str]:
+    """Stage tags `verify.py` prints only when a path outside this package exists.
+
+    A standalone clone never sees these, so requiring them in the sample transcript
+    would make the transcript wrong for the reader who actually has the package.
+    Instead they must be *documented* as conditional in prose.
+    """
+    vp = (ROOT / "verify.py").read_text(encoding="utf-8")
+    out: set[str] = set()
+    for m in re.finditer(r"if\s+([A-Za-z_]\w*)\.exists\(\):", vp):
+        head = vp[max(0, m.start() - 500):m.start()]
+        if "HERE.parent" not in head:
+            continue
+        tail = vp[m.end():m.end() + 1500]
+        tags = re.findall(r'print\(f?"\[([a-z][a-z0-9]*)\]', tail)
+        if tags:
+            out.add(tags[0])
+    return out
 
 
 def check_stage_tags() -> list[str]:
@@ -222,10 +328,257 @@ def check_stage_tags() -> list[str]:
     printed = set(re.findall(r'print\(f?"\[([a-z][a-z0-9]*)\]', vp))
     shown = set(re.findall(r"\[([a-z][a-z0-9]*)\] \.\.\.", (ROOT / "README.md").read_text(encoding="utf-8")))
     bad = []
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    cond = _conditional_stages()
     for tag in sorted(printed - shown):
+        if tag in cond:
+            # Allowed out of the transcript, but only if the prose says it is conditional.
+            if not re.search(rf"`?\[{tag}\]`?[^.]{{0,400}}?\bonly\b", readme, re.S):
+                bad.append(f"README.md: the [{tag}] stage prints only when a path outside "
+                           f"this package exists, and the README does not say so")
+            continue
         bad.append(f"README.md: verify.py prints a [{tag}] stage the transcript omits")
     for tag in sorted(shown - printed):
         bad.append(f"README.md: transcript shows a [{tag}] stage verify.py never prints")
+    return bad
+
+
+def check_cli_examples() -> list[str]:
+    """Every CLI invocation the package advertises must be runnable as written.
+
+    Two defects of this kind shipped in the released instrument: a documented
+    `--npy` flag that does not exist (the path is positional and `.npy` is
+    detected by suffix), and a headline example that declares none of the three
+    layouts the instrument itself calls mandatory, so on the layout its own
+    `--spatial-dims 3` implies it exits non-zero with `ambiguous layout`.
+
+    Checked mechanically (the worked example under the instrument's examples
+    directory is swept the same way):
+      - every long flag in an advertised `normscreen` line exists in its parser
+      - no advertised line both passes `--spatial-dims` and omits all three
+        layout declarations, which the instrument documents as refused
+    """
+    import argparse
+
+    bad: list[str] = []
+    sys.path.insert(0, str(ROOT / "instrument"))
+    try:
+        from normscreen.__main__ import build_parser  # type: ignore
+    except Exception:
+        try:
+            from normscreen import __main__ as _m  # type: ignore
+            build_parser = getattr(_m, "build_parser", None)
+        except Exception:
+            build_parser = None
+    known: set[str] = set()
+    if build_parser is not None:
+        try:
+            p = build_parser()
+            for a in p._actions:
+                known.update(o for o in a.option_strings if o.startswith("--"))
+        except Exception:
+            known = set()
+    if not known:
+        # Fall back to reading the option strings out of the source, so a parser
+        # that cannot be imported does not silently disable the check.
+        src = (ROOT / "instrument" / "normscreen" / "__main__.py").read_text(encoding="utf-8")
+        known = set(re.findall(r'add_argument\(\s*"(--[a-z0-9-]+)"', src))
+    if not known:
+        return ["check_cli_examples: could not determine normscreen's flags; check disabled"]
+
+    LAYOUT_DECLS = ("--leading-axes", "--no-split-components", "--component-axis")
+    surfaces = [("README.md", ROOT / "README.md"),
+                ("instrument/README.md", ROOT / "instrument" / "README.md"),
+                ("instrument/normscreen/__main__.py", ROOT / "instrument" / "normscreen" / "__main__.py"),
+                ("instrument/normscreen/screen.py", ROOT / "instrument" / "normscreen" / "screen.py")]
+    for label, path in surfaces:
+        if not path.exists():
+            continue
+        for line in path.read_text(encoding="utf-8").splitlines():
+            st = line.strip().lstrip("#").strip()
+            if "normscreen" not in st or st.startswith(("*", "|", "-")):
+                continue
+            if not (st.startswith("normscreen") or st.startswith("python3 -m normscreen")
+                    or st.startswith("python -m normscreen")):
+                continue
+            flags = re.findall(r"(--[a-z0-9-]+)", st)
+            for f in flags:
+                if f not in known:
+                    bad.append(f"{label}: advertises `{f}` in `{st}`, which the parser does not accept")
+            if "--spatial-dims" in flags and not any(d in flags for d in LAYOUT_DECLS):
+                if "--demo" not in flags:
+                    bad.append(f"{label}: advertises `{st}`, which declares no layout and so "
+                               f"cannot produce a clean screen on the rank the flag implies")
+    return bad
+
+
+def check_numeric_examples() -> list[str]:
+    """Numeric examples in prose and docstrings must evaluate to what they claim.
+
+    `floor_share(var=1e-11, eps=1e-7) # 0.99989` shipped in the released
+    instrument's README; the value is 0.99990.
+    """
+    bad: list[str] = []
+    sys.path.insert(0, str(ROOT / "instrument"))
+    try:
+        from normscreen import floor_share  # type: ignore
+    except Exception as exc:
+        return [f"check_numeric_examples: cannot import normscreen ({exc}); check disabled"]
+    pat = re.compile(r"floor_share\(\s*var\s*=\s*([0-9.e+-]+)\s*,\s*eps\s*=\s*([0-9.e+-]+)\s*\)"
+                     r"\s*#\s*([0-9.]+)")
+    for rel in ("instrument/README.md", "README.md", "instrument/normscreen/screen.py"):
+        p = ROOT / rel
+        if not p.exists():
+            continue
+        for var, eps, claimed in pat.findall(p.read_text(encoding="utf-8")):
+            actual = float(floor_share(var=float(var), eps=float(eps)))
+            if abs(actual - float(claimed)) > 0.5 * 10 ** -(len(claimed.split(".")[-1])):
+                bad.append(f"{rel}: claims floor_share(var={var}, eps={eps}) # {claimed}; "
+                           f"it is {actual:.{len(claimed.split('.')[-1])}f}")
+    return bad
+
+
+def check_transcript_order() -> list[str]:
+    """The README transcript must match the order stages actually print, and must
+    not present a conditional stage as unconditional.
+
+    `[reference]` prints fifth, not first, and only when a path *outside* this
+    standalone package exists -- so a reviewer running the released harness
+    alone never sees the line the transcript leads with. A set comparison passed
+    this; an order comparison does not.
+    """
+    vp = (ROOT / "verify.py").read_text(encoding="utf-8")
+    printed = re.findall(r'print\(f?"\[([a-z][a-z0-9]*)\]', vp)
+    shown = re.findall(r"\[([a-z][a-z0-9]*)\] \.\.\.", (ROOT / "README.md").read_text(encoding="utf-8"))
+    bad = []
+    # Order, comparing first appearances so the "x3" shorthand stays legal.
+    def firsts(seq):
+        out = []
+        for t in seq:
+            if t not in out:
+                out.append(t)
+        return out
+    cond = _conditional_stages()
+    printed = [t for t in printed if t not in cond]
+    if firsts(printed) != firsts(shown):
+        bad.append(f"README.md: transcript order {firsts(shown)} is not the print order {firsts(printed)}")
+    return bad
+
+
+def check_io_contract() -> list[str]:
+    """The row-file writer and reader must agree, and must be single-sourced.
+
+    They were written twice and drifted: the writer named its output `.json.gz`
+    and wrote it uncompressed, so the documented regeneration path produced
+    files the aggregator raised `BadGzipFile` on.
+    """
+    import tempfile
+
+    bad: list[str] = []
+    sys.path.insert(0, str(ROOT / "scripts"))
+    try:
+        from io_contract import read_rows, write_rows  # type: ignore
+    except Exception as exc:
+        return [f"scripts/io_contract.py: cannot import ({exc})"]
+    payload = {"rows": [{"a": 1.5}], "fields": ["a"], "provenance": {"x": "y"}}
+    with tempfile.TemporaryDirectory() as td:
+        path = str(pathlib.Path(td) / "sub" / "dir" / "probe.json.gz")
+        write_rows(path, payload)
+        if read_rows(path) != payload:
+            bad.append("scripts/io_contract.py: write_rows/read_rows do not round-trip")
+        with gzip.open(path, "rt", encoding="utf-8") as fh:
+            json.load(fh)  # raises BadGzipFile if the writer stopped compressing
+    for rel in ("scripts/rb_model_eval.py", "scripts/rb_checkpoint_audit.py"):
+        src = (ROOT / rel).read_text(encoding="utf-8")
+        if "io_contract" not in src:
+            bad.append(f"{rel}: does not use scripts/io_contract.py, so the row-file "
+                       f"contract is stated in more than one place again")
+    return bad
+
+
+# The claims RT-QUANT.md's banner withdraws, as fragments that actually occur in the
+# body. Deriving these from the banner text alone does not work: the banner states the
+# provenance claim in contracted form while the body interpolates a repository glob into
+# the middle of it, so a literal-substring match silently never fires -- which is how
+# four unmarked withdrawals survived a version of this check that tried to be clever.
+# Each entry is (fragment-in-body, fragment-the-banner-must-still-declare).
+_WITHDRAWN = [
+    ("are the paper-run models", "paper-run models"),
+    ("10/10 trajectories", "wherever they appear"),
+    ("class reproduced", "reproduces / is reproduced"),
+    ("predicting-the-mean", "predicting the mean"),
+    ("deepest near-zero-variance", "deepest near-zero-variance"),
+]
+_MARKER = "WITHDRAWN"
+
+
+def check_withdrawal_markers() -> list[str]:
+    """A ledger claiming its withdrawals are marked inline must have them marked.
+
+    `RT-QUANT.md` is the working ledger the appendix cites as the evidentiary record,
+    and its banner asserts each withdrawn claim is marked "wherever it appears". Four
+    occurrences were not, including the provenance identity the manuscript exists to
+    deny. Checked in both directions: every fragment must still be declared by the
+    banner, and every occurrence in the body must carry the marker.
+    """
+    p = ROOT.parent / "RT-QUANT.md"
+    if not p.exists():
+        return []          # not shipped inside the harness; swept from the submission tree
+    text = p.read_text(encoding="utf-8")
+    head, sep, body = text.partition("\n## ")
+    if not sep:
+        return ["RT-QUANT.md: no section heading found; cannot separate banner from body"]
+    bad = []
+    for frag, declared in _WITHDRAWN:
+        if declared.lower() not in head.lower():
+            bad.append(f"RT-QUANT.md: the banner no longer declares {declared!r} withdrawn, "
+                       f"but this checker still holds {frag!r} as a withdrawn claim")
+        for i, line in enumerate(body.splitlines(), start=head.count("\n") + 2):
+            if frag.lower() in line.lower() and _MARKER not in line:
+                bad.append(f"RT-QUANT.md:{i}: banner declares {frag!r} withdrawn wherever it "
+                           f"appears; this occurrence carries no marker")
+    return bad
+
+
+def check_producer_targets() -> list[str]:
+    """No shipped script may default to writing outside the package.
+
+    Three did, all into a `.gate-work` working directory that is not shipped and in
+    two cases was never created: the RB census died with `FileNotFoundError` after a
+    full network run, and the benchmark-wide census wrote where the assembler never
+    looked, so the MANIFEST's "re-runnable from the two scripts" did not compose.
+    A default output path outside the package is not reproducible by a reader.
+    """
+    bad: list[str] = []
+    for path in sorted(ROOT.glob("scripts/*.py")):
+        if path.name == "check_self_claims.py":
+            continue  # its mutation table names the defect it checks for
+        src = path.read_text(encoding="utf-8")
+        for m in re.finditer(r'["\'](\.gate-work[^"\']*)["\']', src):
+            line = src[:m.start()].count("\n") + 1
+            ctx = src.splitlines()[line - 1]
+            if ctx.lstrip().startswith("#"):
+                continue          # naming the old path in a comment is not a default
+            bad.append(f"scripts/{path.name}:{line}: defaults to writing {m.group(1)!r}, "
+                       f"which is outside the package")
+    return bad
+
+
+def check_command_placeholders() -> list[str]:
+    """A documented command must be runnable as written, not a sketch.
+
+    A revision sha abbreviated to `7d351350eaf6...` inside a reproduction command is
+    not a command; it is a note that someone still has to look the value up. The full
+    values are in the packaged fixtures' provenance blocks, so there is no reason for
+    a placeholder to survive.
+    """
+    bad: list[str] = []
+    for rel in ("MANIFEST.md", "README.md"):
+        text = (ROOT / rel).read_text(encoding="utf-8")
+        for block in re.findall(r"```(?:bash|sh)?\n(.*?)```", text, re.S):
+            for i, line in enumerate(block.splitlines(), start=1):
+                if re.search(r"[0-9a-f]{6,}\.\.\.", line) or "<YOUR" in line or "TODO" in line:
+                    bad.append(f"{rel}: a documented command carries a placeholder: {line.strip()[:78]!r}")
     return bad
 
 
@@ -254,7 +607,12 @@ def check_deps() -> list[str]:
 
 
 def run() -> tuple[int, list[str]]:
-    findings = check_paths() + check_counts() + check_stage_tags() + check_deps()
+    findings = (check_paths() + check_counts() + check_stage_tags()
+                + check_transcript_order() + check_cli_examples()
+                + check_numeric_examples() + check_io_contract()
+                + check_withdrawal_markers() + check_producer_targets()
+                + check_command_placeholders()
+                + check_deps())
     n = len(PROSE) + len(CODE)
     return n, findings
 
@@ -273,6 +631,25 @@ _MUTATIONS = [
      "instrument/README.md", "17 rows reproduced", "16 rows reproduced"),
     ("a producer string naming a script that was never shipped",
      "MANIFEST.md", "scripts/gate3_assemble.py", "scripts/gate3_build_fixture.py"),
+    # Added after two independent reviewers defeated the first version of this guard
+    # with mutations it was not written to catch. Each of the five below passed then.
+    ("the enumerated check total changed on every prose surface at once",
+     "README.md", "142 value checks", "143 value checks"),
+    ("a real filename claimed under a directory it does not live in",
+     "MANIFEST.md", "`scripts/aggregate_results.py`", "`fixtures/aggregate_results.py`"),
+    ("an advertised flag the parser does not accept",
+     "instrument/README.md", "--no-split-components", "--whole-fields"),
+    ("a worked numeric example that no longer evaluates to its claim",
+     "instrument/README.md", "# 0.99990", "# 0.99889"),
+    ("the row-file writer bypassing the single-sourced contract",
+     "scripts/rb_model_eval.py", "from io_contract import write_rows  # noqa: E402", "import json as _unused"),
+    ("a stage comment contradicting the fixture it introduces",
+     "verify.py", "over a 31-step", "over a 5-step"),
+    ("a documented command left with an abbreviated identifier",
+     "MANIFEST.md", "7d351350eaf68caba1eac1e545cd6661251dd1fd", "7d351350eaf6..."),
+    ("a shipped script defaulting to a write outside the package",
+     "scripts/rb_census.py", 'os.environ.get("RB_CENSUS_OUT", os.path.join(',
+     'os.environ.get("RB_CENSUS_OUT", ".gate-work/out.json") or os.path.join('),
 ]
 
 
@@ -318,8 +695,11 @@ def main() -> int:
         for f in findings:
             print(f"  - {f}")
         return 1
-    print(f"[selfclaims] OK: {n} surfaces; every named path exists, "
-          f"pinned counts match the tree, declared dependency floor admits the APIs used")
+    print(f"[selfclaims] OK over {n} surfaces: no named path is missing, no pinned count "
+          f"disagrees with the tree, no advertised invocation names a flag its parser "
+          f"rejects, the row-file writer and reader round-trip, and the numeric examples "
+          f"evaluate as written. This is one-directional: it does not check that "
+          f"everything shipped is described, only that what is described is true.")
     return 0
 
 

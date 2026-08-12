@@ -7,7 +7,7 @@ computes per-frame spatial sample variance (ddof=1) for velocity components
 reference), over the benchmark rollout window (frames 4-33 = steps 1-30,
 history=4). No model in the loop.
 """
-import fsspec, h5py, numpy as np, json, sys, time
+import fsspec, h5py, numpy as np, json, os, sys, time
 
 HF = "https://huggingface.co/datasets/polymathic-ai/rayleigh_benard/resolve/main/data/test/"
 # a spread of Rayleigh/Prandtl test files
@@ -22,6 +22,16 @@ EPS_LIB, EPS_FIX = 1e-7, 1e-5
 def spatial_var(field):  # field: (nt, H, W) -> per-frame ddof=1 variance
     f = field.astype(np.float64).reshape(field.shape[0], -1)
     return f.var(axis=1, ddof=1)
+
+_HERE = os.path.dirname(os.path.abspath(__file__))
+# The path MANIFEST.md attributes to this script. It used to write
+# a working file under a .gate-work directory it never created, named nothing
+# else referenced -- so the documented producer relation was false and a clean
+# run died with FileNotFoundError after the whole network census had run.
+_OUT = os.environ.get("RB_CENSUS_OUT", os.path.join(
+    os.path.dirname(_HERE), "fixtures", "generalization",
+    "rayleigh_benard_census.json"))
+
 
 def main():
     fs = fsspec.filesystem("http")
@@ -59,8 +69,10 @@ def main():
                   f"vx<=epsfix {tr['vx_frac_below_epsfix']:.0%} vy<=epsfix {tr['vy_frac_below_epsfix']:.0%} "
                   f"buoy<=epsfix {tr['buoy_frac_below_epsfix']:.0%}")
         sys.stdout.flush()
-    json.dump(out, open(".gate-work/rb_census_out.json", "w"), indent=2)
-    print("\nsaved .gate-work/rb_census_out.json")
+    os.makedirs(os.path.dirname(_OUT) or ".", exist_ok=True)
+    with open(_OUT, "w", encoding="utf-8") as fh:
+        json.dump(out, fh, indent=2)
+    print(f"\nsaved {_OUT}")
 
 if __name__ == "__main__":
     main()

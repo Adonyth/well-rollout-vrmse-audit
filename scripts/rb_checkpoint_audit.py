@@ -24,7 +24,7 @@ not an estimated screen-to-outcome relation.
 Everything here is derived from the packaged per-window scalars in fixtures/rb_models/
 and fixtures/rb_spread/; nothing is transcribed by hand.
 All scores are in RAW PHYSICAL UNITS, the convention the published validation loop uses
-(it denormalizes predictions before scoring) and the one rt_model_eval.py/rb_model_eval.py
+(it denormalizes predictions before scoring) and the one rt_model_eval.py and rb_model_eval.py
 store: mse and target_variance_ddof1 are computed on denormalized fields.
 
 Published RB comparison cells are QUOTED from the benchmark paper, not recomputed:
@@ -43,6 +43,8 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 HARNESS = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
+
+from io_contract import read_rows  # noqa: E402
 from aggregate_results import field_mean_vrmse, per_field_vrmse  # noqa: E402
 
 FLOORS = {"definitional": None, "eps_1e9": 1e-9, "library": 1e-7, "eps_fix": 1e-5}
@@ -82,8 +84,7 @@ CHECKPOINT_PROVENANCE = {"initial_commit": "2025-03-28",
 def load(subdir):
     rows, prov = [], {}
     for fp in sorted(glob.glob(os.path.join(HARNESS, "fixtures", subdir, "*.json.gz"))):
-        with gzip.open(fp, "rt", encoding="utf-8") as f:
-            d = json.load(f)
+        d = read_rows(fp)
         rows += d["rows"]
         p = d.get("provenance", {})
         if p.get("repo"):

@@ -34,6 +34,7 @@ import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from independent_metrics import spatial_mse, spatial_sample_variance  # noqa: E402
+from io_contract import write_rows  # noqa: E402
 
 import the_well.benchmark.models as model_zoo  # noqa: E402
 
@@ -173,11 +174,12 @@ def main() -> None:
 
     stem = args.file.replace(".hdf5", "")
     out = os.path.join(args.output_dir, f"{args.model}_{stem}.json.gz")
-    json.dump({"rows": all_rows, "fields": FIELDS,
-               "provenance": {"repo": repo, "revision": args.revision, "device": args.device,
-                              "dataset_url": url, "history": HISTORY,
-                              "captured_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}},
-              open(out, "w"))
+    write_rows(out, {"rows": all_rows, "fields": FIELDS,
+                     "provenance": {"repo": repo, "revision": args.revision,
+                                    "device": args.device, "dataset_url": url,
+                                    "history": HISTORY,
+                                    "captured_utc": time.strftime(
+                                        "%Y-%m-%dT%H:%M:%SZ", time.gmtime())}})
     log(f"wrote {out} ({len(all_rows)} rows)")
 
 

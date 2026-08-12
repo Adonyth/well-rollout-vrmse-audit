@@ -1,8 +1,8 @@
 """normscreen CLI -- point it at a benchmark split, get a conditioning report.
 
-    python3 -m normscreen data.h5 --auto
-    python3 -m normscreen data.h5 --fields density velocity_x --spatial-dims 3
-    python3 -m normscreen field.npy --spatial-dims 2 --json out.json
+    python3 -m normscreen data.h5 --auto --no-split-components
+    python3 -m normscreen data.h5 --fields density velocity_x --spatial-dims 3 --no-split-components
+    python3 -m normscreen field.npy --spatial-dims 2 --json out.json --no-split-components
     python3 -m normscreen --demo
 """
 from __future__ import annotations

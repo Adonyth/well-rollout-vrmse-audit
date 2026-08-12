@@ -380,7 +380,7 @@ def main() -> int:
     # it certifies a single forward pass only; every cell in the reported reproduction gap
     # is multi-step. This stage asserts the frozen result of the packaged alignment fixture
     # (scripts/gate2_alignment_fixture.py), which compares the library's own
-    # Trainer.rollout_model against this audit's mirror elementwise over a 5-step
+    # Trainer.rollout_model against this audit's mirror elementwise over a 31-step
     # autoregressive rollout. Re-running it live needs the Tier-2 stack (the_well + torch),
     # so the offline harness checks the frozen copy, as it does for Gate 3.
     _g2_src = FIXTURES / "gate2" / "alignment_fixture.json"

@@ -8,7 +8,9 @@ variance over the benchmark rollout window together with the fraction of that
 window at or below each epsilon floor. No model in the loop.
 
 Usage: python3 well_denominator_census.py <dataset_name> [n_files] [win0] [win1]
-Writes .gate-work/census/<dataset_name>.json
+Writes fixtures/generalization/benchmark_map/<dataset_name>.json -- the directory
+`assemble_map.py` reads, so the two scripts compose without an undocumented copy.
+Override with CENSUS_OUT_DIR.
 """
 import fsspec, h5py, numpy as np, json, time, sys, os, urllib.request
 
@@ -85,6 +87,15 @@ def census_file(fs, url, win0, win1, fstride=1):
     return fields, statics
 
 
+_HERE = os.path.dirname(os.path.abspath(__file__))
+# The directory assemble_map.py actually reads. This used to write into a .gate-work
+# working directory that is not shipped, so MANIFEST's "re-runnable from the two
+# scripts" did not compose: the assembler never looked where the census wrote.
+_OUT_DIR = os.environ.get(
+    "CENSUS_OUT_DIR",
+    os.path.join(os.path.dirname(_HERE), "fixtures", "generalization", "benchmark_map"))
+
+
 def main():
     argv = list(sys.argv[1:])
     base_override = files_override = None
@@ -136,9 +147,11 @@ def main():
                    for k, d in fields.items() if d["frac_below_epsfix"] > 0 or d["var_min"] <= EPS_FIX]
         healthy = [k for k, d in fields.items() if d["frac_below_epsfix"] == 0 and d["var_min"] > EPS_FIX]
         print(f"  {fn}: {sec}s | FLOORED: {flagged or 'none'} | healthy: {healthy}", flush=True)
-    os.makedirs(".gate-work/census", exist_ok=True)
-    json.dump(out, open(f".gate-work/census/{ds}.json", "w"), indent=1)
-    print(f"saved .gate-work/census/{ds}.json  (total test files: {len(all_files)})", flush=True)
+    os.makedirs(_OUT_DIR, exist_ok=True)
+    _path = os.path.join(_OUT_DIR, f"{ds}.json")
+    with open(_path, "w", encoding="utf-8") as _fh:
+        json.dump(out, _fh, indent=1)
+    print(f"saved {_path}  (total test files: {len(all_files)})", flush=True)
 
 
 if __name__ == "__main__":

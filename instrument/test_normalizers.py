@@ -15,7 +15,7 @@ These encode the finding that motivated normalizer support: two peer physics-ML
 benchmarks divide by different quantities, and the choice decides whether a quiescent
 field is scoreable at all.
 
-  The Well   VRMSE  : divide by (Var + eps),  eps = 1e-7   -> saturates at 1/sqrt(eps)
+  The Well   VRMSE  : divide by (Var + eps),  eps = 1e-7   -> a fixed error's amplification saturates at 1/sqrt(eps)
   PDEBench   nRMSE  : divide by sqrt(mean(x^2)), no eps    -> unbounded at zero signal
 
 Run:  python3 test_normalizers.py
@@ -84,13 +84,20 @@ check("the two thresholds are not interchangeable",
       at_eps.fraction_at_or_below_floor != at_eps.fraction_floor_determined)
 
 print("\n=== saturation vs unboundedness ===")
-# with a floor the worst achievable score is bounded by 1/sqrt(eps); without one it is not
-mse = np.array([1.0])
-bounded = float(np.sqrt(mse / (0.0 + 1e-7))[0])
-check("floored metric saturates at 1/sqrt(eps)", abs(bounded - 1 / np.sqrt(1e-7)) < 1e-6,
-      f"{bounded:.1f}")
+# What a floor bounds is the AMPLIFICATION of a fixed error, not the score. An earlier
+# version of this block fixed MSE = 1 and called sqrt(MSE/eps) "the worst achievable
+# score"; at MSE = 1 the amplification factor and the score coincide numerically, which
+# is exactly why the error was invisible here. Both properties are now pinned, including
+# the one the mistaken version asserted the negation of.
+for _mse in (1e-4, 1.0, 1e4):
+    _amp = float(np.sqrt(_mse / (0.0 + 1e-7)) / np.sqrt(_mse))
+    check(f"floored: amplification of a fixed error saturates at 1/sqrt(eps) (MSE={_mse:g})",
+          abs(_amp - 1 / np.sqrt(1e-7)) < 1e-6, f"{_amp:.1f}")
+_big = float(np.sqrt(1e4 / (0.0 + 1e-7)))
+check("floored: the SCORE itself is NOT bounded by 1/sqrt(eps) -- it grows with the error",
+      _big > 1 / np.sqrt(1e-7), f"{_big:.4g} > {1 / np.sqrt(1e-7):.4g}")
 with np.errstate(divide="ignore"):
-    unbounded = float(np.sqrt(mse / (0.0 + 0.0))[0])
+    unbounded = float(np.sqrt(np.array([1.0]) / (0.0 + 0.0))[0])
 check("floorless metric is genuinely infinite", not np.isfinite(unbounded))
 
 # The module-level checks above tally into `fails`; the regression guards defined below

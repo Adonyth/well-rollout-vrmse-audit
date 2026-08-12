@@ -66,6 +66,12 @@ floor_share = eps / (Var + eps)
 
 `0` means the data carries the denominator. `1` means the constant does.
 
+A floor bounds the *amplification*, not the score: at `Var = 0` the score is
+`RMSE/sqrt(eps)`, which still grows without limit as the model's error grows. What the
+floor removes is the divide-by-zero, and with it any information about how quiescent the
+target was — two fields with the same error and wildly different variability score the
+same once both are floor-determined.
+
 ## Two normalizer conventions, and why the choice matters
 
 Benchmarks do not agree on what to divide by, and the choice decides which fields are
@@ -73,7 +79,7 @@ scoreable at all:
 
 | benchmark | denominator | floor | failure mode where the signal vanishes |
 |---|---|---|---|
-| The Well (VRMSE) | `Var + eps` — second moment about the **mean** | `eps = 1e-7` | **saturates** at `1/sqrt(eps)` |
+| The Well (VRMSE) | `Var + eps` — second moment about the **mean** | `eps = 1e-7` | a fixed error's **amplification saturates** at `1/sqrt(eps)` |
 | PDEBench (nRMSE) | `sqrt(mean(x**2))` — second moment about **zero** | none | **unbounded** |
 
 Because `RMS² = Var + mean²`, a field oscillating slightly about a large offset has a
@@ -164,7 +170,7 @@ report = screen_fields({"density": rho, "velocity_x": vx}, eps=1e-7, n_spatial=3
                        component_axis=None)   # or component_axis={"velocity": -1}
 print(report.text())
 report.to_dict()                 # JSON-serializable
-floor_share(var=1e-11, eps=1e-7) # 0.99989
+floor_share(var=1e-11, eps=1e-7) # 0.99990
 ```
 
 ## References

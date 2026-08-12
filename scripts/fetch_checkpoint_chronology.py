@@ -91,7 +91,11 @@ def main():
             return 1
         rec["days_after_benchmark_paper"] = days_after(rec["initial_commit"], v1)
         rec["days_after_quoted_tables_version"] = days_after(rec["initial_commit"], vq)
-        rec["dataset"] = repo.split("-", 1)[1]
+        # repo is "polymathic-ai/<Model>-<dataset>"; splitting on the first "-"
+        # cut inside the ORG name and produced "ai/FNO-rayleigh_benard".
+        _model, _, _ds = repo.split("/", 1)[1].partition("-")
+        rec["model"] = _model
+        rec["dataset"] = _ds
         out["repos"][repo] = rec
         print(f"  {repo}: {rec['n_commits']} commits, {rec['initial_commit']} .. "
               f"{rec['latest_commit']} (+{rec['days_after_benchmark_paper']}d after v1, "
