@@ -1160,6 +1160,19 @@
    }
   }
  },
+ "unit_convention_derived": {
+  "_derivation": "library_vrmse_zscored / library_vrmse_raw over Gate 3's nine windows. The convention rescales the floor with the data, so it moves only windows whose denominator the floor carries.",
+  "n_windows": 9,
+  "n_moved": 3,
+  "n_near_unity": 6,
+  "ratios_moved": [
+   4.18,
+   4.983,
+   57.62
+  ],
+  "max_ratio": 57.62,
+  "max_deviation_unmoved": 0.012
+ },
  "rb_checkpoint_audit": {
   "source": "repro-harness/fixtures/rb_models/rb_checkpoint_audit.json",
   "protocol": {

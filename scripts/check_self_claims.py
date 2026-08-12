@@ -36,9 +36,10 @@ Ten families are checkable without judgement:
 says is true, never that everything the package ships is said. It cannot judge whether
 a description is *apt*. The dependency rule knows about one API, not the dependency
 graph. The count rules bind the quantities named below, not every number in the prose.
-Reviewers found ten discrepancies of this class by hand before it existed and six more
-after its first version, so read a pass as "these families are clean", not as
-"the package is honest about itself".
+Reviewers repeatedly found discrepancies of this class by hand, both before this
+check existed and after its first version, and defeated several of its rules with
+mutations it was not written to catch. Read a pass as "the rules below found
+nothing", not as "the package is honest about itself".
 
 Run standalone (`python3 scripts/check_self_claims.py`) or via `verify.py`.
 """
@@ -67,7 +68,8 @@ CODE = sorted(
 
 # A backticked token is treated as a path claim when it looks like one: it has a
 # known suffix, or a directory separator, and no spaces or shell metacharacters.
-_SUFFIXES = (".py", ".json", ".json.gz", ".md", ".txt", ".sty", ".tex", ".toml", ".cfg")
+_SUFFIXES = (".py", ".json", ".json.gz", ".md", ".txt", ".sty", ".tex", ".toml", ".cfg",
+             ".h5", ".hdf5", ".yaml", ".yml", ".npy", ".npz", ".csv", ".sh", ".lock")
 _PATHY = re.compile(r"`([A-Za-z0-9_./{},*~-]+)`")
 
 # Brace/star globs are claims about a *set*; require at least one match.
@@ -98,9 +100,11 @@ def _is_path_claim(tok: str) -> bool:
         if stem.endswith(suf):
             stem = stem[: -len(suf)]
             break
-    # A bare suffix is the tail of a glob the tokenizer split on `*`; a stem with
-    # several hyphens is a hyphenated English phrase, not a filename.
-    return bool(stem) and stem.count("-") <= 2
+    # A bare suffix is the tail of a glob the tokenizer split on `*`. A stem with
+    # several hyphens is usually a hyphenated English phrase rather than a filename --
+    # but only in unbackticked prose. Inside backticks it is a claim, and discarding it
+    # let `fixtures/a-b-c-d.json` pass.
+    return bool(stem)
 
 
 # Files named by these surfaces that belong to something *else* -- the library
@@ -122,9 +126,16 @@ EXTERNAL = {
     "metrics.py",
     # files the *reader* creates by running an advertised command
     "out.json", "report.json",
+    # the reader's own inputs in usage examples
+    "data.h5", "field.npy", "x.h5", "split.h5",
+    # fetched from the public mirror at run time, never shipped
+    "stats.yaml",
 }
 # .tex chapters live in the paper repo; this package ships none.
-_EXTERNAL_SUFFIX = (".tex",)
+# Raw field tensors are never package contents: the package ships derived statistics
+# only, and says so. A .hdf5/.h5 path in the prose names a remote object on the public
+# mirror or a file the reader supplies, so it is not a claim about this tree.
+_EXTERNAL_SUFFIX = (".tex", ".hdf5", ".h5")
 
 
 def _exists(tok: str) -> bool:
@@ -191,7 +202,8 @@ def check_paths() -> list[str]:
                     lines.append(st)
             docs = re.findall(r'"""(.*?)"""', text, re.S)
             text = "\n".join(lines + docs)
-            toks = re.findall(r"[A-Za-z0-9_./{}-]+", text)
+            toks = [t for t in re.findall(r"[A-Za-z0-9_./{}-]+", text)
+                    if t.rsplit("/", 1)[-1].count("-") <= 2]
         else:
             toks = _PATHY.findall(text)
         for tok in toks:
@@ -347,6 +359,15 @@ def check_own_counts() -> list[str]:
         bad.append("check_self_claims.py: docstring no longer states its family count")
     elif _WORDS.get(m.group(1).lower()) != n_fam:
         bad.append(f"check_self_claims.py: docstring says {m.group(1)!r} families; it lists {n_fam}")
+    # and the families must account for every rule that actually runs
+    listed = {m.lower() for m in re.findall(r"^  ([a-z]+) *-- ", doc, re.M)}
+    executed = {fam for fam, _ in _rules()}
+    for fam in sorted(listed - executed):
+        bad.append(f"check_self_claims.py: the docstring describes a {fam!r} family that "
+                   f"no executing rule provides")
+    for fam in sorted(executed - listed):
+        bad.append(f"check_self_claims.py: a {fam!r} rule executes that the docstring "
+                   f"does not describe")
 
     for rel in ("README.md", "MANIFEST.md"):
         text = (ROOT / rel).read_text(encoding="utf-8")
@@ -450,8 +471,9 @@ def check_cli_examples() -> list[str]:
             st = line.strip().lstrip("#").strip()
             if "normscreen" not in st or st.startswith(("*", "|", "-")):
                 continue
-            if not (st.startswith("normscreen") or st.startswith("python3 -m normscreen")
-                    or st.startswith("python -m normscreen")):
+            st = re.sub(r"^\$\s*", "", st)
+            st = st.split("&&")[-1].strip() if "&&" in st else st
+            if "normscreen" not in st.split("#")[0]:
                 continue
             flags = re.findall(r"(--[a-z0-9-]+)", st)
             for f in flags:
@@ -473,7 +495,9 @@ def check_saturation_claim() -> list[str]:
     checked for it -- and there it asserted the negation of the package's own test.
     """
     bad: list[str] = []
-    pat = re.compile(r"(?:score|metric)[^.\n]{0,60}\bcaps?\b(?![a-z])|caps at\s*`?1/sqrt", re.I)
+    pat = re.compile(
+        r"(?:score|metric)[^.\n]{0,60}\b(?:caps?|capped|bounded above|saturates?|"
+        r"maximum|ceiling)\b|caps at\s*`?1/sqrt", re.I)
     for path in sorted(list(ROOT.rglob("*.py")) + list(ROOT.rglob("*.md"))):
         if "__pycache__" in str(path) or path.name == "check_self_claims.py":
             continue
@@ -629,7 +653,9 @@ def check_producer_targets() -> list[str]:
     A default output path outside the package is not reproducible by a reader.
     """
     bad: list[str] = []
-    for path in sorted(ROOT.glob("scripts/*.py")):
+    targets = (sorted(ROOT.glob("scripts/*.py")) + [ROOT / "verify.py"]
+               + sorted(ROOT.glob("instrument/**/*.py")))
+    for path in targets:
         if path.name == "check_self_claims.py":
             continue  # its mutation table names the defect it checks for
         src = path.read_text(encoding="utf-8")
@@ -643,7 +669,7 @@ def check_producer_targets() -> list[str]:
                 continue          # not a write target
             if cand.startswith("../") and (path.parent.parent / cand[3:]).exists():
                 continue          # inside the submission tree, e.g. ../hf-cache for downloads
-            bad.append(f"scripts/{path.name}:{line}: defaults to writing {cand!r}, "
+            bad.append(f"{path.relative_to(ROOT)}:{line}: defaults to writing {cand!r}, "
                        f"which is outside the package")
     return bad
 
@@ -694,6 +720,78 @@ def check_producer_relations() -> list[str]:
     return bad
 
 
+def check_factor_claims() -> list[str]:
+    """A "factor of N" in the manuscript must trace to the number table.
+
+    `check_unsourced.py` exempts bare one- and two-digit integers by design, and the
+    manuscript says so. That exemption is where a wrong headline hid for several
+    rounds: the introduction claimed the predictions "move by a factor of 47 across
+    floors a released pipeline actually uses" when 47 requires the definitional limit
+    and the released-floor span is 8.542. A magnitude claim is load-bearing whatever
+    its digit count, so these are swept even where the general sweep declines.
+
+    **Limit.** This catches a magnitude with no leaf behind it. It cannot catch a
+    magnitude attached to the wrong SCOPE -- the 47 above is a real leaf, the
+    definitional-limit span, quoted in a clause about released floors. Scope is
+    semantic; four independent reviewers found that one, this rule would not have.
+    """
+    tex = ROOT.parent / "paper" / "tex"
+    ref = ROOT / "fixtures" / "numbers_reference.json"
+    if not tex.is_dir() or not ref.exists():
+        return []
+    keys = set()
+    def walk(o):
+        if isinstance(o, dict):
+            for v in o.values():
+                walk(v)
+        elif isinstance(o, list):
+            for v in o:
+                walk(v)
+        elif isinstance(o, (int, float)) and not isinstance(o, bool):
+            keys.add(float(o))
+    walk(json.loads(ref.read_text(encoding="utf-8")))
+    bad = []
+    for f in sorted(tex.glob("*.tex")):
+        for i, line in enumerate(f.read_text(encoding="utf-8").splitlines(), 1):
+            for m in re.finditer(r"factor of \$?([0-9][0-9.]*)\$?", line):
+                claim = m.group(1).rstrip(".")
+                val = float(claim)
+                # A claim may legitimately round its leaf ("a factor of 66" for 65.88),
+                # so match at the precision the claim itself states.
+                digits = len(claim.replace(".", "").lstrip("0")) or 1
+                if not any(float(f"{k:.{digits}g}") == val for k in keys):
+                    bad.append(f"paper/tex/{f.name}:{i}: claims a factor of {claim}, which "
+                               f"no leaf of the number table rounds to at that precision")
+    return bad
+
+
+def check_instrument_copies() -> list[str]:
+    """The instrument ships twice; the two trees must be identical.
+
+    The package sweeps its own copy under `instrument/`. The submission also ships a
+    root-level copy, which the freeze covers and which readers of the paper reach
+    first. A defect corrected in one and not the other survived a full round exactly
+    this way, so rather than sweep both, the copies are pinned equal: fix one and the
+    other must follow, or this fails.
+    """
+    other = ROOT.parent / "instrument"
+    if not other.is_dir():
+        return []
+    bad = []
+    ours = {q.relative_to(ROOT / "instrument"): q for q in (ROOT / "instrument").rglob("*")
+            if q.is_file() and "__pycache__" not in str(q)}
+    theirs = {q.relative_to(other): q for q in other.rglob("*")
+              if q.is_file() and "__pycache__" not in str(q)}
+    for rel in sorted(set(ours) | set(theirs)):
+        if rel not in ours:
+            bad.append(f"instrument/{rel}: shipped at the submission root but not in the package")
+        elif rel not in theirs:
+            bad.append(f"instrument/{rel}: shipped in the package but not at the submission root")
+        elif ours[rel].read_bytes() != theirs[rel].read_bytes():
+            bad.append(f"instrument/{rel}: the two shipped copies differ")
+    return bad
+
+
 def check_quoted_sizes() -> list[str]:
     """Byte totals quoted in the prose must be the tree's actual byte totals."""
     bad: list[str] = []
@@ -718,9 +816,13 @@ def check_command_placeholders() -> list[str]:
     bad: list[str] = []
     for rel in ("MANIFEST.md", "README.md"):
         text = (ROOT / rel).read_text(encoding="utf-8")
-        for block in re.findall(r"```(?:bash|sh)?\n(.*?)```", text, re.S):
-            for i, line in enumerate(block.splitlines(), start=1):
-                if re.search(r"[0-9a-f]{6,}\.\.\.", line) or "<YOUR" in line or "TODO" in line:
+        blocks = re.findall(r"```(?:bash|sh)?\n(.*?)```", text, re.S)
+        blocks += [l for l in text.splitlines() if l.startswith("    ") and "--" in l]
+        blocks += re.findall(r"`([^`\n]*--[^`\n]*)`", text)
+        for block in blocks:
+            for i, line in enumerate(block.splitlines() or [block], start=1):
+                if (re.search(r"[0-9a-f]{6,}\.\.\.", line) or "<YOUR" in line
+                        or "TODO" in line or re.search(r"<[A-Z][A-Z-]{3,}>", line)):
                     bad.append(f"{rel}: a documented command carries a placeholder: {line.strip()[:78]!r}")
     return bad
 
@@ -749,15 +851,30 @@ def check_deps() -> list[str]:
     return bad
 
 
+def _rules() -> list:
+    """The rule functions `run` executes. Single source for what runs AND what is
+    reported: an earlier version derived the count from the module docstring's bullet
+    list, so deleting a rule from `run` still printed "ten rule families found nothing"
+    and passed on the defect the missing rule existed to catch."""
+    return [
+        ("paths", check_paths),
+        ("counts", check_counts), ("counts", check_own_counts),
+        ("counts", check_quoted_sizes), ("counts", check_factor_claims),
+        ("stages", check_stage_tags), ("stages", check_transcript_order),
+        ("cli", check_cli_examples),
+        ("commands", check_command_placeholders),
+        ("numbers", check_numeric_examples), ("numbers", check_saturation_claim),
+        ("io", check_io_contract), ("io", check_instrument_copies),
+        ("markers", check_withdrawal_markers),
+        ("producers", check_producer_targets), ("producers", check_producer_relations),
+        ("deps", check_deps),
+    ]
+
+
 def run() -> tuple[int, list[str]]:
-    findings = (check_paths() + check_counts() + check_own_counts() + check_stage_tags()
-                + check_transcript_order() + check_cli_examples()
-                + check_numeric_examples() + check_saturation_claim()
-                + check_io_contract()
-                + check_withdrawal_markers() + check_producer_targets()
-                + check_producer_relations() + check_quoted_sizes()
-                + check_command_placeholders()
-                + check_deps())
+    findings: list[str] = []
+    for _family, rule in _rules():
+        findings += rule()
     n = len(PROSE) + len(CODE)
     return n, findings
 
@@ -853,7 +970,7 @@ def main() -> int:
         for f in findings:
             print(f"  - {f}")
         return 1
-    print(f"[selfclaims] OK over {n} surfaces: ten rule families found nothing. Each binds "
+    print(f"[selfclaims] OK over {n} surfaces: {len(_rules())} rules across {len({f for f, _ in _rules()})} families found nothing. Each binds "
           f"a NAMED set, not a universal -- the counts checked are the ones enumerated in "
           f"the module docstring, the producer rule the relations listed there, the marker "
           f"rule literal fragments (a paraphrase of a withdrawn claim passes). It is also "
