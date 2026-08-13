@@ -730,10 +730,22 @@ def check_factor_claims() -> list[str]:
     and the released-floor span is 8.542. A magnitude claim is load-bearing whatever
     its digit count, so these are swept even where the general sweep declines.
 
-    **Limit.** This catches a magnitude with no leaf behind it. It cannot catch a
-    magnitude attached to the wrong SCOPE -- the 47 above is a real leaf, the
-    definitional-limit span, quoted in a clause about released floors. Scope is
-    semantic; four independent reviewers found that one, this rule would not have.
+    **Limits, measured rather than asserted.** Three, and they are large:
+
+    1. It cannot catch a magnitude attached to the wrong SCOPE. The 47 above is a real
+       leaf -- the definitional-limit span -- quoted in a clause about released floors.
+       Four independent reviewers found that one; this rule would not have.
+    2. A claim passes if it rounds to ANY leaf at its own precision, and the table has
+       hundreds of leaves. At one and two significant digits that is close to no
+       constraint at all: a reviewer measured 9 of 9 one-digit and 68 of 90 two-digit
+       candidate values passing by collision with unrelated leaves (a frame count, a
+       file count). Those are exactly the digit counts `check_unsourced.py` exempts and
+       that this rule was added to cover.
+    3. It matches the phrase "factor of N" only. "an N-fold span", "a factor N", and
+       "moves by N times" all bypass it.
+
+    It is therefore a guard against a fabricated magnitude, not a guarantee that every
+    magnitude in the manuscript is sourced and correctly scoped.
     """
     tex = ROOT.parent / "paper" / "tex"
     ref = ROOT / "fixtures" / "numbers_reference.json"
@@ -851,6 +863,16 @@ def check_deps() -> list[str]:
     return bad
 
 
+# Subjects that live one level up, outside the package. In a standalone clone these
+# are absent and the rule cannot run; `run` reports it as SKIPPED rather than as a pass.
+check_factor_claims._needs_source_repo = lambda: (ROOT.parent / "paper" / "tex").is_dir()
+check_instrument_copies._needs_source_repo = lambda: (ROOT.parent / "instrument").is_dir()
+check_withdrawal_markers._needs_source_repo = lambda: (ROOT.parent / "RT-QUANT.md").exists()
+
+
+_LAST_SKIPPED: list[str] = []
+
+
 def _rules() -> list:
     """The rule functions `run` executes. Single source for what runs AND what is
     reported: an earlier version derived the count from the module docstring's bullet
@@ -873,8 +895,19 @@ def _rules() -> list:
 
 def run() -> tuple[int, list[str]]:
     findings: list[str] = []
+    skipped: list[str] = []
     for _family, rule in _rules():
-        findings += rule()
+        out = rule()
+        # A rule whose subject lives outside the package returns [] in a standalone
+        # clone. Reporting that as "found nothing" is itself a false self-description:
+        # three rules ran zero checks in the artifact a reviewer downloads while the
+        # stage still printed a full pass.
+        if out == [] and getattr(rule, "_needs_source_repo", None) is not None:
+            if not rule._needs_source_repo():
+                skipped.append(rule.__name__)
+                continue
+        findings += out
+    _LAST_SKIPPED[:] = skipped
     n = len(PROSE) + len(CODE)
     return n, findings
 
@@ -970,7 +1003,10 @@ def main() -> int:
         for f in findings:
             print(f"  - {f}")
         return 1
-    print(f"[selfclaims] OK over {n} surfaces: {len(_rules())} rules across {len({f for f, _ in _rules()})} families found nothing. Each binds "
+    _sk = (f"; {len(_LAST_SKIPPED)} rule(s) SKIPPED -- their subject lives outside this "
+           f"package and is absent here ({', '.join(_LAST_SKIPPED)})") if _LAST_SKIPPED else ""
+    print(f"[selfclaims] OK over {n} surfaces: {len(_rules()) - len(_LAST_SKIPPED)} of "
+          f"{len(_rules())} rules across {len({f for f, _ in _rules()})} families found nothing{_sk}. Each binds "
           f"a NAMED set, not a universal -- the counts checked are the ones enumerated in "
           f"the module docstring, the producer rule the relations listed there, the marker "
           f"rule literal fragments (a paraphrase of a withdrawn claim passes). It is also "

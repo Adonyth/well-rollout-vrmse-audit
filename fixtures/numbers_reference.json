@@ -1160,6 +1160,15 @@
    }
   }
  },
+ "unit_convention_census_derived": {
+  "_derivation": "Z-scored / raw on the reported census cells, using the packaged normalization_std. The Gate-3 figures are single windows; these are the aggregates the manuscript reports.",
+  "window_6_12": 5.518,
+  "window_13_30": 2.406,
+  "rb_onestep_required_ratio": {
+   "FNO": 0.094,
+   "TFNO": 0.061
+  }
+ },
  "unit_convention_derived": {
   "_derivation": "library_vrmse_zscored / library_vrmse_raw over Gate 3's nine windows. The convention rescales the floor with the data, so it moves only windows whose denominator the floor carries.",
   "n_windows": 9,
