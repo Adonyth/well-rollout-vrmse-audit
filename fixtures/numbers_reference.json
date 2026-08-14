@@ -1164,6 +1164,34 @@
   "_derivation": "Z-scored / raw on the reported census cells, using the packaged normalization_std. The Gate-3 figures are single windows; these are the aggregates the manuscript reports.",
   "window_6_12": 5.518,
   "window_13_30": 2.406,
+  "window_6_12_by_floor": {
+   "eps_lib_1e7": 5.518,
+   "eps_fix_1e5": 36.42
+  },
+  "window_13_30_by_floor": {
+   "eps_lib_1e7": 2.406,
+   "eps_fix_1e5": 11.82
+  },
+  "onestep_spread_by_floor": {
+   "eps_lib_1e7": {
+    "n": 220,
+    "max": 57.62,
+    "mean": 6.882
+   },
+   "eps_fix_1e5": {
+    "n": 220,
+    "max": 74.92,
+    "mean": 26.19
+   }
+  },
+  "zscored_at_library_floor": {
+   "rollout_6_12": 90.84,
+   "definitional_raw_6_12": 91.46
+  },
+  "onestep_sampled_mean_zscored_eps_lib": {
+   "UNetClassic": 9.451,
+   "UNetConvNext": 14.57
+  },
   "rb_onestep_required_ratio": {
    "FNO": 0.094,
    "TFNO": 0.061
