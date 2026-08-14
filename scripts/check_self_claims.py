@@ -375,7 +375,26 @@ def check_own_counts() -> list[str]:
             if _WORDS.get(w) != n_mut:
                 bad.append(f"{rel}: says --validate-guard reintroduces {w!r} discrepancies; "
                            f"the table holds {n_mut}")
-    # and the manuscript, one level up, when present
+    return bad
+
+
+def check_own_counts_manuscript() -> list[str]:
+    """The manuscript's statement of the guard's size must match the guard.
+
+    Split out of `check_own_counts` because it reads a file outside the package:
+    as one rule the whole family went silent in a standalone clone while still
+    being counted clean, so a mutation of the manuscript's own family count could
+    not be caught there and no skip was reported.
+    """
+    _WORDS = {"three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8,
+              "nine": 9, "ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13,
+              "fourteen": 14, "fifteen": 15, "sixteen": 16, "seventeen": 17,
+              "eighteen": 18}
+    src = (ROOT / "scripts" / "check_self_claims.py").read_text(encoding="utf-8")
+    doc = src.split('"""')[1] if '"""' in src else ""
+    n_fam = len(re.findall(r"^  ([a-z]+) *-- ", doc, re.M))
+    n_mut = len(_MUTATIONS)
+    bad: list[str] = []
     tex = ROOT.parent / "paper" / "tex" / "sec7_boundaries.tex"
     if tex.exists():
         t = tex.read_text(encoding="utf-8")
@@ -804,6 +823,121 @@ def check_instrument_copies() -> list[str]:
     return bad
 
 
+def check_floor_declarations() -> list[str]:
+    """A floor-dependent value in the manuscript must name its floor nearby.
+
+    This is the defect class that led four consecutive review rounds: a score, a
+    ratio of scores, or a statistic computed on scores, quoted without saying at
+    which denominator floor -- after which a comparison built on it silently
+    reverses at the other floor the paper also reports. Instances found by hand
+    included a 47x span, the unit-convention ratios, an estimator factor of 2.461
+    (1.105 at the other floor), and eight correlation statistics whose significance
+    pattern is a library-floor artefact.
+
+    The rule: for every numeric leaf whose own path in the number table names a
+    floor, find that value in the manuscript and require a floor declaration
+    (`\epslib`, `\epsfix`, "definitional", or an explicit 10^{-N}) within the same
+    sentence. Values that are floor-invariant are exempt by construction, because
+    only leaves the table itself files under a floor are swept.
+
+    **Limit.** It cannot see a value the table does not carry at 4 significant
+    figures, and it treats a sentence boundary as the scope of a declaration.
+    """
+    tex = ROOT.parent / "paper" / "tex"
+    ref = ROOT / "fixtures" / "numbers_reference.json"
+    if not tex.is_dir() or not ref.exists():
+        return []
+    # A path component that names a FLOOR -- not a Rayleigh number inside a dataset
+    # filename, which is why this matches components rather than substrings.
+    floory = re.compile(r"^(eps_?(lib|fix|0)\w*|eps_1e9|definitional\w*|"
+                        r"library_floor\w*|\w*_eps_(lib|fix)\w*)$", re.I)
+    wanted: dict[str, str] = {}
+
+    def walk(o, path=""):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                walk(v, f"{path}.{k}" if path else k)
+        elif isinstance(o, (int, float)) and not isinstance(o, bool):
+            if any(floory.match(seg) for seg in path.split(".")):
+                key = f"{float(o):.4g}"
+                wanted.setdefault(key, path)
+
+    walk(json.loads(ref.read_text(encoding="utf-8")))
+    # Only actual floor IDENTIFIERS count. The bare word "floor" is not one: a
+    # sentence saying "under the better-conditioned floor \epsfix{}" names one floor,
+    # not two, and treating the noun as a second name made it look ambiguous.
+    # Floor IDENTIFIERS, in macro form and in the three worded forms the paper uses.
+    # The bare noun "floor" is deliberately not one: a sentence saying "under the
+    # better-conditioned floor \epsfix{}" names one floor, not two, and counting the
+    # noun made single-floor sentences look ambiguous.
+    decl = re.compile(r"\\epslib|\\epsfix|10\^\{-\d+\}|10\$\^\{-\d+\}\$|"
+                      r"\\num\{1e-\d+\}|definitional(?:\s+limit)?|"
+                      r"library'?s?\s+(?:own\s+)?(?:default\s+)?floor|library\s+metric|"
+                      r"better-conditioned\s+floor|documented\s+floor|"
+                      r"its\s+own\s+default\s+floor", re.I)
+    bad = []
+    for f in sorted(tex.glob("*.tex")):
+        text = f.read_text(encoding="utf-8")
+        # A float environment is ONE scope: a floor named in the caption governs
+        # every cell in the body, so the sentence splitter must not cut between them.
+        scopes, rest = [], []
+        pos = 0
+        for m in re.finditer(r"\\begin\{(table|figure)\*?\}.*?\\end\{\1\*?\}",
+                             text, re.S):
+            rest.append(text[pos:m.start()])
+            scopes.append(m.group(0))
+            pos = m.end()
+        rest.append(text[pos:])
+        # split the non-float prose into sentences, keeping enough context that a
+        # declaration one clause away still counts
+        floats = set(range(len(scopes)))
+        chunks = scopes + [x for chunk in rest
+                           for x in re.split(r"(?<=[.:;])\s+", chunk)]
+        for _i, sent in enumerate(chunks):
+            # Inside a float, a floor named in the caption or a column header governs
+            # every cell; in running prose the declaration must sit beside the value.
+            in_float = _i in floats
+            for m in re.finditer(r"\$?(\d+\.\d{3,4})\$?", sent):
+                v = f"{float(m.group(1)):.4g}"
+                if v not in wanted:
+                    continue
+                # A declaration must sit near THIS value, not merely somewhere in the
+                # sentence: a sentence that quotes two floors needs two declarations,
+                # and stripping one of them used to pass on the strength of the other.
+                # Ambiguity only arises when one sentence carries MORE THAN ONE
+                # floor: then a value must have a declaration beside it, because the
+                # other one governs a different number. With a single floor named --
+                # or inside a float, where the caption governs the body -- one
+                # declaration anywhere in the scope is unambiguous.
+                # Each value must have ITS OWN floor named nearby. The leaf path says
+                # which floor the value belongs to, so a sentence that names one floor
+                # does not license a value computed at the other -- the hole that let a
+                # phase-mean pair at two different floors pass on one declaration.
+                def _canon(tok: str) -> str:
+                    t = tok.lower()
+                    if "epsfix" in t or "better-conditioned" in t or "10^{-5}" in t:
+                        return "fix"
+                    if ("epslib" in t or "library" in t or "10^{-7}" in t
+                            or "documented floor" in t):
+                        return "lib"
+                    if "definitional" in t:
+                        return "def"
+                    return t
+
+                path = wanted[v].lower()
+                own = ("fix" if "eps_fix" in path else
+                       "lib" if "eps_lib" in path or "library_floor" in path else
+                       "def" if "definitional" in path or "eps_0" in path else None)
+                if own is None:
+                    continue
+                scope = sent if in_float else sent[max(0, m.start() - 130):m.end() + 130]
+                if own in {_canon(d.group(0)) for d in decl.finditer(scope)}:
+                    continue
+                bad.append(f"paper/tex/{f.name}: quotes {m.group(1)} "
+                           f"({wanted[v]}) with no floor named beside it")
+    return bad
+
+
 def check_quoted_sizes() -> list[str]:
     """Byte totals quoted in the prose must be the tree's actual byte totals."""
     bad: list[str] = []
@@ -868,6 +1002,8 @@ def check_deps() -> list[str]:
 check_factor_claims._needs_source_repo = lambda: (ROOT.parent / "paper" / "tex").is_dir()
 check_instrument_copies._needs_source_repo = lambda: (ROOT.parent / "instrument").is_dir()
 check_withdrawal_markers._needs_source_repo = lambda: (ROOT.parent / "RT-QUANT.md").exists()
+check_own_counts_manuscript._needs_source_repo = lambda: (
+    ROOT.parent / "paper" / "tex" / "sec7_boundaries.tex").exists()
 
 
 _LAST_SKIPPED: list[str] = []
@@ -880,8 +1016,9 @@ def _rules() -> list:
     and passed on the defect the missing rule existed to catch."""
     return [
         ("paths", check_paths),
-        ("counts", check_counts), ("counts", check_own_counts),
+        ("counts", check_counts), ("counts", check_own_counts), ("counts", check_own_counts_manuscript),
         ("counts", check_quoted_sizes), ("counts", check_factor_claims),
+        ("counts", check_floor_declarations),
         ("stages", check_stage_tags), ("stages", check_transcript_order),
         ("cli", check_cli_examples),
         ("commands", check_command_placeholders),

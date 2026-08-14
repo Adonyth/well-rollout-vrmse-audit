@@ -812,6 +812,14 @@
    "ratio_definitional_to_eps_fix": 12.81
   }
  },
+ "map_asymmetry_derived": {
+  "_derivation": "hypergeometric: P(all k severe rows carry a '>10' headline | random draw of k from n, of which gt10 carry one)",
+  "n_datasets": 17,
+  "n_with_gt10_headline": 9,
+  "n_severe": 3,
+  "p_all_severe_carry_headline": 0.1235,
+  "expected_count_under_chance": 1.59
+ },
  "generalization": {
   "method": "data-only spatial-variance census, benchmark rollout window frames 4-33; floors eps_lib=1e-7 (headline) and eps_fix=1e-5 (better-conditioned)",
   "rayleigh_benard": {
@@ -2086,6 +2094,11 @@
   "interp115_mean_lib": 0.6170537710381284,
   "ratio": 2.460956149155314,
   "source": "models.UNetClassic.onestep; estimator choice at a fixed floor and split"
+ },
+ "onestep_estimator_spread_by_floor": {
+  "_derivation": "subset mean / interpolated estimate, at each floor",
+  "eps_lib_1e7": 2.460956149155314,
+  "eps_fix_1e5": 1.105
  },
  "forward_cost_envelope_derived": {
   "per_forward_seconds": {
