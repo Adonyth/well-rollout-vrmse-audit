@@ -2100,6 +2100,19 @@
   "eps_lib_1e7": 2.460956149155314,
   "eps_fix_1e5": 1.105
  },
+ "flat_extrapolation_slope_derived": {
+  "_derivation": "FNO t10 one-step curve, start 20 vs start 29, at each floor",
+  "eps_lib_1e7": {
+   "start_20": 605.0,
+   "start_29": 357.6,
+   "drop_pct": 40.9
+  },
+  "eps_fix_1e5": {
+   "start_20": 77.72,
+   "start_29": 76.34,
+   "drop_pct": 1.77
+  }
+ },
  "forward_cost_envelope_derived": {
   "per_forward_seconds": {
    "UNetClassic_mps": 5.1,

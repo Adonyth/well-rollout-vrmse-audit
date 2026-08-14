@@ -849,8 +849,13 @@ def check_floor_declarations() -> list[str]:
         return []
     # A path component that names a FLOOR -- not a Rayleigh number inside a dataset
     # filename, which is why this matches components rather than substrings.
-    floory = re.compile(r"^(eps_?(lib|fix|0)\w*|eps_1e9|definitional\w*|"
-                        r"library_floor\w*|\w*_eps_(lib|fix)\w*)$", re.I)
+    # Floor-naming path components, in ALL the vocabularies the number table uses.
+    # An earlier version matched only the eps_lib/eps_fix spellings and so missed the
+    # entire `models` block -- every cell of the three principal tables -- which files
+    # its floors as `lib`, `eps5`, `density_only_lib`, `velocity_only_eps5`, and so on.
+    floory = re.compile(
+        r"^(eps_?(lib|fix|0)\w*|eps_1e9|eps5|lib|definitional\w*|library_floor\w*|"
+        r"\w*_eps_(lib|fix)\w*|\w*_(lib|eps5)|max_(lib|fix))$", re.I)
     wanted: dict[str, str] = {}
 
     def walk(o, path=""):
@@ -860,7 +865,13 @@ def check_floor_declarations() -> list[str]:
         elif isinstance(o, (int, float)) and not isinstance(o, bool):
             if any(floory.match(seg) for seg in path.split(".")):
                 key = f"{float(o):.4g}"
-                wanted.setdefault(key, path)
+                # A 4-s.f. collision between two floors is ambiguous, not
+                # first-writer-wins: record it and skip rather than demand
+                # the wrong floor by accident.
+                if key in wanted and wanted[key] != path:
+                    wanted[key] = None
+                else:
+                    wanted.setdefault(key, path)
 
     walk(json.loads(ref.read_text(encoding="utf-8")))
     # Only actual floor IDENTIFIERS count. The bare word "floor" is not one: a
@@ -874,32 +885,44 @@ def check_floor_declarations() -> list[str]:
                       r"\\num\{1e-\d+\}|definitional(?:\s+limit)?|"
                       r"library'?s?\s+(?:own\s+)?(?:default\s+)?floor|library\s+metric|"
                       r"better-conditioned\s+floor|documented\s+floor|"
-                      r"its\s+own\s+default\s+floor", re.I)
+                      r"its\s+own\s+default\s+floor|library\s+VRMSE|"
+                      # joint declarations: naming BOTH floors at once
+                      r"(?:across|under|between)\s+(?:the\s+)?(?:same\s+)?two\s+floors|"
+                      r"under\s+both\s+floors|both\s+floors|the\s+floor\s+change|"
+                      r"across\s+(?:the\s+)?(?:same\s+)?span", re.I)
     bad = []
     for f in sorted(tex.glob("*.tex")):
         text = f.read_text(encoding="utf-8")
         # A float environment is ONE scope: a floor named in the caption governs
         # every cell in the body, so the sentence splitter must not cut between them.
+        # Chunk the file, keeping each chunk's ABSOLUTE offset so a prose window can
+        # be taken over the surrounding text. Re-finding a chunk by its own prefix
+        # could land on a different occurrence entirely.
         scopes, rest = [], []
         pos = 0
         for m in re.finditer(r"\\begin\{(table|figure)\*?\}.*?\\end\{\1\*?\}",
                              text, re.S):
-            rest.append(text[pos:m.start()])
-            scopes.append(m.group(0))
+            rest.append((pos, text[pos:m.start()]))
+            scopes.append((m.start(), m.group(0)))
             pos = m.end()
-        rest.append(text[pos:])
+        rest.append((pos, text[pos:]))
         # split the non-float prose into sentences, keeping enough context that a
         # declaration one clause away still counts
         floats = set(range(len(scopes)))
-        chunks = scopes + [x for chunk in rest
-                           for x in re.split(r"(?<=[.:;])\s+", chunk)]
-        for _i, sent in enumerate(chunks):
+        chunks = list(scopes)
+        for _base, _chunk in rest:
+            _off = _base
+            for _piece in re.split(r"((?<=[.:;])\s+)", _chunk):
+                if _piece and not _piece.isspace():
+                    chunks.append((_off, _piece))
+                _off += len(_piece)
+        for _i, (_abs0, sent) in enumerate(chunks):
             # Inside a float, a floor named in the caption or a column header governs
             # every cell; in running prose the declaration must sit beside the value.
             in_float = _i in floats
-            for m in re.finditer(r"\$?(\d+\.\d{3,4})\$?", sent):
+            for m in re.finditer(r"\$?(\d+\.\d{1,4})\$?", sent):
                 v = f"{float(m.group(1)):.4g}"
-                if v not in wanted:
+                if v not in wanted or wanted[v] is None:
                     continue
                 # A declaration must sit near THIS value, not merely somewhere in the
                 # sentence: a sentence that quotes two floors needs two declarations,
@@ -915,23 +938,49 @@ def check_floor_declarations() -> list[str]:
                 # phase-mean pair at two different floors pass on one declaration.
                 def _canon(tok: str) -> str:
                     t = tok.lower()
-                    if "epsfix" in t or "better-conditioned" in t or "10^{-5}" in t:
-                        return "fix"
-                    if ("epslib" in t or "library" in t or "10^{-7}" in t
+                    # "the documented floor" is this manuscript's own name for eps_fix
+                    # -- eleven occurrences, none of them the library floor. Mapping it
+                    # to "lib" made the rule manufacture a library declaration out of
+                    # the paper's standard phrase for the OTHER floor.
+                    if ("epsfix" in t or "better-conditioned" in t or "10^{-5}" in t
                             or "documented floor" in t):
+                        return "fix"
+                    if ("two floors" in t or "both floors" in t
+                            or "floor change" in t or "same span" in t):
+                        return "both"
+                    if "epslib" in t or "library" in t or "10^{-7}" in t:
                         return "lib"
                     if "definitional" in t:
                         return "def"
                     return t
 
                 path = wanted[v].lower()
-                own = ("fix" if "eps_fix" in path else
-                       "lib" if "eps_lib" in path or "library_floor" in path else
-                       "def" if "definitional" in path or "eps_0" in path else None)
-                if own is None:
+                # A leaf naming TWO floors is a SPAN between them, not a value at one:
+                # `ratio_definitional_to_eps_fix` has no single "own" floor, so naming
+                # either endpoint is a sufficient declaration.
+                spans = {n for n, tok in (("fix", "eps_fix"), ("lib", "eps_lib"),
+                                          ("def", "definitional"))
+                         if tok in path}
+                if "eps_0" in path:
+                    spans.add("def")
+                if "library_floor" in path or path.endswith((".lib", "_lib")):
+                    spans.add("lib")
+                if path.endswith((".eps5", "_eps5")) or "max_fix" in path:
+                    spans.add("fix")
+                if not spans:
                     continue
-                scope = sent if in_float else sent[max(0, m.start() - 130):m.end() + 130]
-                if own in {_canon(d.group(0)) for d in decl.finditer(scope)}:
+                own = spans
+                # In prose the window is taken over the surrounding TEXT, not clipped
+                # at the sentence boundary: a reader resolving "at \epslib{}" from the
+                # preceding clause does not stop at the period, and clipping there
+                # flagged a dozen occurrences whose floor was one sentence away.
+                if in_float:
+                    scope = sent
+                else:
+                    _abs = _abs0 + m.start()
+                    scope = text[max(0, _abs - 230):_abs + len(m.group(0)) + 230]
+                _found = {_canon(d.group(0)) for d in decl.finditer(scope)}
+                if "both" in _found or own & _found:
                     continue
                 bad.append(f"paper/tex/{f.name}: quotes {m.group(1)} "
                            f"({wanted[v]}) with no floor named beside it")
@@ -1004,6 +1053,8 @@ check_instrument_copies._needs_source_repo = lambda: (ROOT.parent / "instrument"
 check_withdrawal_markers._needs_source_repo = lambda: (ROOT.parent / "RT-QUANT.md").exists()
 check_own_counts_manuscript._needs_source_repo = lambda: (
     ROOT.parent / "paper" / "tex" / "sec7_boundaries.tex").exists()
+check_floor_declarations._needs_source_repo = lambda: (
+    ROOT.parent / "paper" / "tex").is_dir()
 
 
 _LAST_SKIPPED: list[str] = []
@@ -1096,7 +1147,8 @@ def validate_guard_fires() -> int:
     import subprocess
     import tempfile
 
-    missed = []
+    missed: list[str] = []
+    skipped_m: list[str] = []
     for label, rel, old, new in _MUTATIONS:
         with tempfile.TemporaryDirectory() as td:
             # Copy the SUBMISSION TREE, not just the package. The markers rule reads
@@ -1110,6 +1162,12 @@ def validate_guard_fires() -> int:
             shutil.copytree(ROOT.parent, root, ignore=ignore)
             d = root / ROOT.name
             f = (root / rel[len("../"):]) if rel.startswith("../") else (d / rel)
+            if not f.exists():
+                # The subject lives outside the package and is absent from a
+                # standalone clone. Report it rather than raising: the mode a
+                # reviewer is told to run must run in the artifact of record.
+                skipped_m.append(f"{label} (subject absent: {rel})")
+                continue
             src = f.read_text(encoding="utf-8")
             if old not in src:
                 missed.append(f"{label}: anchor {old!r} no longer in {rel}")
@@ -1126,8 +1184,11 @@ def validate_guard_fires() -> int:
         for m in missed:
             print(f"  - {m}")
         return 1
-    print(f"[selfclaims] guard validated: {len(_MUTATIONS)}/{len(_MUTATIONS)} "
-          f"reintroduced discrepancies caught")
+    _n = len(_MUTATIONS) - len(skipped_m)
+    for _s in skipped_m:
+        print(f"  skipped: {_s}")
+    print(f"[selfclaims] guard validated: {_n}/{_n} reintroduced discrepancies caught"
+          + (f"; {len(skipped_m)} skipped (subject outside this package)" if skipped_m else ""))
     return 0
 
 
