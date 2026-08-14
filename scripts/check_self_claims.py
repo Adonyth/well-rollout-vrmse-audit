@@ -856,6 +856,38 @@ def check_floor_declarations() -> list[str]:
     floory = re.compile(
         r"^(eps_?(lib|fix|0)\w*|eps_1e9|eps5|lib|definitional\w*|library_floor\w*|"
         r"\w*_eps_(lib|fix)\w*|\w*_(lib|eps5)|max_(lib|fix))$", re.I)
+    def _seg_floors(seg: str) -> set:
+        """The floor(s) a single path segment names, or an empty set."""
+        q = seg.lower()
+        out = set()
+        if "eps_fix" in q or q == "eps5" or q.endswith("_eps5") or "max_fix" in q:
+            out.add("fix")
+        if ("eps_lib" in q or "library_floor" in q or q == "lib"
+                or q.endswith("_lib")):
+            out.add("lib")
+        if "definitional" in q or "eps_0" in q:
+            out.add("def")
+        return out
+
+    def _floor_of(path: str) -> frozenset:
+        """The floor(s) a leaf path names. A path naming two is a span.
+
+        The LEAF segment is authoritative; ancestors are consulted only when the
+        leaf names no floor. `zscored_at_library_floor.definitional_raw_6_12` is a
+        definitional value stored inside a block named for the library floor, and
+        letting the block name contribute made it look like a two-floor span and
+        collide its own value out of the swept set.
+        """
+        segs = path.split(".")
+        own = _seg_floors(segs[-1])
+        if own:
+            return frozenset(own)
+        for seg in reversed(segs[:-1]):
+            own = _seg_floors(seg)
+            if own:
+                return frozenset(own)
+        return frozenset()
+
     wanted: dict[str, str] = {}
 
     def walk(o, path=""):
@@ -865,13 +897,16 @@ def check_floor_declarations() -> list[str]:
         elif isinstance(o, (int, float)) and not isinstance(o, bool):
             if any(floory.match(seg) for seg in path.split(".")):
                 key = f"{float(o):.4g}"
-                # A 4-s.f. collision between two floors is ambiguous, not
-                # first-writer-wins: record it and skip rather than demand
-                # the wrong floor by accident.
-                if key in wanted and wanted[key] != path:
-                    wanted[key] = None
+                # A 4-s.f. collision is ambiguous only if the colliding leaves sit
+                # at DIFFERENT floors. Comparing paths instead dropped every value
+                # recorded in more than one block -- and the more central a number is,
+                # the more blocks record it, so the guard skipped exactly the values
+                # the class recurred on (16.46, 91.46, 1.927 among them).
+                if key in wanted:
+                    if wanted[key] is not None and _floor_of(wanted[key]) != _floor_of(path):
+                        wanted[key] = None
                 else:
-                    wanted.setdefault(key, path)
+                    wanted[key] = path
 
     walk(json.loads(ref.read_text(encoding="utf-8")))
     # Only actual floor IDENTIFIERS count. The bare word "floor" is not one: a
@@ -958,18 +993,9 @@ def check_floor_declarations() -> list[str]:
                 # A leaf naming TWO floors is a SPAN between them, not a value at one:
                 # `ratio_definitional_to_eps_fix` has no single "own" floor, so naming
                 # either endpoint is a sufficient declaration.
-                spans = {n for n, tok in (("fix", "eps_fix"), ("lib", "eps_lib"),
-                                          ("def", "definitional"))
-                         if tok in path}
-                if "eps_0" in path:
-                    spans.add("def")
-                if "library_floor" in path or path.endswith((".lib", "_lib")):
-                    spans.add("lib")
-                if path.endswith((".eps5", "_eps5")) or "max_fix" in path:
-                    spans.add("fix")
-                if not spans:
+                own = set(_floor_of(path))
+                if not own:
                     continue
-                own = spans
                 # In prose the window is taken over the surrounding TEXT, not clipped
                 # at the sentence boundary: a reader resolving "at \epslib{}" from the
                 # preceding clause does not stop at the period, and clipping there
