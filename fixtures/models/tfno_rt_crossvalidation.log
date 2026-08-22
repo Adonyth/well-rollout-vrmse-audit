@@ -1,0 +1,25 @@
+/tmp/p3lock/lib/python3.12/site-packages/timm/models/layers/__init__.py:49: FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.layers", FutureWarning)
+/tmp/p3lock/lib/python3.12/site-packages/tensorly/solvers/nnls.py:103: SyntaxWarning: invalid escape sequence '\l'
+  .. math:: \lambda_s, \lambda_r
+/tmp/p3lock/lib/python3.12/site-packages/tensorly/solvers/admm.py:99: SyntaxWarning: invalid escape sequence '\_'
+  .. math:: dual\_var = dual\_var + (Ax + Bx_{split} - c)
+/tmp/p3lock/lib/python3.12/site-packages/neuralop/layers/spectral_convolution.py:459: UserWarning: Using a non-tuple sequence for multidimensional indexing is deprecated and will be changed in pytorch 2.9; use x[tuple(seq)] instead of x[seq]. In pytorch 2.9 this will be interpreted as tensor index, x[torch.tensor(seq)], which will result either in an error or a different result (Triggered internally at /Users/runner/work/pytorch/pytorch/torch/csrc/autograd/python_variable_indexing.cpp:355.)
+  out_fft[slices_x] = self._contract(x[slices_x], weight, separable=False)
+dataset len=1150  core_fields=['density', 'velocity']
+TFNO revision pin (hub-verified): 5cccb8597ed98189b63493b3d303cd0d24622b2f
+idx      0  rayleigh_taylor_instability_At_0625.hdf5     traj=0 t=0
+    target  0.00e+00   output  0.00e+00
+    VRMSE  library=56.477219  ours=56.477223  rel=8.01e-08  OK
+
+idx    574  rayleigh_taylor_instability_At_25.hdf5       traj=0 t=114
+    target  0.00e+00   output  0.00e+00
+    VRMSE  library=1.013637  ours=1.013637  rel=3.27e-08  OK
+
+idx   1149  rayleigh_taylor_instability_At_75.hdf5       traj=1 t=114
+    target  0.00e+00   output  0.00e+00
+    VRMSE  library=1.056599  ours=1.056599  rel=1.95e-08  OK
+
+=== VERDICT ===
+  windows: 3   worst relative discrepancy: 8.010e-08   tol 1e-05
+  -> RT evaluator VALIDATED end to end

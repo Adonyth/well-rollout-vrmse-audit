@@ -5,7 +5,7 @@ split; it tells you which fields and frames have a metric denominator carried by
 stabilizing constant rather than by the data. No model required.
 
 ```
-pip install -e .
+pip install -e '.[hdf5]'   # the [hdf5] extra is required for the .h5 commands below
 # declare the layout: how many LEADING axes, e.g. [trajectory, time, x, y, z] -> 2
 normscreen your_data.h5 --auto --spatial-dims 3 --eps 1e-7 --leading-axes 2 --component-axis -1
 # or screen every field whole:
@@ -71,6 +71,23 @@ A floor bounds the *amplification*, not the score: at `Var = 0` the score is
 floor removes is the divide-by-zero, and with it any information about how quiescent the
 target was — two fields with the same error and wildly different variability score the
 same once both are floor-determined.
+
+## Scope: the verdict is about the array you supplied
+
+A verdict describes the array **in the units it is in**. Normalising rescales the variance
+but leaves the floor where it is, so the same physical field can screen POSITIVE raw and
+NEGATIVE after Z-scoring. Worked example, the least-conditioned corner of the packaged Rayleigh-Taylor census
+(`0625/velocity.1`, `var_min = 1.097e-11`) with that component's own
+`normalization_std = 0.0081858`, both at `--eps 1e-7`:
+
+| supplied as | worst floor share | verdict |
+|---|---|---|
+| raw physical | 0.9999 | SCREEN POSITIVE |
+| Z-scored | 0.3792 | SCREEN NEGATIVE |
+
+Neither reading is wrong; they answer different questions. If a downstream metric is applied
+in a different space from the one you screened, re-run the screen in that space. The tool
+prints this scope note on every verdict.
 
 ## Two normalizer conventions, and why the choice matters
 

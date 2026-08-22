@@ -50,6 +50,7 @@ import gzip
 import json
 import pathlib
 import re
+import shlex
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -389,21 +390,27 @@ def check_own_counts_manuscript() -> list[str]:
     _WORDS = {"three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8,
               "nine": 9, "ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13,
               "fourteen": 14, "fifteen": 15, "sixteen": 16, "seventeen": 17,
-              "eighteen": 18}
+              "eighteen": 18, "nineteen": 19, "twenty": 20, "twenty-one": 21,
+              "twenty-two": 22, "twenty-three": 23, "twenty-four": 24}
     src = (ROOT / "scripts" / "check_self_claims.py").read_text(encoding="utf-8")
     doc = src.split('"""')[1] if '"""' in src else ""
     n_fam = len(re.findall(r"^  ([a-z]+) *-- ", doc, re.M))
     n_mut = len(_MUTATIONS)
     bad: list[str] = []
-    tex = ROOT.parent / "paper" / "tex" / "sec7_boundaries.tex"
-    if tex.exists():
+    # Scan EVERY manuscript source, not one named file. This rule read only
+    # sec7_boundaries.tex; the claim it polices had since moved to appendix.tex, so
+    # the rule could not fire on the live manuscript and the "ten rule families"
+    # sentence was unguarded while the rule was counted clean. Auditing which rules
+    # --validate-guard can actually reach is what surfaced it: no mutation could
+    # reach this one, because there was nothing in its file to mutate.
+    for tex in sorted((ROOT.parent / "paper" / "tex").glob("*.tex")):
         t = tex.read_text(encoding="utf-8")
         for w in re.findall(r"holds ([a-z]+) rule families", t):
             if _WORDS.get(w) != n_fam:
-                bad.append(f"sec7_boundaries.tex: says {w!r} rule families; the guard has {n_fam}")
+                bad.append(f"{tex.name}: says {w!r} rule families; the guard has {n_fam}")
         for w in re.findall(r"reintroduces ([a-z]+) real past discrepancies", t):
             if _WORDS.get(w) != n_mut:
-                bad.append(f"sec7_boundaries.tex: says {w!r} reintroduced discrepancies; "
+                bad.append(f"{tex.name}: says {w!r} reintroduced discrepancies; "
                            f"the table holds {n_mut}")
     return bad
 
@@ -435,8 +442,24 @@ def check_stage_tags() -> list[str]:
     return bad
 
 
+class _ParseRejected(Exception):
+    """Raised in place of argparse's SystemExit so a rejection is a finding, not an exit."""
+
+
+def _raise_parse(*a, **k):
+    raise _ParseRejected(" ".join(str(x) for x in a if isinstance(x, str)) or "rejected")
+
+
 def check_cli_examples() -> list[str]:
-    """Every CLI invocation the package advertises must be runnable as written.
+    """Every advertised CLI invocation must PARSE against the tool's real interface.
+
+    Scope, stated exactly, because an earlier docstring said "runnable as written" and
+    this rule cannot establish that: it inspects flags and layout declarations against
+    the argument parser. It does NOT install the package or execute the command, so it
+    cannot see a runtime failure. A reviewer found one it therefore missed -- the
+    advertised HDF5 invocations failed after the advertised `pip install -e .` because
+    h5py is an optional extra -- and that class of defect is out of this rule's reach
+    by construction, not by oversight.
 
     Two defects of this kind shipped in the released instrument: a documented
     `--npy` flag that does not exist (the path is positional and `.npy` is
@@ -444,11 +467,16 @@ def check_cli_examples() -> list[str]:
     layouts the instrument itself calls mandatory, so on the layout its own
     `--spatial-dims 3` implies it exits non-zero with `ambiguous layout`.
 
-    Checked mechanically (the worked example under the instrument's examples
-    directory is swept the same way):
-      - every long flag in an advertised `normscreen` line exists in its parser
-      - no advertised line both passes `--spatial-dims` and omits all three
-        layout declarations, which the instrument documents as refused
+    Checked mechanically, by handing each advertised `normscreen` line to the
+    instrument's REAL parser (`normscreen.__main__.build_parser`) and requiring it
+    to parse. That is stronger than the flag-membership test this rule used to do,
+    which accepted `--eps not-a-number` while the real CLI exited 2. It also checks
+    that no advertised line passes `--spatial-dims` while omitting all three layout
+    declarations, which the instrument documents as refused.
+
+    NOT swept: `instrument/examples/`. An earlier version of this docstring said the
+    worked example there was swept the same way; it never was, and the surfaces list
+    below is the whole of what this rule reads.
     """
     import argparse
 
@@ -498,6 +526,28 @@ def check_cli_examples() -> list[str]:
             for f in flags:
                 if f not in known:
                     bad.append(f"{label}: advertises `{f}` in `{st}`, which the parser does not accept")
+            # Hand the whole invocation to the REAL parser. Flag membership alone let
+            # `--eps not-a-number` through while the shipped CLI exited 2, so the rule's
+            # own headline was wider than its code until this call existed.
+            # Parse only lines that ARE invocations. Prose mentioning the tool by name is
+            # not a command, and handing it to argparse manufactures findings rather than
+            # finding them -- a first cut of this check reported six such "rejections",
+            # every one of them an English sentence.
+            _is_invocation = bool(re.match(
+                r"^(?:python3?\s+-m\s+)?normscreen(?:\s|$)", st.split("#")[0].strip()))
+            if build_parser is not None and _is_invocation:
+                try:
+                    argv = shlex.split(st.split("#")[0])
+                    for _drop in ("python3", "python", "-m", "normscreen"):
+                        while argv and argv[0] == _drop:
+                            argv.pop(0)
+                    _p = build_parser()
+                    _p.exit = _p.error = _raise_parse  # type: ignore[assignment]
+                    _p.parse_args(argv)
+                except _ParseRejected as exc:
+                    bad.append(f"{label}: advertises `{st}`, which the parser rejects: {exc}")
+                except Exception:
+                    pass          # shlex/other failures are not parser verdicts
             if "--spatial-dims" in flags and not any(d in flags for d in LAYOUT_DECLS):
                 if "--demo" not in flags:
                     bad.append(f"{label}: advertises `{st}`, which declares no layout and so "
@@ -823,6 +873,20 @@ def check_instrument_copies() -> list[str]:
     return bad
 
 
+def _published_constants(ref) -> set:
+    """4-sig-fig strings of every value the number table marks as PUBLISHED."""
+    out = set()
+    def walk(o, p=""):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                walk(v, f"{p}.{k}")
+        elif isinstance(o, (int, float)) and not isinstance(o, bool):
+            if p.endswith(".published"):
+                out.add(f"{float(o):.4g}")
+    walk(ref)
+    return out
+
+
 def check_floor_declarations() -> list[str]:
     """A floor-dependent value in the manuscript must name its floor nearby.
 
@@ -856,17 +920,22 @@ def check_floor_declarations() -> list[str]:
     floory = re.compile(
         r"^(eps_?(lib|fix|0)\w*|eps_1e9|eps5|lib|definitional\w*|library_floor\w*|"
         r"\w*_eps_(lib|fix)\w*|\w*_(lib|eps5)|max_(lib|fix))$", re.I)
+    _published_vals = _published_constants(json.loads(ref.read_text(encoding="utf-8")))
+    _ours_floored: set = set()   # filled by walk() below: values under floor-named paths
+
     def _seg_floors(seg: str) -> set:
         """The floor(s) a single path segment names, or an empty set."""
         q = seg.lower()
         out = set()
         if "eps_fix" in q or q == "eps5" or q.endswith("_eps5") or "max_fix" in q:
             out.add("fix")
-        if ("eps_lib" in q or "library_floor" in q or q == "lib"
-                or q.endswith("_lib")):
+        if ("eps_lib" in q or "library_floor" in q or q in ("lib", "library")
+                or q.endswith(("_lib", "_library"))):
             out.add("lib")
         if "definitional" in q or "eps_0" in q:
             out.add("def")
+        if "eps_1e9" in q:
+            out.add("e9")
         return out
 
     def _floor_of(path: str) -> frozenset:
@@ -895,8 +964,16 @@ def check_floor_declarations() -> list[str]:
             for k, v in o.items():
                 walk(v, f"{path}.{k}" if path else k)
         elif isinstance(o, (int, float)) and not isinstance(o, bool):
+            # A leaf named `published` is a PUBLISHED constant even when it sits inside
+            # a block whose path names a floor -- storing a published value beside the
+            # derived value it is compared against is the natural layout. It is neither
+            # one of OUR floor-dependent values nor subject to the floor requirement,
+            # because the paper states those historical floors are unrecoverable.
+            if path.rsplit(".", 1)[-1] == "published":
+                return
             if any(floory.match(seg) for seg in path.split(".")):
                 key = f"{float(o):.4g}"
+                _ours_floored.add(key)
                 # A 4-s.f. collision is ambiguous only if the colliding leaves sit
                 # at DIFFERENT floors. Comparing paths instead dropped every value
                 # recorded in more than one block -- and the more central a number is,
@@ -918,6 +995,7 @@ def check_floor_declarations() -> list[str]:
     # noun made single-floor sentences look ambiguous.
     decl = re.compile(r"\\epslib|\\epsfix|10\^\{-\d+\}|10\$\^\{-\d+\}\$|"
                       r"\\num\{1e-\d+\}|definitional(?:\s+limit)?|"
+                      r"10\^\{-9\}|\$10\^\{-9\}\$|"
                       r"library'?s?\s+(?:own\s+)?(?:default\s+)?floor|library\s+metric|"
                       r"better-conditioned\s+floor|documented\s+floor|"
                       r"its\s+own\s+default\s+floor|library\s+VRMSE|"
@@ -955,7 +1033,46 @@ def check_floor_declarations() -> list[str]:
             # Inside a float, a floor named in the caption or a column header governs
             # every cell; in running prose the declaration must sit beside the value.
             in_float = _i in floats
-            for m in re.finditer(r"\$?(\d+\.\d{1,4})\$?", sent):
+                        # Two value forms, because the first alone was blind to every score the
+            # manuscript typesets in scientific notation: a reviewer found a
+            # floor-dependent \num{...} value this rule could not see, and it had to be
+            # caught by hand. Plain decimals AND \num{}/e-notation are scanned now.
+            # A mantissa carrying an explicit power of ten is NOT the bare mantissa:
+            # `1.097\times10^{-11}` is a variance, and matching it against a stored
+            # scalar 1.097 by mantissa alone flagged a number that is not floor-dependent
+            # at all. Skip the literal when a \times10^{..} follows it -- comparing
+            # magnitudes would need the exponent, and no stored leaf is written that way.
+            _sci = {m.start(1) for m in re.finditer(
+                r"(\d+\.\d{1,4})\s*\\times\s*10\^", sent)}
+            _vals = [(m.start(), m.group(1)) for m in
+                     re.finditer(r"\$?(\d+\.\d{1,4})\$?", sent)
+                     if m.start(1) not in _sci]
+            _vals += [(m.start(), m.group(1)) for m in re.finditer(
+                r"\\num\{([0-9.]+e[+-]?\d+)\}|\$?(\d+\.?\d*e[+-]?\d+)\$?", sent)
+                if m.group(1)]
+                        # A sentence that cites the benchmark's own table is quoting PUBLISHED values,
+            # whose floor this paper states is unrecoverable -- requiring a floor beside them
+            # would demand a declaration the paper explicitly says cannot be made. This
+            # exemption became necessary when a newly added leaf collided at four
+            # significant figures with a published figure quoted from that table.
+            _cites_benchmark = "thewell2024" in sent
+            for m in [type("M", (), {"start": (lambda s, p=p: p), "group": (lambda s, i, g=g: g)})()
+                      for p, g in _vals]:
+                                # Exempt ONLY a value the number table itself records under a
+                # `.published` path, quoted in a sentence citing the benchmark. A blanket
+                # "cites the benchmark" exemption would also excuse OUR derived ratios,
+                # which routinely appear in the same sentence as the published value they
+                # are a ratio to -- that would trade a miss for a pass, which is the
+                # failure mode this project keeps having.
+                                # Exempt a published constant quoted in a benchmark-citing sentence --
+                # but NOT when the same 4-s.f. value is also one of OUR floor-named leaves.
+                # A reviewer found exactly that collision: our
+                # tfno_rt_rollout_derived.eps_lib_1e7.leave_one_out_max is 1.486, the same
+                # to four figures as the published RB one-step cell, so a blanket exemption
+                # would let our value be quoted floorless in any citing sentence.
+                _v4 = f"{float(m.group(1)):.4g}"
+                if _cites_benchmark and _v4 in _published_vals and _v4 not in _ours_floored:
+                    continue
                 v = f"{float(m.group(1)):.4g}"
                 if v not in wanted or wanted[v] is None:
                     continue
@@ -985,6 +1102,8 @@ def check_floor_declarations() -> list[str]:
                         return "both"
                     if "epslib" in t or "library" in t or "10^{-7}" in t:
                         return "lib"
+                    if "10^{-9}" in t:
+                        return "e9"
                     if "definitional" in t:
                         return "def"
                     return t
@@ -1006,7 +1125,43 @@ def check_floor_declarations() -> list[str]:
                     _abs = _abs0 + m.start()
                     scope = text[max(0, _abs - 230):_abs + len(m.group(0)) + 230]
                 _found = {_canon(d.group(0)) for d in decl.finditer(scope)}
-                if "both" in _found or own & _found:
+                # A joint declaration ("across the two floors") names lib AND fix, so it
+                # satisfies a value at either -- but NOT a value at a third floor, and
+                # not a lone value that belongs to only one of them. Treating it as a
+                # blanket pass reopened the very hole this rule was written to close.
+                if "both" in _found:
+                    _found |= {"lib", "fix"}
+                if own & _found:
+                    continue
+                # An explicit statement that the floor is UNRECOVERABLE is a floor
+                # declaration -- the only honest one available for a published cell whose
+                # scoring configuration this paper says cannot be recovered. Without this,
+                # the rule demands a name the paper's own boundaries forbid it to supply,
+                # and the only way to satisfy it would be to delete the disclosure.
+                                # ...but ONLY for a value the table records as PUBLISHED. Unrecoverability
+                # is a property of the historical record, never of a number we computed
+                # ourselves: our own floors are always known. Without this restriction the
+                # clause is an escape hatch -- writing "at a floor the record does not
+                # state" beside one of OUR values silenced the rule, which I verified
+                # before narrowing it.
+                                # The narrowing guard (a) received applies here too -- a value that is
+                # ALSO one of our floor-named leaves must not be exempted by a claim about
+                # the historical record. A real 4-s.f. collision exists (our
+                # tfno_rt_rollout_derived.eps_lib_1e7.leave_one_out_max equals the published
+                # RB one-step cell at 1.486), so for such a value the sentence must ALSO
+                # assert, in words, that the number being quoted is the published one. That
+                # turns the hatch from a value coincidence into a falsifiable statement an
+                # editor can check. A previous round claimed this narrowing and shipped
+                # without it; the negative control used a value that could not reach this
+                # branch, so it passed for the wrong reason.
+                _declares_unrecoverable = re.search(
+                    r"(floor|scoring space)[^.]{0,120}?"
+                    r"(not recoverable|does not state|cannot recover|unrecoverable|"
+                    r"not stated|unstated)", scope, re.I | re.S)
+                _asserted_published = re.search(r"\bas published\b|\bpublished\b[^.]{0,40}?"
+                                                + re.escape(m.group(1)), scope, re.I | re.S)
+                if _v4 in _published_vals and _declares_unrecoverable and (
+                        _v4 not in _ours_floored or _asserted_published):
                     continue
                 bad.append(f"paper/tex/{f.name}: quotes {m.group(1)} "
                            f"({wanted[v]}) with no floor named beside it")
@@ -1027,7 +1182,15 @@ def check_quoted_sizes() -> list[str]:
 
 
 def check_command_placeholders() -> list[str]:
-    """A documented command must be runnable as written, not a sketch.
+    """No documented command may contain an unresolved placeholder.
+
+    Scope, stated exactly: this greps for placeholder PATTERNS -- abbreviated shas,
+    `<YOUR...>`, `TODO`, `<UPPER-CASE>`. It does not execute anything, does not check
+    a flag against a parser, and does not check that a named script exists, so a
+    command naming a missing file passes it. The headline used to say such a command
+    "must be runnable as written", which this rule cannot establish; a reviewer added a
+    documented command naming a script that does not exist to a clone, and the rule
+    passed while the command itself exited 2.
 
     A revision sha abbreviated to `7d351350eaf6...` inside a reproduction command is
     not a command; it is a note that someone still has to look the value up. The full
@@ -1165,10 +1328,68 @@ _MUTATIONS = [
     ("a shipped script defaulting to a write outside the package",
      "scripts/rb_census.py", 'os.environ.get("RB_CENSUS_OUT", os.path.join(',
      'os.environ.get("RB_CENSUS_OUT", ".gate-work/out.json") or os.path.join('),
+    # Below: the seven rules that had NO mutation able to reach them. The validator
+    # reported "15/15 caught" truthfully while exercising 12 of 19 rules -- including
+    # check_floor_declarations, whose own guards shipped broken twice. Each mutation
+    # below was confirmed to fire the named rule and only then added.
+    ("the guard's own family count misstated in its docstring",          # check_own_counts
+     "scripts/check_self_claims.py", "Ten families are checkable", "Nine families are checkable"),
+    ("the manuscript misstating how many rule families the guard holds",  # ..._manuscript
+     "../paper/tex/appendix.tex", "holds ten rule families", "holds nine rule families"),
+    ("a quoted fixtures byte total that is not the tree's actual size",   # check_quoted_sizes
+     "README.md", "957,824", "957,300"),
+    ("a factor claim that no longer follows from its two operands",       # check_factor_claims
+     "../paper/tex/sec1_intro.tex", "factor of $8.542$", "factor of $8.642$"),
+    ("a floor-dependent value quoted with no floor named",                # check_floor_declarations
+     "../paper/tex/appendix.tex", "$16.46$ at \\epslib{} by it", "$16.46$ by it"),
+    ("a documented stage tag that no stage in verify.py emits",           # check_stage_tags
+     "README.md", "[coverage] ...", "[covrage] ..."),
+    ("two documented stages listed out of execution order",               # check_transcript_order
+     "README.md", "[map] ...   [gate3] ...", "[gate3] ...   [map] ..."),
+    # These three are the rules that no earlier mutation OWNED: every mutation reaching
+    # them was also caught by a broader rule, so each could be replaced by `return []`
+    # with the validator still reporting a full pass. Each edit below fires its rule
+    # and no other.
+    ("one shipped copy of the instrument edited without the other",       # ..._copies
+     "instrument/README.md", "## Scope", "## Scopes"),
+    ("the MANIFEST attributing a fixture to another shipped script",      # producer_relations
+     "MANIFEST.md", "`scripts/rb_census.py`", "`scripts/aggregate_results.py`"),
 ]
+
+# Which rule MUST catch each mutation, by label. "Some rule fired" is too weak: it lets a
+# rule be neutered silently whenever a broader rule happens to cover the same edit.
+_MUTATION_OWNER = {
+    "a renamed script whose docstrings keep the old name": "check_paths",
+    "a dependency floor below the APIs the scripts call": "check_deps",
+    "a packaged-window count off by one": "check_counts",
+    "a census row count off by one": "check_counts",
+    "a producer string naming a script that was never shipped": "check_paths",
+    "the enumerated check total changed on every prose surface at once": "check_counts",
+    "a real filename claimed under a directory it does not live in": "check_paths",
+    "an advertised flag the parser does not accept": "check_cli_examples",
+    "a worked numeric example that no longer evaluates to its claim": "check_numeric_examples",
+    "the row-file writer bypassing the single-sourced contract": "check_io_contract",
+    "a stage comment contradicting the fixture it introduces": "check_counts",
+    "a documented command left with an abbreviated identifier": "check_command_placeholders",
+    "an unmarked restatement of a withdrawn claim in the packaged ledger":
+        "check_withdrawal_markers",
+    "a shipped surface claiming a floored score is capped": "check_saturation_claim",
+    "a shipped script defaulting to a write outside the package": "check_producer_targets",
+    "the guard's own family count misstated in its docstring": "check_own_counts",
+    "the manuscript misstating how many rule families the guard holds":
+        "check_own_counts_manuscript",
+    "a quoted fixtures byte total that is not the tree's actual size": "check_quoted_sizes",
+    "a factor claim that no longer follows from its two operands": "check_factor_claims",
+    "a floor-dependent value quoted with no floor named": "check_floor_declarations",
+    "a documented stage tag that no stage in verify.py emits": "check_stage_tags",
+    "two documented stages listed out of execution order": "check_transcript_order",
+    "one shipped copy of the instrument edited without the other": "check_instrument_copies",
+    "the MANIFEST attributing a fixture to another shipped script": "check_producer_relations",
+}
 
 
 def validate_guard_fires() -> int:
+    import os
     import shutil
     import subprocess
     import tempfile
@@ -1185,9 +1406,36 @@ def validate_guard_fires() -> int:
             root = pathlib.Path(td) / "lane"
             ignore = shutil.ignore_patterns("__pycache__", "*.pyc", ".git", "hf-cache",
                                             ".gate-work", "results", "tmp", "*.pdf")
-            shutil.copytree(ROOT.parent, root, ignore=ignore)
+                        # Copy only regular files and directories. The parent is whatever directory
+            # a reviewer happened to clone into, and copytree raises on anything else --
+            # a unix socket or a dangling symlink there gave an uncaught shutil.Error at
+            # exactly this line, in the one mode whose whole purpose is to return a
+            # verdict. Skipping the unreadable entry is right: nothing this validator
+            # checks lives in a socket, and a crash here reads as the guard failing.
+            def _ignore(src, names, _ig=ignore):
+                skip = set(_ig(src, names))
+                for n in names:
+                    p = os.path.join(src, n)
+                    if not (os.path.isdir(p) or os.path.isfile(p)) or (
+                            os.path.islink(p) and not os.path.exists(p)):
+                        skip.add(n)
+                return skip
+            shutil.copytree(ROOT.parent, root, ignore=_ignore)
             d = root / ROOT.name
             f = (root / rel[len("../"):]) if rel.startswith("../") else (d / rel)
+            # A mutation is unreachable when its OWNING RULE cannot run in this tree,
+            # even though the subject file is present. In a standalone clone of the package
+            # `instrument/README.md` exists inside it, but check_instrument_copies compares
+            # against a sibling copy that does not, so the rule returns [] and the mutation
+            # was recorded as MISSED -- making the advertised mode exit 1 in exactly the
+            # artifact the MANIFEST tells a reviewer to download. Skip it, as with an
+            # absent subject: unavailable is not the same as uncaught.
+            _own = _MUTATION_OWNER.get(label)
+            _ownfn = dict((r.__name__, r) for _f, r in _rules()).get(_own) if _own else None
+            _need = getattr(_ownfn, "_needs_source_repo", None) if _ownfn else None
+            if _need is not None and not _need():
+                skipped_m.append(f"{label} (owning rule {_own} unavailable here)")
+                continue
             if not f.exists():
                 # The subject lives outside the package and is absent from a
                 # standalone clone. Report it rather than raising: the mode a
@@ -1199,12 +1447,20 @@ def validate_guard_fires() -> int:
                 missed.append(f"{label}: anchor {old!r} no longer in {rel}")
                 continue
             f.write_text(src.replace(old, new, 1), encoding="utf-8")
-            r = subprocess.run([sys.executable, "scripts/check_self_claims.py"],
-                               cwd=d, capture_output=True, text=True)
+            owner = _MUTATION_OWNER.get(label)
+            r = subprocess.run([sys.executable, "scripts/check_self_claims.py",
+                                "--which-rules"], cwd=d, capture_output=True, text=True)
+            fired = set(r.stdout.split("RULES_FIRED:")[-1].split()) if \
+                "RULES_FIRED:" in r.stdout else set()
             if r.returncode == 0:
                 missed.append(f"{label}: reintroduced in {rel}, guard still passed")
+            elif owner and owner not in fired:
+                # Caught, but by a DIFFERENT rule -- so the rule this mutation exists to
+                # protect could be deleted and this entry would still report a pass.
+                missed.append(f"{label}: caught, but not by {owner} "
+                              f"(fired: {', '.join(sorted(fired)) or 'none'})")
             else:
-                print(f"  caught: {label}")
+                print(f"  caught: {label}" + (f"  [{owner}]" if owner else ""))
     if missed:
         print("FAIL: the guard does not catch what it was written for:")
         for m in missed:
@@ -1219,6 +1475,18 @@ def validate_guard_fires() -> int:
 
 
 def main() -> int:
+    if "--which-rules" in sys.argv:
+        # Names the rules that fired, so --validate-guard can require that a mutation is
+        # caught by the rule it was written for rather than by any rule at all.
+        _fired = []
+        for _fam, _r in _rules():
+            try:
+                if _r():
+                    _fired.append(_r.__name__)
+            except Exception:
+                _fired.append(_r.__name__)
+        print("RULES_FIRED: " + " ".join(_fired))
+        return 1 if _fired else 0
     if "--validate-guard" in sys.argv:
         return validate_guard_fires()
     n, findings = run()

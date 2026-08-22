@@ -1,3 +1,8 @@
+# Python 3.12 is REQUIRED, not incidental: numpy==2.5.1 below publishes no CPython 3.11
+# wheel, so `pip install -r env-lock-full.txt` on 3.11 fails with
+#   ERROR: No matching distribution found for numpy==2.5.1
+# The frozen fixtures were assembled under CPython 3.12.12 (recorded in
+# fixtures/gate3/library_equivalence.json -> environment_at_assembly).
 aiohappyeyeballs==2.7.1
 aiohttp==3.14.1
 aiosignal==1.4.0

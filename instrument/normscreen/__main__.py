@@ -75,7 +75,16 @@ def _load_hdf5(path: str, wanted: list[str] | None, auto: bool,
     return out
 
 
-def main(argv: list[str] | None = None) -> int:
+def build_parser() -> "argparse.ArgumentParser":
+    """The real parser, extracted so callers can validate an advertised
+    invocation without executing the tool.
+
+    The package's self-description guard claims every advertised CLI
+    invocation parses. Previously it checked only that long-flag names
+    appeared in the source, so `--eps not-a-number` satisfied the guard
+    while the real CLI exited 2. Exposing the parser lets that guard make
+    the claim true by construction instead of narrowing it again.
+    """
     p = argparse.ArgumentParser(
         prog="normscreen",
         description="Conditioning screen for variance-normalized error metrics "
@@ -115,6 +124,11 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--json", metavar="OUT", help="also write the full report as JSON")
     p.add_argument("--demo", action="store_true",
                    help="run on a synthetic quiescent-then-developed field and exit")
+    return p
+
+
+def main(argv: list[str] | None = None) -> int:
+    p = build_parser()
     a = p.parse_args(argv)
 
     if a.demo:
@@ -188,9 +202,15 @@ def main(argv: list[str] | None = None) -> int:
 def _exit_status(rep) -> int:
     """Exit 1 on anything a caller should not treat as a clean screen.
 
-    That is three conditions, not one: a floor-determined denominator; a zero denominator
-    under a floorless metric (unbounded rather than merely amplified by at most 1/sqrt(eps)); and a non-finite
-    denominator, which is undefined rather than well conditioned and must not exit clean.
+    That is five conditions, not one, and they are enumerated here because an earlier
+    version of this docstring said three while the code below enforced five:
+      * positive   -- a floor-determined denominator (worst floor share >= 0.90);
+      * degenerate -- a zero denominator under a floorless metric, which is unbounded
+        rather than merely amplified by at most 1/sqrt(eps);
+      * undefined  -- a non-finite denominator, undefined rather than well conditioned;
+      * floorless  -- a floorless metric whose denominator spans orders of magnitude;
+      * incomplete -- a field the tool had to GUESS was a scalar, so it was never
+        screened per component and a degenerate component could be out of reach.
     """
     degenerate = any(f.frames_zero_denominator for f in rep.fields)
     # a floorless metric whose denominator spans orders of magnitude is not a clean screen

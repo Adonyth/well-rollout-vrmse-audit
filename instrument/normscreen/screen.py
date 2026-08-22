@@ -540,6 +540,18 @@ def screen_fields(fields: dict[str, np.ndarray], *, eps: float = 1e-7, n_spatial
         raise ValueError(f"internal: {len(expanded)} screened fields, expected {_want}")
     fields = expanded
     _incomplete = [t for sev, t in _notes if sev == "assumed"]
+    # A verdict is a statement about the array AS SUPPLIED. The same physical field
+    # screened raw and Z-scored can return opposite verdicts, because normalising rescales
+    # the data and leaves the floor where it is. The tool cannot know which space a
+    # downstream metric will use, so it says so rather than letting the caller assume the
+    # verdict travels. The manuscript claimed this limitation was stated in the tool; it
+    # was not stated anywhere in the shipped tree until now.
+    _space_note = (
+        "SCOPE: this verdict describes the array as supplied, in whatever units it is in. "
+        "Normalising the data (e.g. Z-scoring) rescales the variance but not the floor, so "
+        "the same physical field can screen POSITIVE raw and NEGATIVE normalised. If a "
+        "downstream metric is applied in a different space, re-run this screen in that space."
+    )
     _assumed_note = (("INCOMPLETE: " if _incomplete else "NOTE: ")
                      + " | ".join(t for _, t in _notes)) if _notes else ""
     reports = [screen_array(k, v, eps=eps, n_spatial=n_spatial, ddof=ddof,
@@ -592,8 +604,9 @@ def screen_fields(fields: dict[str, np.ndarray], *, eps: float = 1e-7, n_spatial
     else:
         verdict = (
             f"SCREEN NEGATIVE over the frames supplied. The worst floor share is {ws:.4g} "
-            f"({worst_r.name}), so the denominator is carried by the data everywhere here. "
-            f"This bounds only what was screened, not the whole split."
+            f"({worst_r.name}), so the denominator is carried by the data everywhere here "
+            f"IN THE UNITS THIS ARRAY IS IN. This bounds only what was screened, not the "
+            f"whole split."
         )
     # eps==0 has its own headline, but an UNDEFINED denominator outranks it: with NaN in
     # the data no conditioning statement can be made at any floor. Guard, or the
@@ -611,4 +624,5 @@ def screen_fields(fields: dict[str, np.ndarray], *, eps: float = 1e-7, n_spatial
     return ScreenReport(eps=eps, n_spatial=n_spatial, ddof=ddof, normalizer=normalizer,
                         fields=reports,
                         least_conditioned_field=worst_r.name, worst_floor_share=ws,
-                        verdict=(verdict + ("\n\n" + _assumed_note if _assumed_note else "")))
+                        verdict=(verdict + ("\n\n" + _assumed_note if _assumed_note else "")
+                             + "\n\n" + _space_note))

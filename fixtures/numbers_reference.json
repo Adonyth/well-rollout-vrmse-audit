@@ -750,6 +750,13 @@
    "eps_1e9": 6.217690616098235,
    "definitional": 9.624689420229478
   },
+  "TFNO": {
+   "n_sampled_starts": 10,
+   "eps_fix": 0.5995449864022391,
+   "library": 2.402164048136263,
+   "eps_1e9": 14.858082441464138,
+   "definitional": 38.68430405992501
+  },
   "FNO": {
    "n_sampled_starts": 14,
    "eps_fix": 40.01531899910363,
@@ -1193,7 +1200,12 @@
    }
   },
   "zscored_at_library_floor": {
+   "definitional_zscored_over_raw": 1.0,
+   "zscored_over_raw_eps_lib": 5.518,
+   "zscored_over_raw_eps_fix": 36.42,
    "rollout_6_12": 90.84,
+   "rollout_6_12_eps_fix": 70.2,
+   "span_between_released_floors": 1.294,
    "definitional_raw_6_12": 91.46
   },
   "onestep_sampled_mean_zscored_eps_lib": {
@@ -2101,17 +2113,123 @@
   "eps_fix_1e5": 1.105
  },
  "flat_extrapolation_slope_derived": {
-  "_derivation": "FNO t10 one-step curve, start 20 vs start 29, at each floor",
+  "_derivation": "per-row t10 one-step curve over each row's OWN final sampled interval, at each floor; interval discovered from the packaged starts, not assumed",
+  "FNO": {
+   "start_lo": 20,
+   "start_hi": 29,
+   "eps_lib_1e7": {
+    "value_lo": 605.0,
+    "value_hi": 357.6,
+    "drop_pct": 40.9
+   },
+   "eps_fix_1e5": {
+    "value_lo": 77.72,
+    "value_hi": 76.34,
+    "drop_pct": 1.77
+   }
+  },
+  "UNetConvNext": {
+   "start_lo": 12,
+   "start_hi": 29,
+   "eps_lib_1e7": {
+    "value_lo": 2.932,
+    "value_hi": 1.534,
+    "drop_pct": 47.7
+   },
+   "eps_fix_1e5": {
+    "value_lo": 0.4596,
+    "value_hi": 0.4566,
+    "drop_pct": 0.664
+   }
+  }
+ },
+ "tfno_rt_rollout_derived": {
+  "n_trajectories": 10,
+  "window": [
+   6,
+   12
+  ],
+  "published_cell": 6.72,
+  "rollout_steps_run": 12,
+  "zscored_eps_lib_cell": 6.966,
+  "zscored_eps_lib_ratio_to_published": 1.037,
+  "zscored_eps_lib_other_uncensored": {
+   "UNetClassic": {
+    "zscored_cell": 16.2097,
+    "published": 2.84,
+    "ratio_to_published": 5.708
+   },
+   "UNetConvNext": {
+    "zscored_cell": 34.2048,
+    "published": 7.43,
+    "ratio_to_published": 4.604
+   }
+  },
+  "_derivation": "full RT test split, 12-step rollout, raw physical units; mean over steps 6-12 then over trajectories",
+  "eps_0_definitional": {
+   "cell": 7.038,
+   "per_trajectory_min": 2.615,
+   "per_trajectory_max": 21.55,
+   "per_trajectory_median": 5.456,
+   "per_trajectory_spread_ratio": 8.241,
+   "per_trajectory_cv_pct": 81.5,
+   "leave_one_out_min": 5.426,
+   "leave_one_out_max": 7.53,
+   "ratio_to_published": 1.047
+  },
+  "eps_1e9": {
+   "cell": 5.075,
+   "per_trajectory_min": 2.503,
+   "per_trajectory_max": 10.27,
+   "per_trajectory_median": 4.716,
+   "per_trajectory_spread_ratio": 4.104,
+   "per_trajectory_cv_pct": 48.6,
+   "leave_one_out_min": 4.497,
+   "leave_one_out_max": 5.36,
+   "ratio_to_published": 0.7551
+  },
   "eps_lib_1e7": {
-   "start_20": 605.0,
-   "start_29": 357.6,
-   "drop_pct": 40.9
+   "cell": 1.46,
+   "per_trajectory_min": 1.225,
+   "per_trajectory_max": 1.917,
+   "per_trajectory_median": 1.353,
+   "per_trajectory_spread_ratio": 1.565,
+   "per_trajectory_cv_pct": 17.1,
+   "leave_one_out_min": 1.409,
+   "leave_one_out_max": 1.486,
+   "ratio_to_published": 0.2172
   },
   "eps_fix_1e5": {
-   "start_20": 77.72,
-   "start_29": 76.34,
-   "drop_pct": 1.77
-  }
+   "cell": 0.5116,
+   "per_trajectory_min": 0.3682,
+   "per_trajectory_max": 0.9244,
+   "per_trajectory_median": 0.3887,
+   "per_trajectory_spread_ratio": 2.51,
+   "per_trajectory_cv_pct": 43.5,
+   "leave_one_out_min": 0.4658,
+   "leave_one_out_max": 0.5276,
+   "ratio_to_published": 0.07614
+  },
+  "sign_crossover_eps": 5.759e-11,
+  "floor_sensitivity": 2.853,
+  "published_over_ours_eps_lib": 4.603,
+  "agreement_pct_at_definitional": 4.7,
+  "published_over_ours_eps_lib_1sf": 4.6,
+  "params": 302394124,
+  "params_millions": 302
+ },
+ "screen_space_flip": {
+  "corner": "0625/velocity.1",
+  "var_min": 1.097e-11,
+  "floor_share_raw_pct": 99.99,
+  "floor_share_zscored_pct": 37.92
+ },
+ "tfno_crossvalidation_derived": {
+  "worst_relative_discrepancy": 8.01e-08,
+  "tolerance": 1e-05,
+  "n_windows": 3,
+  "validated": true,
+  "_derivation": "parsed from fixtures/models/tfno_rt_crossvalidation.log"
  },
  "forward_cost_envelope_derived": {
   "per_forward_seconds": {

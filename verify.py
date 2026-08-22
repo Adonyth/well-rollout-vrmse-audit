@@ -22,11 +22,56 @@ from __future__ import annotations
 import json
 import math
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
 
 HERE = Path(__file__).parent
+
+# ---------------------------------------------------------------------------
+# Every reference block this file consumes is REQUIRED. Reading one with a
+# `{}` default turns a missing block into a silently skipped stage, and this
+# harness shipped exactly that defect twice: once in the flat-extrapolation
+# slope stage, and then -- after that one was repaired and a comment written
+# above it naming the problem -- in the two stages immediately below that
+# comment, plus the Gate-3 summary leaf. Reviewers demonstrated all three by
+# deleting a block from both number tables and watching verify.py print PASS
+# while the manuscript went on citing the numbers it no longer checked.
+#
+# `_req` makes absence a named failure. `REQUIRED_REFERENCE_BLOCKS` is the
+# enumerated contract, and scripts/test_absent_reference_blocks.py deletes each
+# one in turn and requires a named failure, so a future stage that reverts to
+# `.get(k, {})` is caught by test rather than by the next reviewer.
+# ---------------------------------------------------------------------------
+REQUIRED_REFERENCE_BLOCKS = (
+    "gate2_alignment",
+    "tfno_rt_rollout_derived",
+    "tfno_crossvalidation_derived",
+    "gate3_library_equivalence",
+    "window_coverage_derived",
+    "unetclassic_floor_sweep_derived",
+    "onestep_sampled_mean_by_floor_derived",
+    "onestep_interp_extrapolation_derived",
+    "flat_extrapolation_slope_derived",
+    "spatial_displacement_frames_derived",
+    "onestep_sampled_max_derived",
+    "rb_checkpoint_audit",
+)
+_missing_reference_blocks: list[str] = []
+
+
+def _req(reference, key):
+    """Fetch a REQUIRED reference block; record absence as a failure, never skip."""
+    blk = reference.get(key)
+    if not isinstance(blk, dict) or not blk:
+        if key not in _missing_reference_blocks:
+            _missing_reference_blocks.append(key)
+            print(f"  [FAIL] required reference block absent: {key} -- the stage that "
+                  f"consumes it would otherwise pass by checking nothing")
+        return {}
+    return blk
+
 SCRIPTS = HERE / "scripts"
 FIXTURES = HERE / "fixtures"
 REFERENCE = FIXTURES / "numbers_reference.json"
@@ -334,7 +379,7 @@ def main() -> int:
         print("FAIL: fixtures/gate3/library_equivalence.json missing -- Gate 3 cannot be checked")
         return 1
     g3 = json.loads(_g3.read_text())
-    g3ref = reference.get("gate3_library_equivalence", {})
+    g3ref = _req(reference, "gate3_library_equivalence")
     g3_bad = 0
     # Assert the EXPECTED comparison legs per dataset rather than globbing whichever keys
     # happen to exist: a missing leg previously passed vacuously while the manuscript claimed
@@ -459,7 +504,7 @@ def main() -> int:
     # packaged audit rows rather than trusted, and the census containment leaves with it,
     # since item 8 claims those are bound and they were not.
     import gzip as _gz, glob as _gl
-    _lo, _hi = (_wc0 := reference.get("window_coverage_derived", {})).get("window_frames", [4, 33])
+    _lo, _hi = (_wc0 := _req(reference, "window_coverage_derived")).get("window_frames", [4, 33])
     _fr, _vzfull, _hzfull = [], 0, 0
     for _fp in sorted(_gl.glob(str(FIXTURES / "audit" / "*.json.gz"))):
         with _gz.open(_fp, "rt", encoding="utf-8") as _f:
@@ -476,7 +521,7 @@ def main() -> int:
                        for n in _v if n != "velocity_z"))
         _vzfull += all(x <= 1e-5 for x in _v.get("velocity_z", []))
         _hzfull += all(all(x <= 1e-5 for x in _v[n]) for n in _v if n != "velocity_z")
-    _wc = reference.get("window_coverage_derived", {})
+    _wc = _req(reference, "window_coverage_derived")
     _wc_bad = 0
     for _key, _got in (("horizontal_frac_below_epslib_mean", sum(_fr) / len(_fr)),
                        ("horizontal_frac_below_epslib_min", min(_fr)),
@@ -495,7 +540,25 @@ def main() -> int:
           f"below the library floor over {sum(_fr)/len(_fr):.2f} of the window on average, "
           f"vertical below the better-conditioned floor whole-window in {_vzfull})")
 
-    print(f"[gate2] multi-step alignment OK ({g2['rollout_steps']}-step rollout vs the "
+        # Bind the RELEASED number table's gate2 block to the fixture just validated. Without
+    # this the manuscript's quoted 1.192e-7, "31 steps" and "all are 0" sit in numbers.json
+    # bound by nothing: a reviewer set identity_rollout_max_abs_diff to 0.5 in both number
+    # files and verify.py still exited 0 while printing "identity norm exact (0.0)" -- the
+    # printed 0.0 came from the fixture, the released 0.5 was never compared to it.
+    _g2ref = _req(reference, "gate2_alignment")
+    for _k, _got in (("rollout_steps", g2.get("rollout_steps")),
+                     ("identity_rollout_max_abs_diff",
+                      c2.get("C_rollout_identity_norm_max_abs_diff")),
+                     ("zscore_rollout_max_abs_diff",
+                      c2.get("D_rollout_zscore_norm_max_abs_diff"))):
+        _want = _g2ref.get(_k)
+        if _want is None or f"{float(_want):.6g}" != f"{float(_got):.6g}":
+            print(f"  [FAIL] gate2_alignment.{_k}: released {_want!r} vs fixture {_got!r}")
+            g2_bad += 1
+    if g2_bad:
+        print(f"FAIL: Gate 2 disagreements ({g2_bad})")
+        return 1
+    print(f"[gate2] multi-step alignment OK ({g2['rollout_steps']}-step rollout vs the  "
           f"library's own Trainer.rollout_model, spanning both disputed windows; "
           f"identity norm exact (0.0), Z-scored max abs diff {_d:.3e})")
 
@@ -568,7 +631,7 @@ def main() -> int:
                     if not _stored_eq(_a, _b):
                         print(f"  [FAIL] map block {_ds}.{_k}: {_a!r} vs MAP.json {_b!r}")
                         map_bad += 1
-    _g3_ref = reference.get("gate3_library_equivalence", {})
+    _g3_ref = _req(reference, "gate3_library_equivalence")
     _g3_src = FIXTURES / "gate3" / "library_equivalence.json"
     if _g3_ref and _g3_src.exists():
         with open(_g3_src, encoding="utf-8") as _f:
@@ -652,8 +715,8 @@ def main() -> int:
     # EddyFormer rebuttal, and were previously neither machine-checked NOR listed among the
     # things the harness does not check -- the worst of the two states. Re-derived here from
     # the same packaged per-window scalars the reported cells come from.
-    _sweep_ref = reference.get("unetclassic_floor_sweep_derived", {})
-    _mean_ref = reference.get("onestep_sampled_mean_by_floor_derived", {})
+    _sweep_ref = _req(reference, "unetclassic_floor_sweep_derived")
+    _mean_ref = _req(reference, "onestep_sampled_mean_by_floor_derived")
     sweep_bad = 0
     if not _sweep_ref or not _mean_ref:
         print("FAIL: floor-sweep / sampled-mean reference blocks missing")
@@ -694,7 +757,7 @@ def main() -> int:
     # spatial-displacement field-frame count. A reviewer demonstrated that both could be
     # perturbed in numbers.json and its frozen twin with this harness still exiting 0,
     # because the reference-identity stage only compares the two copies to each other.
-    _interp_ref = reference.get("onestep_interp_extrapolation_derived", {})
+    _interp_ref = _req(reference, "onestep_interp_extrapolation_derived")
     if _interp_ref:
         _fno = [r for r in _fixture_rows.get(("FNO", "onestep"), [])]
         _by = {}
@@ -710,7 +773,193 @@ def main() -> int:
                         print(f"  [FAIL] onestep interp {_key}: {_got!r} vs "
                               f"{_interp_ref[_key]!r}")
                         sweep_bad += 1
-    _disp_ref = reference.get("spatial_displacement_frames_derived", {})
+    # The flat-extrapolation slope the tab:onestep caption quotes, per ROW and per floor.
+    # Two disciplines here, both learned from defects this stage itself shipped:
+    #   1. Each row's interval is re-derived from ITS OWN sampled starts. FNO stops at
+    #      20, UNetConvNext at 12; a previous version assumed 20 for both and so
+    #      asserted one row's slope against the other's cells.
+    #   2. The block's ABSENCE is a failure, not a skip. The previous version guarded
+    #      with `if _slope_ref:` and `if not _blk: continue`, so emptying the block in
+    #      both number files made this stage emit nothing while verify.py still passed.
+    _slope_ref = _req(reference, "flat_extrapolation_slope_derived")
+    if not isinstance(_slope_ref, dict):
+        print("  [FAIL] flat-extrap slope: reference block absent -- this stage would "
+              "otherwise pass by checking nothing")
+        sweep_bad += 1
+    else:
+        for _model in ("FNO", "UNetConvNext"):
+            _blk = _slope_ref.get(_model)
+            if not isinstance(_blk, dict):
+                print(f"  [FAIL] flat-extrap slope {_model}: row block absent")
+                sweep_bad += 1
+                continue
+            _by = {}
+            for _r in _fixture_rows.get((_model, "onestep"), []):
+                if _r["file"].endswith("At_75.hdf5") and _r["trajectory"] == 1:
+                    _by.setdefault(_r["input_start"], []).append(_r)
+            _starts = sorted(_by)
+            if len(_starts) < 2:
+                print(f"  [FAIL] flat-extrap slope {_model}: fewer than two sampled starts")
+                sweep_bad += 1
+                continue
+            _lo, _hi = _starts[-2], _starts[-1]
+            for _k, _want in (("start_lo", _lo), ("start_hi", _hi)):
+                if _blk.get(_k) != _want:
+                    print(f"  [FAIL] flat-extrap slope {_model}.{_k}: {_want!r} vs "
+                          f"{_blk.get(_k)!r}")
+                    sweep_bad += 1
+            for _fkey, _eps in (("eps_lib_1e7", 1e-7), ("eps_fix_1e5", 1e-5)):
+                _fb = _blk.get(_fkey)
+                if not isinstance(_fb, dict):
+                    print(f"  [FAIL] flat-extrap slope {_model}.{_fkey}: floor block absent")
+                    sweep_bad += 1
+                    continue
+                _ends = {}
+                for _s, _name in ((_lo, "value_lo"), (_hi, "value_hi")):
+                    _vals = [_field_mean_vrmse(_r, _eps) for _r in _by[_s]]
+                    _ends[_name] = sum(_vals) / len(_vals)
+                    if f"{_ends[_name]:.4g}" != f"{float(_fb.get(_name, float('nan'))):.4g}":
+                        print(f"  [FAIL] flat-extrap slope {_model}.{_fkey}.{_name}: "
+                              f"{_ends[_name]!r} vs {_fb.get(_name)!r}")
+                        sweep_bad += 1
+                _drop = 100.0 * (_ends["value_lo"] - _ends["value_hi"]) / _ends["value_lo"]
+                if f"{_drop:.3g}" != f"{float(_fb.get('drop_pct', float('nan'))):.3g}":
+                    print(f"  [FAIL] flat-extrap slope {_model}.{_fkey}.drop_pct: "
+                          f"{_drop!r} vs {_fb.get('drop_pct')!r}")
+                    sweep_bad += 1
+    # The TFNO Rayleigh-Taylor cell -- the paper's only same-window comparison against
+    # an uncensored published cell. Deliberately NOT called like-for-like: the manuscript
+    # states the historical weights, floor and scoring space are unbound. Re-derived here from the packaged rows at both floors,
+    # with the trajectory count asserted: a cell computed from fewer than the full ten
+    # is not comparable to a full-split published value, and a partial mean that still
+    # printed OK would be exactly the defect this harness has shipped before.
+    _tf = _req(reference, "tfno_rt_rollout_derived")
+    if _tf:
+        _per = {}
+        for _r in _fixture_rows.get(("TFNO", "rollout"), []):
+            if 6 <= _r["rollout_step"] <= 12:
+                _per.setdefault((_r["file"], _r["trajectory"]), []).append(_r)
+                # Assert the exact STEP SET, not just how many trajectories carry rows. A
+        # reviewer relabelled one trajectory's step 12 as a duplicate 11 -- preserving the
+        # row count and the byte count -- and this stage still returned PASS, silently
+        # averaging a window that was missing its last step.
+        _want_steps = set(range(6, 13))
+        for _k, _rows in sorted(_per.items()):
+            _got_steps = sorted(r["rollout_step"] for r in _rows)
+            if set(_got_steps) != _want_steps or len(_got_steps) != len(_want_steps):
+                print(f"  [FAIL] tfno_rt_rollout step set for {_k[0]} traj {_k[1]}: "
+                      f"{_got_steps} is not exactly {sorted(_want_steps)}")
+                sweep_bad += 1
+        if len(_per) != _tf.get("n_trajectories"):
+            print(f"  [FAIL] tfno_rt_rollout n_trajectories: {len(_per)} rows vs "
+                  f"{_tf.get('n_trajectories')!r} declared")
+            sweep_bad += 1
+        elif len(_per) != 10:
+            print(f"  [FAIL] tfno_rt_rollout covers {len(_per)} trajectories, not the "
+                  f"full split of 10; the published cell is a full-split estimate")
+            sweep_bad += 1
+        else:
+            for _fk, _eps in (("eps_0_definitional", 0.0), ("eps_1e9", 1e-9),
+                              ("eps_lib_1e7", 1e-7), ("eps_fix_1e5", 1e-5)):
+                _blk = _tf.get(_fk)
+                if not isinstance(_blk, dict):
+                    print(f"  [FAIL] tfno_rt_rollout.{_fk}: floor block absent")
+                    sweep_bad += 1
+                    continue
+                _cells = [sum(_field_mean_vrmse(_r, _eps) for _r in _rows) / len(_rows)
+                          for _rows in _per.values()]
+                _got = sum(_cells) / len(_cells)
+                                # ALL leaves, dispersion included. The dispersion leaves were added in
+                # the round that repaired a BLOCKER about undisclosed spread -- and were
+                # bound by nothing, so the numbers repairing the previous round's headline
+                # defect (5.426 and 7.53 appear in the abstract) were themselves unasserted.
+                # A naive perturbation test appeared to bind them; that was a fixtures-tree
+                # byte-count check firing, not a value check.
+                import statistics as _st
+                _loo = [(sum(_cells) - _c) / (len(_cells) - 1) for _c in _cells]
+                for _k, _v in (("cell", _got), ("per_trajectory_min", min(_cells)),
+                               ("per_trajectory_max", max(_cells)),
+                               ("per_trajectory_median", _st.median(_cells)),
+                               ("per_trajectory_spread_ratio", max(_cells) / min(_cells)),
+                               ("per_trajectory_cv_pct", _st.stdev(_cells) / _got * 100),
+                               ("leave_one_out_min", min(_loo)),
+                               ("leave_one_out_max", max(_loo)),
+                               ("ratio_to_published", _got / 6.72)):
+                                        # cv_pct is stored at three significant figures (it is a
+                    # percentage); everything else at four. Compare at the precision the
+                    # producer actually writes, or the check fails on rounding alone.
+                    _p = 3 if _k == "per_trajectory_cv_pct" else 4
+                    if f"{_v:.{_p}g}" != f"{float(_blk.get(_k, float('nan'))):.{_p}g}":
+                        print(f"  [FAIL] tfno_rt_rollout.{_fk}.{_k}: {_v!r} vs "
+                              f"{_blk.get(_k)!r}")
+                        sweep_bad += 1
+        # The screen's space-inversion example. Nothing re-derived it: it was quoted in
+        # the manuscript, in the instrument README and nowhere else, and it shipped with
+        # the wrong velocity component's constant (velocity.1 is v_y at std index 2, not
+        # index 1 -- density holds slot zero).
+        _sf = reference.get("screen_space_flip")
+        if isinstance(_sf, dict) and "var_min" in _sf:
+            import json as _js
+            _bm = _js.load(open(os.path.join(str(FIXTURES), "generalization",
+                                             "benchmark_map",
+                                             "rayleigh_taylor_instability.json")))
+            _pv = _js.load(open(os.path.join(str(FIXTURES), "models",
+                                             "provenance_UNetClassic.json")))
+            _std = _pv["runs"][0]["normalization_std"]
+            _cand = [(fl["var_min"], f"{fn.split('_')[-1].replace('.hdf5','')}/{nm}")
+                     for fn, fe in _bm["files"].items()
+                     for nm, fl in fe["fields"].items() if fl.get("var_min")]
+            _v, _corner = min(_cand)
+            _nm = _corner.rsplit("/", 1)[-1]
+            _s = _std[1 + int(_nm.rsplit(".", 1)[-1])] if _nm.startswith("velocity.") \
+                else _std[0]
+            for _k, _got in (("corner", _corner), ("var_min", float(f"{_v:.4g}")),
+                             ("floor_share_raw_pct",
+                              float(f"{1e-7 / (_v + 1e-7) * 100:.4g}")),
+                             ("floor_share_zscored_pct",
+                              float(f"{1e-7 / (_v / _s ** 2 + 1e-7) * 100:.4g}"))):
+                if _sf.get(_k) != _got:
+                    print(f"  [FAIL] screen_space_flip.{_k}: {_got!r} vs {_sf.get(_k)!r}")
+                    sweep_bad += 1
+
+        # The TFNO cross-validation the manuscript cites (8.01e-8 against a 1e-5 tolerance).
+    # It was bound by NOTHING until a reviewer pointed that out: every leaf survived
+    # both-table mutation silently, and deleting the whole block still gave PASS. The
+    # values are re-parsed here from the packaged log, which is the artifact of record,
+    # so the manuscript cannot drift from it and the block cannot quietly vanish.
+    _cv = _req(reference, "tfno_crossvalidation_derived")
+    if _cv:
+        _log = FIXTURES / "models" / "tfno_rt_crossvalidation.log"
+        if not _log.exists():
+            print(f"  [FAIL] tfno cross-validation log missing at {_log}; the manuscript "
+                  f"cites its worst-case agreement")
+            sweep_bad += 1
+        else:
+            _txt = _log.read_text(encoding="utf-8", errors="replace")
+            _m = re.search(r"worst relative discrepancy:\s*([0-9.eE+-]+)\s+tol\s+([0-9.eE+-]+)",
+                           _txt)
+            _w = re.search(r"windows:\s*(\d+)", _txt)
+            if not (_m and _w):
+                print("  [FAIL] tfno cross-validation log does not carry a parseable verdict")
+                sweep_bad += 1
+            else:
+                for _k, _got in (("worst_relative_discrepancy", float(_m.group(1))),
+                                 ("tolerance", float(_m.group(2))),
+                                 ("n_windows", int(_w.group(1)))):
+                    _want = _cv.get(_k)
+                    if _want is None or f"{float(_want):.6g}" != f"{float(_got):.6g}":
+                        print(f"  [FAIL] tfno_crossvalidation.{_k}: released {_want!r} vs "
+                              f"log {_got!r}")
+                        sweep_bad += 1
+                if _cv.get("validated") is not ("VALIDATED end to end" in _txt):
+                    print(f"  [FAIL] tfno_crossvalidation.validated: released "
+                          f"{_cv.get('validated')!r} vs log verdict")
+                    sweep_bad += 1
+                if float(_m.group(1)) >= float(_m.group(2)):
+                    print(f"  [FAIL] tfno cross-validation did not pass its own tolerance: "
+                          f"{_m.group(1)} >= {_m.group(2)}")
+                    sweep_bad += 1
+    _disp_ref = _req(reference, "spatial_displacement_frames_derived")
     if _disp_ref:
         _sel = [r for r in _fixture_rows.get(("UNetClassic", "rollout"), [])
                 if 6 <= r["rollout_step"] <= 12]
@@ -728,7 +977,7 @@ def main() -> int:
                 print(f"  [FAIL] spatial displacement {_k}: {_got!r} vs {_disp_ref[_k]!r}")
                 sweep_bad += 1
 
-    _max_ref = reference.get("onestep_sampled_max_derived", {})
+    _max_ref = _req(reference, "onestep_sampled_max_derived")
     for model in ("UNetClassic", "UNetConvNext"):
         rows_ = _fixture_rows.get((model, "onestep"), [])
         if not rows_ or not dig(_max_ref, model):
@@ -770,7 +1019,7 @@ def main() -> int:
     import importlib
     rbmod = importlib.import_module("rb_checkpoint_audit")
     rb_now = rbmod.build()
-    rb_ref = reference.get("rb_checkpoint_audit", {})
+    rb_ref = _req(reference, "rb_checkpoint_audit")
     rb_bad = 0
     for model in sorted(rb_now["rollout_windows"]):
         for win in ("6-12", "13-30"):
@@ -947,6 +1196,17 @@ def main() -> int:
     _msg = _sc.stdout.strip().splitlines()[-1].replace("[selfclaims] ", "", 1)
     print(f"[selfclaims] {_msg}")
 
+    # A missing required block must gate the EXIT CODE, not merely print. The first
+    # version of `_req` recorded and printed the absence and returned {}, and the
+    # consuming stage then iterated nothing and reported OK -- so deleting
+    # `spatial_displacement_frames_derived` from both number tables printed a [FAIL]
+    # line and still exited 0. The regression test that was supposed to forbid this
+    # passed only because its byte padding was off by the length of the padding key
+    # itself, which tripped an unrelated size check. Both are fixed; this is the wiring.
+    if _missing_reference_blocks:
+        print(f"FAIL: {len(_missing_reference_blocks)} required reference block(s) absent: "
+              f"{', '.join(_missing_reference_blocks)}")
+        return 1
     print("PASS: repro-harness regenerates the frozen P3 values to a relative tolerance of 1e-4 (~4 sig figs).")
     return 0
 
