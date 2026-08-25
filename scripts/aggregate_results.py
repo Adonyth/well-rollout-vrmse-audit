@@ -33,6 +33,11 @@ HERE = Path(__file__).parent
 # lets the harness point the aggregator at the packaged fixtures/ directory
 # (or any fresh cold-run output directory) without changing call sites below.
 RESULTS_DIR = Path(os.environ.get("P3_RESULTS_DIR", str(HERE / "results")))
+# Output may be directed elsewhere than input. They were the same variable, so the
+# verifier could only regenerate by WRITING INTO the package it was verifying -- which
+# made the advertised one-command check impossible on a read-only checkout and modified
+# the artifact under review on every run.
+OUT_DIR = Path(os.environ.get("P3_SUMMARY_OUT", str(RESULTS_DIR)))
 FIELDS = ["density", "velocity_x", "velocity_y", "velocity_z"]
 EPS_LIB = 1e-7
 EPS_REQ = 1e-5
@@ -385,7 +390,7 @@ def main() -> None:
             "rollout": rollout_summary(rows, last_batch),
         }
 
-    out = RESULTS_DIR / "summary.json"
+    out = OUT_DIR / "summary.json"
     out.write_text(json.dumps(summary, indent=1) + "\n")
     print(f"wrote {out}")
 
@@ -420,7 +425,7 @@ def main() -> None:
 
 def emit_markdown() -> None:
     """Emit report-ready markdown tables from results/summary.json."""
-    s = json.loads((RESULTS_DIR / "summary.json").read_text())
+    s = json.loads((OUT_DIR / "summary.json").read_text())
     models = s["models"]
 
     def g(x: float | None, digits: int = 4) -> str:

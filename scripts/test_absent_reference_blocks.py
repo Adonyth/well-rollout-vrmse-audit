@@ -33,6 +33,28 @@ LANE = ROOT.parent
 NUMBERS = ("paper/extracted/numbers.json",
            "repro-harness/fixtures/numbers_reference.json")
 
+def _make_writable(root) -> None:
+    """A copy of a read-only checkout is a read-only copy.
+
+    `shutil.copytree` preserves mode bits, so every probe that copied the package and
+    then wrote to the copy died with PermissionError the moment a reviewer ran it from
+    the read-only checkout this package tells them to use. The advertised property was
+    real for verify.py and false for everything else that mutates a copy.
+    """
+    import os
+    import stat as _stat
+    for dirpath, dirnames, filenames in os.walk(root):
+        for name in dirnames + filenames:
+            p = os.path.join(dirpath, name)
+            try:
+                os.chmod(p, os.stat(p).st_mode | _stat.S_IWUSR)
+            except OSError:
+                pass
+    try:
+        os.chmod(root, os.stat(root).st_mode | _stat.S_IWUSR)
+    except OSError:
+        pass
+
 
 def main() -> int:
     sys.path.insert(0, str(ROOT))
@@ -48,6 +70,7 @@ def main() -> int:
         shutil.copytree(LANE, lane, ignore=shutil.ignore_patterns(
             "__pycache__", "*.pyc", ".git", "hf-cache", ".gate-work", "results",
             "tmp", "*.pdf"))
+        _make_writable(lane)
         pristine = {p: (lane / p).read_text() for p in NUMBERS}
         for key in keys:
             for p in NUMBERS:

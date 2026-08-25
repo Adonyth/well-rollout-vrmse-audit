@@ -746,30 +746,30 @@
   "UNetClassic": {
    "n_sampled_starts": 220,
    "eps_fix": 0.26139136914001,
-   "library": 1.5185422721957578,
-   "eps_1e9": 6.217690616098235,
+   "library": 1.5185422721957573,
+   "eps_1e9": 6.217690616098233,
    "definitional": 9.624689420229478
   },
   "TFNO": {
    "n_sampled_starts": 10,
    "eps_fix": 0.5995449864022391,
-   "library": 2.402164048136263,
-   "eps_1e9": 14.858082441464138,
-   "definitional": 38.68430405992501
+   "library": 2.4021640481362634,
+   "eps_1e9": 14.858082441464134,
+   "definitional": 38.68430405992502
   },
   "FNO": {
    "n_sampled_starts": 14,
    "eps_fix": 40.01531899910363,
    "library": 332.10706556312863,
    "eps_1e9": 1309.4131832188382,
-   "definitional": 1949.900089712029
+   "definitional": 1949.9000897120293
   },
   "UNetConvNext": {
    "n_sampled_starts": 5,
    "eps_fix": 0.459533404263642,
-   "library": 2.706116013903056,
+   "library": 2.7061160139030553,
    "eps_1e9": 10.08972042609607,
-   "definitional": 14.701250286040992
+   "definitional": 14.701250286040988
   }
  },
  "bessel_discrepancy_derived": {
@@ -2213,10 +2213,17 @@
   "sign_crossover_eps": 5.759e-11,
   "floor_sensitivity": 2.853,
   "published_over_ours_eps_lib": 4.603,
+  "definitional_over_ours_eps_lib": 4.821,
   "agreement_pct_at_definitional": 4.7,
   "published_over_ours_eps_lib_1sf": 4.6,
   "params": 302394124,
   "params_millions": 302
+ },
+ "census_coverage": {
+  "datasets_total": 17,
+  "datasets_strided": 7,
+  "coarsest_frames_kept": 3,
+  "coarsest_window_frames": 30
  },
  "screen_space_flip": {
   "corner": "0625/velocity.1",

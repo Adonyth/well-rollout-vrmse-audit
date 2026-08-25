@@ -19,9 +19,11 @@ Exit code 0 = all checked numbers match within tolerance; 1 = mismatch.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import os
+import pathlib
 import re
 import subprocess
 import sys
@@ -44,6 +46,26 @@ HERE = Path(__file__).parent
 # one in turn and requires a named failure, so a future stage that reverts to
 # `.get(k, {})` is caught by test rather than by the next reviewer.
 # ---------------------------------------------------------------------------
+# --- The shape contract's anchor -------------------------------------------------
+# fixtures/required_shape.json declares what the number table must contain. v59 left
+# that declaration bound to nothing but its own agreement with the tables it describes,
+# which is the same circularity it was added to break: edit all three consistently and
+# everything stays green. These two constants are the anchor. They live in source, so
+# changing what is required is a diff a reviewer reads, not a data edit nobody sees.
+# HONEST LIMIT, stated because this package's whole subject is packages that overstate
+# their own guarantees: nothing here binds verify.py. An edit that changes the tables,
+# the declaration AND these constants passes, and should -- that is what a legitimate
+# change to the required set looks like. What is no longer possible is doing it in data
+# alone.
+ONESTEP_COMPARED_MODELS = ("UNetClassic", "UNetConvNext", "FNO")
+REQUIRED_SHAPE_SHA256 = "baa03c3b01dcb22b1f60f49ff187c68540cc19eb41f84b03e298cab08c1c7a71"
+REQUIRED_SHAPE_CARDINALITY = {
+    "leaf_paths": 1515,
+    "top_level_blocks": 47,
+    "map_row_keys": 12,
+    "nullable_leaves": 11,
+}
+
 REQUIRED_REFERENCE_BLOCKS = (
     "gate2_alignment",
     "tfno_rt_rollout_derived",
@@ -57,6 +79,26 @@ REQUIRED_REFERENCE_BLOCKS = (
     "spatial_displacement_frames_derived",
     "onestep_sampled_max_derived",
     "rb_checkpoint_audit",
+    "screen_space_flip",
+)
+
+# Block-level presence is not enough: a stage can consume a present block and still
+# skip the LEAF it exists to check. Deleting any of these from both number files left
+# every gate printing PASS -- the only thing that noticed was a byte-count on the
+# fixtures tree quoted in the README, an incidental catcher that fires on any edit and
+# stands in for no particular check. A previous round bound these leaves against
+# PERTURBATION and proved that fired; it never tested ABSENCE, which is the failure
+# that actually occurred.
+REQUIRED_REFERENCE_LEAVES = (
+    "generalization.benchmark_map.datasets",
+    "gate3_library_equivalence.worst_rel_diff_vrmse",
+    "gate3_library_equivalence.worst_rel_diff_vrmse_raw",
+    "onestep_interp_extrapolation_derived.fno_lib_at_start_20",
+    "spatial_displacement_frames_derived.velocity_field_frames",
+    "screen_space_flip.corner",
+    "screen_space_flip.var_min",
+    "screen_space_flip.floor_share_raw_pct",
+    "screen_space_flip.floor_share_zscored_pct",
 )
 _missing_reference_blocks: list[str] = []
 
@@ -278,9 +320,19 @@ def sig4_equal(a: float, b: float) -> bool:
 
 
 def main() -> int:
+    # Recompute into a TEMPORARY directory, never into the shipped tree. This wrote
+    # `fixtures/summary.json` in place, so the one-command verification the README tells
+    # a reviewer to run could not complete on a read-only checkout -- and every run
+    # silently modified the artifact under review. Writing elsewhere also makes the
+    # comparison stronger: the packaged summary is now an input to check, not a file the
+    # verifier overwrites before reading it back.
+    import tempfile as _tf
+    _outdir = _tf.mkdtemp(prefix="p3-verify-")
     env = dict(os.environ)
-    env["P3_RESULTS_DIR"] = str(FIXTURES)
-    print(f"[1/3] Recomputing summary.json from packaged fixtures ({FIXTURES})...")
+    env["P3_RESULTS_DIR"] = str(FIXTURES)     # inputs: the packaged fixtures
+    env["P3_SUMMARY_OUT"] = _outdir           # output: a temporary directory
+    print(f"[1/3] Recomputing summary.json from packaged fixtures ({FIXTURES})")
+    print(f"      into a temporary directory; the package is not modified.")
     proc = subprocess.run(
         [sys.executable, str(SCRIPTS / "aggregate_results.py")],
         env=env, capture_output=True, text=True,
@@ -291,8 +343,210 @@ def main() -> int:
         print("FAIL: aggregate_results.py exited nonzero")
         return 1
 
-    summary = json.loads((FIXTURES / "summary.json").read_text())
+    # Read the FRESHLY recomputed summary, and additionally require that the packaged
+    # copy still matches it: the package must ship what its own code regenerates.
+    _fresh = pathlib.Path(_outdir) / "summary.json"
+    if not _fresh.exists():
+        print(f"FAIL: aggregate_results.py wrote no summary.json into {_outdir}")
+        return 1
+    summary = json.loads(_fresh.read_text())
+    _packaged = FIXTURES / "summary.json"
+    if not _packaged.exists():
+        print("FAIL: fixtures/summary.json is not in the package")
+        return 1
+    # Everything the shipped code regenerates must MATCH the shipped copy. The packaged
+    # copy is a superset: it was produced from richer fixtures, and the shipped ones were
+    # trimmed of `persistence_mse` (Lane-3 regression curves that no check here consumes),
+    # so those leaves cannot be regenerated. Equality would fail on that alone; silence
+    # would hide it. Extra packaged leaves are counted and printed instead.
+    def _leaves(o, p=""):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                yield from _leaves(v, f"{p}.{k}" if p else k)
+        elif isinstance(o, list):
+            for i, v in enumerate(o):
+                yield from _leaves(v, f"{p}[{i}]")
+        else:
+            yield p, o
+    _fresh_l = dict(_leaves(summary))
+    _pack_l = dict(_leaves(json.loads(_packaged.read_text())))
+    _absent = sorted(set(_fresh_l) - set(_pack_l))
+    def _same(a, b):
+        # NaN never equals itself, and these summaries are full of legitimate NaNs
+        # (empty conditioned subsets). Comparing with != reported 163 differences
+        # where every pair was nan vs nan.
+        if isinstance(a, float) and isinstance(b, float) and a != a and b != b:
+            return True
+        return a == b
+    _differ = sorted(k for k in set(_fresh_l) & set(_pack_l) if not _same(_fresh_l[k], _pack_l[k]))
+    if _absent or _differ:
+        print(f"FAIL: regenerated summary disagrees with the packaged copy — "
+              f"{len(_absent)} regenerated leaf/leaves absent from it, {len(_differ)} differing")
+        for _k in (_absent[:3] + _differ[:3]):
+            print(f"       {_k}")
+        return 1
+    _extra = len(set(_pack_l) - set(_fresh_l))
+    if _extra:
+        print(f"      packaged summary carries {_extra} leaves the trimmed fixtures cannot "
+              f"regenerate (persistence curves; consumed by no check here)")
     reference = json.loads(REFERENCE.read_text())
+    # Required-input validation runs BEFORE any stage. Run at the tail it was
+    # unreachable whenever an earlier stage exited first: deleting a required
+    # block was 'caught' only by a byte-count on the fixtures tree, which names
+    # no block and fires on any edit at all.
+
+    # Leaf-level presence, checked here rather than inside each stage, because a stage
+    # that consumes a present block can still skip the leaf it exists to check.
+    # `dig` RAISES on a missing path rather than returning None, so probing with it
+    # crashed instead of reporting -- exit 1 with no named block, which reads to a
+    # reviewer as "something broke", not "a required input is missing".
+    def _probe(dotted):
+        cur = reference
+        for part in dotted.split("."):
+            if not isinstance(cur, dict) or part not in cur:
+                return None
+            cur = cur[part]
+        return cur
+    # Non-empty is not complete. The paper says "all seventeen datasets", so a map
+    # missing one row is a false census, not a smaller one -- and deleting a single row
+    # was the one omission the presence check alone did not catch.
+    _map_rows = _probe("generalization.benchmark_map.datasets") or {}
+    if len(_map_rows) != 17:
+        print(f"  [FAIL] benchmark_map.datasets holds {len(_map_rows)} datasets; the paper "
+              f"claims a census of all seventeen")
+        return 1
+    _no_share = [k for k, v in _map_rows.items()
+                 if not isinstance(v, dict) or v.get("floor_share_pct") is None]
+    if _no_share:
+        print(f"  [FAIL] benchmark_map rows missing floor_share_pct: {', '.join(sorted(_no_share))}")
+        return 1
+    # Block absence must speak with ONE voice: the sentinel `_req` emits, which the
+    # absence regression test requires by exact string. A parallel message naming the
+    # same key is not the same thing -- the test exists precisely to forbid "some
+    # failure plus the key appearing somewhere in stdout".
+    for _bk in REQUIRED_REFERENCE_BLOCKS:
+        _req(reference, _bk)
+    if _missing_reference_blocks:
+        print(f"FAIL: {len(_missing_reference_blocks)} required reference block(s) absent: "
+              f"{', '.join(_missing_reference_blocks)}")
+        return 1
+    # THE GENERAL CONTRACT. Declaring the particular leaves a reviewer happened to name
+    # is whack-a-mole: two rounds of that left 28 of 32 top-level blocks and 11 of 12
+    # per-row map keys still deletable from BOTH number files with every gate green,
+    # because the two files only had to agree with EACH OTHER -- and a paired deletion
+    # keeps them agreeing. v59 answered that with `fixtures/required_shape.json` and
+    # got the SAME defect one level up: a third file that also only had to agree, so a
+    # size-preserving edit of all three deleted 29 of 47 blocks and 11 of 12 map-row
+    # keys and still reached global PASS. What follows binds the declaration itself --
+    # by digest and by cardinality, against constants compiled into THIS file. State
+    # plainly what that does and does not buy: omission is now a source edit to the
+    # reviewed artifact instead of a data edit. It is not impossible; it is visible.
+    _shape_p = FIXTURES / "required_shape.json"
+    if not _shape_p.exists():
+        print("FAIL: fixtures/required_shape.json is missing; the absence contract is void")
+        return 1
+    _shape_raw = _shape_p.read_bytes()
+    _shape_sha = hashlib.sha256(_shape_raw).hexdigest()
+    if _shape_sha != REQUIRED_SHAPE_SHA256:
+        print(f"FAIL: fixtures/required_shape.json has SHA-256 {_shape_sha}, not the "
+              f"{REQUIRED_SHAPE_SHA256} this verify.py was written against; the absence "
+              f"contract is unbound")
+        return 1
+    _shape = json.loads(_shape_raw)
+    for _card_key, _card_field in (("leaf_paths", "n_leaves"),
+                                   ("top_level_blocks", "n_top_level_blocks"),
+                                   ("map_row_keys", "n_map_row_keys"),
+                                   ("nullable_leaves", "n_nullable_leaves")):
+        _want_n = REQUIRED_SHAPE_CARDINALITY[_card_key]
+        _actual = len(_shape.get(_card_key, ()))
+        _declared = _shape.get(_card_field)
+        if _actual != _want_n:
+            print(f"FAIL: required_shape.{_card_key} holds {_actual} entries; verify.py "
+                  f"was written against {_want_n}")
+            return 1
+        if _declared != _want_n:
+            print(f"FAIL: required_shape.{_card_field} says {_declared!r}; the list holds "
+                  f"{_actual} and verify.py expects {_want_n}")
+            return 1
+    def _all_leaf_items(o, p=""):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                yield from _all_leaf_items(v, f"{p}.{k}" if p else k)
+        elif isinstance(o, list):
+            for i, v in enumerate(o):
+                yield from _all_leaf_items(v, f"{p}[{i}]")
+        else:
+            yield p, o
+
+    def _all_leaves(o, p=""):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                yield from _all_leaves(v, f"{p}.{k}" if p else k)
+        elif isinstance(o, list):
+            for i, v in enumerate(o):
+                yield from _all_leaves(v, f"{p}[{i}]")
+        else:
+            yield p
+    _have = set(_all_leaves(reference))
+    _want = set(_shape["leaf_paths"])
+    _gone = sorted(_want - _have)
+    if _gone:
+        print(f"FAIL: {len(_gone)} declared reference leaf/leaves absent from the number "
+              f"table (see fixtures/required_shape.json)")
+        for _g in _gone[:6]:
+            print(f"       {_g}")
+        return 1
+    # BOTH directions. Checking only declared-minus-present lets a leaf be added without
+    # ever being declared or compared, and leaves the declaration free to drift below the
+    # table it claims to describe.
+    _undeclared = sorted(_have - _want)
+    if _undeclared:
+        print(f"FAIL: {len(_undeclared)} reference leaf/leaves are not declared in "
+              f"fixtures/required_shape.json; regenerate it and re-pin its digest")
+        for _u in _undeclared[:6]:
+            print(f"       {_u}")
+        return 1
+    # NULL IS A VALUE, AND ABSENCE OF A VALUE IS ABSENCE. A path check alone cannot see
+    # this: v59 declared every leaf path and still accepted 18 of them set to null in
+    # BOTH tables, whereupon three stages skipped their comparisons and printed OK --
+    # [gate3] announced "all compared tensors bit-identical" having compared none.
+    # Which leaves may be null is therefore itself declared and cardinality-bound.
+    _nullable = set(_shape["nullable_leaves"])
+    _observed_null = {_p for _p, _v in _all_leaf_items(reference) if _v is None}
+    _undeclared_null = sorted(_observed_null - _nullable)
+    if _undeclared_null:
+        print(f"FAIL: {len(_undeclared_null)} reference leaf/leaves are null but not "
+              f"declared nullable; a null leaf is a missing value, not a present one")
+        for _n in _undeclared_null[:6]:
+            print(f"       {_n}")
+        return 1
+    _stale_null = sorted(_nullable - _observed_null)
+    if _stale_null:
+        print(f"FAIL: {len(_stale_null)} leaf/leaves declared nullable are not null; the "
+              f"declaration is stale: {', '.join(_stale_null[:4])}")
+        return 1
+    _blocks_gone = sorted(set(_shape["top_level_blocks"]) - set(reference))
+    if _blocks_gone:
+        print(f"FAIL: declared top-level block(s) absent: {', '.join(_blocks_gone)}")
+        return 1
+    _blocks_undeclared = sorted(set(reference) - set(_shape["top_level_blocks"]))
+    if _blocks_undeclared:
+        print(f"FAIL: undeclared top-level block(s) present: "
+              f"{', '.join(_blocks_undeclared)}")
+        return 1
+    _rowkeys = set(_shape["map_row_keys"])
+    for _name, _row in (_probe("generalization.benchmark_map.datasets") or {}).items():
+        _miss = sorted(_rowkeys - set(_row if isinstance(_row, dict) else {}))
+        if _miss:
+            print(f"FAIL: benchmark_map row {_name} is missing {', '.join(_miss)}")
+            return 1
+
+    # Leaves are checked only once every parent block is known present.
+    _missing_leaves = [d for d in REQUIRED_REFERENCE_LEAVES if _probe(d) in (None, {}, [])]
+    if _missing_leaves:
+        print(f"FAIL: {len(_missing_leaves)} required reference leaf/leaves absent or empty: "
+              f"{', '.join(_missing_leaves)}")
+        return 1
 
     print("[2/3] Checking recomputed values against paper/extracted/numbers.json (rel tol 1e-4, ~4 sig figs)...")
     n_ok, n_bad = 0, 0
@@ -398,7 +652,11 @@ def main() -> int:
                 print(f"  [FAIL] gate3 {dset} window {w.get('start')}: missing {sorted(missing)}")
                 g3_bad += 1
         ref_declared = g3ref.get("datasets", {}).get(dset, {}).get("tensors_compared")
-        if ref_declared is not None and sorted(ref_declared) != sorted(declared):
+        if ref_declared is None:
+            print(f"  [FAIL] gate3 {dset}: numbers.json declares no tensors_compared; "
+                  f"nothing was compared")
+            g3_bad += 1
+        elif sorted(ref_declared) != sorted(declared):
             print(f"  [FAIL] gate3 {dset}: tensors_compared {declared} vs numbers.json {ref_declared}")
             g3_bad += 1
         tens = [w[k] for w in d["windows"] for k in _TKEY.values() if k in w]
@@ -652,7 +910,14 @@ def main() -> int:
             _eq = (f"{float(_a):.4g}" == f"{float(_b):.4g}"
                    if isinstance(_a, (int, float)) and isinstance(_b, (int, float))
                    else _a == _b)
-            if _a is not None and _b is not None and not _eq:
+            # A null on either side used to skip this comparison silently, so nulling
+            # four leaves left [gate3] printing "all compared tensors bit-identical"
+            # having compared none of them. Absent is now a failure, not a skip.
+            if _a is None or _b is None:
+                print(f"  [FAIL] gate3 block {_path}: value absent "
+                      f"(reference {_a!r}, fixture {_b!r}); nothing was compared")
+                map_bad += 1
+            elif not _eq:
                 print(f"  [FAIL] gate3 block {_path}: {_a!r} vs fixture {_b!r}")
                 map_bad += 1
     if map_bad:
@@ -718,6 +983,7 @@ def main() -> int:
     _sweep_ref = _req(reference, "unetclassic_floor_sweep_derived")
     _mean_ref = _req(reference, "onestep_sampled_mean_by_floor_derived")
     sweep_bad = 0
+    _n_sweep_cells = 0
     if not _sweep_ref or not _mean_ref:
         print("FAIL: floor-sweep / sampled-mean reference blocks missing")
         return 1
@@ -739,6 +1005,7 @@ def main() -> int:
                    for rs in by_traj.values()]
             got = sum(per) / len(per)
             want = dig(_sweep_ref, f"{wname}.{fname}")
+            _n_sweep_cells += 1
             if not sig4_equal(got, want):
                 print(f"  [FAIL] floor sweep UNetClassic {wname} {fname}: {got!r} vs {want!r}")
                 sweep_bad += 1
@@ -977,10 +1244,24 @@ def main() -> int:
                 print(f"  [FAIL] spatial displacement {_k}: {_got!r} vs {_disp_ref[_k]!r}")
                 sweep_bad += 1
 
+    _n_sampled_compared = 0
     _max_ref = _req(reference, "onestep_sampled_max_derived")
-    for model in ("UNetClassic", "UNetConvNext"):
+    # ONESTEP_COMPARED_MODELS is the declared scope of this stage, and the table is
+    # checked against it below. v59 iterated two models while the table carried three,
+    # so every FNO leaf here -- max_lib 730.4, max_defn 8401 -- was stored, quoted, and
+    # never recomputed, with no line of output admitting it.
+    _max_models = sorted(k for k in _max_ref if not k.startswith("_"))
+    if _max_models != sorted(ONESTEP_COMPARED_MODELS):
+        print(f"  [FAIL] onestep_sampled_max_derived carries {_max_models}; this stage "
+              f"compares {sorted(ONESTEP_COMPARED_MODELS)}. A model in the table that no "
+              f"stage recomputes must not pass silently.")
+        sweep_bad += 1
+    for model in ONESTEP_COMPARED_MODELS:
         rows_ = _fixture_rows.get((model, "onestep"), [])
         if not rows_ or not dig(_max_ref, model):
+            print(f"  [FAIL] onestep sampled {model}: declared compared but "
+                  f"{'no fixture rows' if not rows_ else 'no reference block'}")
+            sweep_bad += 1
             continue
         vals_lib = [_field_mean_vrmse(r, 1e-7) for r in rows_]
         vals_fix = [_field_mean_vrmse(r, 1e-5) for r in rows_]
@@ -994,19 +1275,28 @@ def main() -> int:
                           sum(_field_mean_vrmse(r, 0.0) > 10 for r in rows_))):
             want = dig(_max_ref, f"{model}.{key}")
             if want is None:
+                print(f"  [FAIL] onestep sampled {model} {key}: absent from the number "
+                      f"table; nothing was compared")
+                sweep_bad += 1
                 continue
             # These leaves are STORED rounded to four significant figures by the extractor,
             # so compare at that precision rather than with a 1e-4 relative tolerance.
             ok = (got == want if isinstance(want, int)
                   else f"{got:.4g}" == f"{float(want):.4g}")
+            _n_sampled_compared += 1
             if not ok:
                 print(f"  [FAIL] onestep sampled {model} {key}: {got!r} vs {want!r}")
                 sweep_bad += 1
     if sweep_bad:
         print(f"FAIL: floor sweep / sampled means disagree with the reference ({sweep_bad})")
         return 1
-    print("[sweep] floor sweep + definitional-limit one-step means OK "
-          "(8 sweep cells, 12 sampled means, re-derived from the packaged scalars)")
+    # COUNTED, not asserted. This line used to carry a hard-coded "12 sampled means"; the
+    # loop above it compared whatever it compared, and the two were free to diverge -- as
+    # they did the moment a third model entered the table. A stage that reports its own
+    # coverage must report the coverage it achieved.
+    print(f"[sweep] floor sweep + definitional-limit one-step means OK "
+          f"({_n_sweep_cells} sweep cells, {_n_sampled_compared} sampled means over "
+          f"{len(ONESTEP_COMPARED_MODELS)} models, re-derived from the packaged scalars)")
 
     # Rayleigh-Benard checkpoint audit (second audited dataset, paper section 'generalize'):
     # re-derive the cited cells from the packaged per-window scalars and compare with

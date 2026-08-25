@@ -15,7 +15,7 @@ None of those is a wrong result. Each is the package asserting something untrue
 about itself, which is the exact failure mode the paper is about, so it is worth a
 machine check rather than a reviewer's attention.
 
-Ten families are checkable without judgement:
+Eleven families are checkable without judgement:
 
   paths     -- every repo-relative path named in the prose or in a docstring resolves,
                at the location it names when it names one
@@ -31,6 +31,9 @@ Ten families are checkable without judgement:
   producers -- no shipped script defaults to writing outside the package
   commands  -- no documented command carries an abbreviated or placeholder value
   deps      -- the declared dependency floor admits the APIs the scripts call
+  contract  -- the absence contract's own self-description is true: verify.py's pinned
+               digest and cardinalities match the shipped required_shape.json, and that
+               file no longer asserts a protection that does not exist
 
 **What this does not do.** It is one-directional: it checks that what the package
 says is true, never that everything the package ships is said. It cannot judge whether
@@ -47,6 +50,7 @@ Run standalone (`python3 scripts/check_self_claims.py`) or via `verify.py`.
 from __future__ import annotations
 
 import gzip
+import hashlib
 import json
 import pathlib
 import re
@@ -338,6 +342,37 @@ def _conditional_stages() -> set[str]:
     return out
 
 
+def _number_words(limit: int = 99) -> dict[str, int]:
+    """Every number word up to `limit`, generated.
+
+    This was a hand-written literal that stopped at whatever the counts happened to be
+    when someone last extended it. Twice that cost a real defect: first the table had no
+    hyphenated entries at all, so every count from twenty-one up went unchecked while the
+    guard printed a clean pass over a live wrong count; then the extended table stopped at
+    "twenty-six" and the next mutation added took the count to twenty-eight, whereupon the
+    lookup returned None and the rule reported a mismatch against surfaces that were
+    correct. A table that must be edited whenever the thing it measures changes is not a
+    check, it is a second copy of the number.
+    """
+    ones = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
+            "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
+            "sixteen", "seventeen", "eighteen", "nineteen"]
+    tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy",
+            "eighty", "ninety"]
+    out = {w: i for i, w in enumerate(ones) if i <= limit}
+    for n in range(20, min(limit, 99) + 1):
+        t_, o_ = divmod(n, 10)
+        out[tens[t_] if not o_ else f"{tens[t_]}-{ones[o_]}"] = n
+    return out
+
+
+# ONE table, for both count rules. There were two, local to each rule, and only one was
+# extended when hyphenated numbers arrived -- so the rule reading README/MANIFEST looked
+# up "twenty-four", got None, and reported a mismatch against a surface that was right,
+# while the rule reading the manuscript could not see the surface that was wrong.
+_NUMBER_WORDS = _number_words()
+
+
 def check_own_counts() -> list[str]:
     """The guard's statements about its OWN size must equal its own tables.
 
@@ -346,9 +381,6 @@ def check_own_counts() -> list[str]:
     false self-descriptions inside the artifact whose sole purpose is catching false
     self-descriptions, on surfaces it sweeps, all passing.
     """
-    _WORDS = {"three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8,
-              "nine": 9, "ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13,
-              "fourteen": 14, "fifteen": 15, "sixteen": 16}
     src = (ROOT / "scripts" / "check_self_claims.py").read_text(encoding="utf-8")
     doc = src.split('"""')[1] if '"""' in src else ""
     n_fam = len(re.findall(r"^  [a-z]+ *-- ", doc, re.M))
@@ -358,7 +390,7 @@ def check_own_counts() -> list[str]:
     m = re.search(r"^([A-Za-z]+) families are checkable", doc, re.M)
     if not m:
         bad.append("check_self_claims.py: docstring no longer states its family count")
-    elif _WORDS.get(m.group(1).lower()) != n_fam:
+    elif _NUMBER_WORDS.get(m.group(1).lower()) != n_fam:
         bad.append(f"check_self_claims.py: docstring says {m.group(1)!r} families; it lists {n_fam}")
     # and the families must account for every rule that actually runs
     listed = {m.lower() for m in re.findall(r"^  ([a-z]+) *-- ", doc, re.M)}
@@ -372,8 +404,8 @@ def check_own_counts() -> list[str]:
 
     for rel in ("README.md", "MANIFEST.md"):
         text = (ROOT / rel).read_text(encoding="utf-8")
-        for w in re.findall(r"--validate-guard`? reintroduces ([a-z]+) real", text):
-            if _WORDS.get(w) != n_mut:
+        for w in re.findall(r"--validate-guard`? reintroduces ([a-z-]+) real", text):
+            if _NUMBER_WORDS.get(w) != n_mut:
                 bad.append(f"{rel}: says --validate-guard reintroduces {w!r} discrepancies; "
                            f"the table holds {n_mut}")
     return bad
@@ -387,11 +419,6 @@ def check_own_counts_manuscript() -> list[str]:
     being counted clean, so a mutation of the manuscript's own family count could
     not be caught there and no skip was reported.
     """
-    _WORDS = {"three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8,
-              "nine": 9, "ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13,
-              "fourteen": 14, "fifteen": 15, "sixteen": 16, "seventeen": 17,
-              "eighteen": 18, "nineteen": 19, "twenty": 20, "twenty-one": 21,
-              "twenty-two": 22, "twenty-three": 23, "twenty-four": 24}
     src = (ROOT / "scripts" / "check_self_claims.py").read_text(encoding="utf-8")
     doc = src.split('"""')[1] if '"""' in src else ""
     n_fam = len(re.findall(r"^  ([a-z]+) *-- ", doc, re.M))
@@ -406,10 +433,10 @@ def check_own_counts_manuscript() -> list[str]:
     for tex in sorted((ROOT.parent / "paper" / "tex").glob("*.tex")):
         t = tex.read_text(encoding="utf-8")
         for w in re.findall(r"holds ([a-z]+) rule families", t):
-            if _WORDS.get(w) != n_fam:
+            if _NUMBER_WORDS.get(w) != n_fam:
                 bad.append(f"{tex.name}: says {w!r} rule families; the guard has {n_fam}")
-        for w in re.findall(r"reintroduces ([a-z]+) real past discrepancies", t):
-            if _WORDS.get(w) != n_mut:
+        for w in re.findall(r"reintroduces ([a-z-]+) real past discrepancies", t):
+            if _NUMBER_WORDS.get(w) != n_mut:
                 bad.append(f"{tex.name}: says {w!r} reintroduced discrepancies; "
                            f"the table holds {n_mut}")
     return bad
@@ -888,7 +915,7 @@ def _published_constants(ref) -> set:
 
 
 def check_floor_declarations() -> list[str]:
-    """A floor-dependent value in the manuscript must name its floor nearby.
+    r"""A floor-dependent value in the manuscript must name its floor nearby.
 
     This is the defect class that led four consecutive review rounds: a score, a
     ratio of scores, or a statistic computed on scores, quoted without saying at
@@ -1249,6 +1276,79 @@ check_floor_declarations._needs_source_repo = lambda: (
 _LAST_SKIPPED: list[str] = []
 
 
+def check_required_shape_binding() -> list[str]:
+    """The absence contract's own self-description must be true.
+
+    v59 added `fixtures/required_shape.json` and shipped it describing itself as
+    "size-bound in the self-claims guard" and as a surface "check_self_claims binds to
+    the manifest". Neither was true: the file was referenced by verify.py alone, and
+    this guard -- the one named in the claim -- had no rule that so much as mentioned
+    it. The claim about a protection was the protection. This rule is that protection.
+
+    Scope, stated exactly: it checks that verify.py's pinned digest matches the shipped
+    file, that the four cardinality constants match the four lists, and that the file's
+    self-description does not re-assert the two claims that were false. It does NOT
+    establish that the declared universe is the right one.
+    """
+    bad: list[str] = []
+    shape_p = ROOT / "fixtures" / "required_shape.json"
+    verify_p = ROOT / "verify.py"
+    if not shape_p.exists() or not verify_p.exists():
+        return ["required_shape.json or verify.py is missing"]
+    raw = shape_p.read_bytes()
+    shape = json.loads(raw)
+    vtext = verify_p.read_text(encoding="utf-8")
+    m = re.search(r'REQUIRED_SHAPE_SHA256\s*=\s*"([0-9a-f]{64})"', vtext)
+    if not m:
+        bad.append("verify.py declares no REQUIRED_SHAPE_SHA256 to bind the shape contract")
+    elif m.group(1) != hashlib.sha256(raw).hexdigest():
+        bad.append(f"verify.py pins REQUIRED_SHAPE_SHA256 {m.group(1)[:16]}...; the shipped "
+                   f"required_shape.json hashes to {hashlib.sha256(raw).hexdigest()[:16]}...")
+    cm = re.search(r"REQUIRED_SHAPE_CARDINALITY\s*=\s*\{(.*?)\}", vtext, re.S)
+    if not cm:
+        bad.append("verify.py declares no REQUIRED_SHAPE_CARDINALITY")
+    else:
+        pinned = {k: int(v) for k, v in re.findall(r'"(\w+)":\s*(\d+)', cm.group(1))}
+        for key, field in (("leaf_paths", "n_leaves"),
+                           ("top_level_blocks", "n_top_level_blocks"),
+                           ("map_row_keys", "n_map_row_keys"),
+                           ("nullable_leaves", "n_nullable_leaves")):
+            actual = len(shape.get(key, ()))
+            if pinned.get(key) != actual:
+                bad.append(f"verify.py pins {key}={pinned.get(key)}; the file holds {actual}")
+            if shape.get(field) != actual:
+                bad.append(f"required_shape.{field} says {shape.get(field)!r}; the list holds {actual}")
+    what = shape.get("_what", "")
+    for dead in ("size-bound in the self-claims guard",
+                 "check_self_claims binds its size to the manifest"):
+        if dead in what:
+            bad.append(f"required_shape._what still asserts {dead!r}, which is not true")
+    return bad
+
+
+def _make_writable(root) -> None:
+    """A copy of a read-only checkout is a read-only copy.
+
+    `shutil.copytree` preserves mode bits, so every probe that copied the package and
+    then wrote to the copy died with PermissionError the moment a reviewer ran it from
+    the read-only checkout this package tells them to use. The advertised property was
+    real for verify.py and false for everything else that mutates a copy.
+    """
+    import os
+    import stat as _stat
+    for dirpath, dirnames, filenames in os.walk(root):
+        for name in dirnames + filenames:
+            p = os.path.join(dirpath, name)
+            try:
+                os.chmod(p, os.stat(p).st_mode | _stat.S_IWUSR)
+            except OSError:
+                pass
+    try:
+        os.chmod(root, os.stat(root).st_mode | _stat.S_IWUSR)
+    except OSError:
+        pass
+
+
 def _rules() -> list:
     """The rule functions `run` executes. Single source for what runs AND what is
     reported: an earlier version derived the count from the module docstring's bullet
@@ -1267,6 +1367,7 @@ def _rules() -> list:
         ("markers", check_withdrawal_markers),
         ("producers", check_producer_targets), ("producers", check_producer_relations),
         ("deps", check_deps),
+        ("contract", check_required_shape_binding),
     ]
 
 
@@ -1333,11 +1434,11 @@ _MUTATIONS = [
     # check_floor_declarations, whose own guards shipped broken twice. Each mutation
     # below was confirmed to fire the named rule and only then added.
     ("the guard's own family count misstated in its docstring",          # check_own_counts
-     "scripts/check_self_claims.py", "Ten families are checkable", "Nine families are checkable"),
+     "scripts/check_self_claims.py", "Eleven families are checkable", "Ten families are checkable"),
     ("the manuscript misstating how many rule families the guard holds",  # ..._manuscript
-     "../paper/tex/appendix.tex", "holds ten rule families", "holds nine rule families"),
+     "../paper/tex/appendix.tex", "holds eleven rule families", "holds ten rule families"),
     ("a quoted fixtures byte total that is not the tree's actual size",   # check_quoted_sizes
-     "README.md", "957,824", "957,300"),
+     "README.md", "1,069,993", "957,300"),
     ("a factor claim that no longer follows from its two operands",       # check_factor_claims
      "../paper/tex/sec1_intro.tex", "factor of $8.542$", "factor of $8.642$"),
     ("a floor-dependent value quoted with no floor named",                # check_floor_declarations
@@ -1354,6 +1455,29 @@ _MUTATIONS = [
      "instrument/README.md", "## Scope", "## Scopes"),
     ("the MANIFEST attributing a fixture to another shipped script",      # producer_relations
      "MANIFEST.md", "`scripts/rb_census.py`", "`scripts/aggregate_results.py`"),
+    # The mutation-count branch had NO mutation, and its regex could not match a
+    # hyphenated number word, so every count from twenty-one up went unchecked while the
+    # guard printed a clean pass over a live wrong count in the manuscript. Two mutations
+    # now exercise it, one per surface family, both with hyphenated words.
+    ("a hyphenated mutation count stale on a package surface",            # check_own_counts
+     "README.md", "reintroduces twenty-eight real", "reintroduces twenty-two real"),
+    ("a hyphenated mutation count stale in the manuscript",   # check_own_counts_manuscript
+     "../paper/tex/appendix.tex", "reintroduces twenty-eight real past discrepancies",
+     "reintroduces twenty-two real past discrepancies"),
+    # The absence contract's binding. v59's declaration file described a protection that
+    # did not exist and no mutation could reach the claim, because no rule read it.
+    # Anchored on the KEY, not on the count. An anchor that quotes the number it guards
+    # goes stale the moment that number legitimately changes -- which happened on the very
+    # next edit -- and a mutation whose anchor is missing tests nothing while the validator
+    # reports it as a failure of the package rather than of itself.
+    ("the shape declaration losing the cardinality field that binds it",  # ..._shape_binding
+     "fixtures/required_shape.json", '"n_leaves"', '"n_leafs"'),
+    # Anchored on the declaration's prose, not on the digest: an anchor that quotes two
+    # hex characters of the value it guards goes stale the first time the value changes,
+    # and a mutation whose anchor is missing is a mutation that tests nothing.
+    ("the shape declaration edited without re-pinning verify.py's digest",   # ..._shape_binding
+     "fixtures/required_shape.json", "Every leaf path the frozen",
+     "every leaf path the frozen"),
 ]
 
 # Which rule MUST catch each mutation, by label. "Some rule fired" is too weak: it lets a
@@ -1383,6 +1507,8 @@ _MUTATION_OWNER = {
     "a floor-dependent value quoted with no floor named": "check_floor_declarations",
     "a documented stage tag that no stage in verify.py emits": "check_stage_tags",
     "two documented stages listed out of execution order": "check_transcript_order",
+    "a hyphenated mutation count stale on a package surface": "check_own_counts",
+    "a hyphenated mutation count stale in the manuscript": "check_own_counts_manuscript",
     "one shipped copy of the instrument edited without the other": "check_instrument_copies",
     "the MANIFEST attributing a fixture to another shipped script": "check_producer_relations",
 }
@@ -1421,6 +1547,7 @@ def validate_guard_fires() -> int:
                         skip.add(n)
                 return skip
             shutil.copytree(ROOT.parent, root, ignore=_ignore)
+            _make_writable(root)
             d = root / ROOT.name
             f = (root / rel[len("../"):]) if rel.startswith("../") else (d / rel)
             # A mutation is unreachable when its OWNING RULE cannot run in this tree,

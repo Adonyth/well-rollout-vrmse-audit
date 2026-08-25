@@ -98,9 +98,9 @@ repro-harness/
       spatial_mean_baseline.py <- trivial spatial-mean-predictor VRMSE baseline
       gate3_assemble.py        <- assembles the Gate-3 fixture from the two per-dataset outputs
       check_self_claims.py     <- checks the package's prose/docstrings against the tree they describe
-                                  (`--validate-guard` reintroduces twenty-four real discrepancies, each must
-                                   be caught BY THE RULE NAMED FOR IT; nineteen run in a standalone clone,
-                                   five skipped because their subject or owning rule is outside the package)
+                                  (`--validate-guard` reintroduces twenty-eight real discrepancies, each must
+                                   be caught BY THE RULE NAMED FOR IT; twenty-two run in a standalone clone,
+                                   six skipped because their subject or owning rule is outside the package)
       check_unsourced.py       <- numbers-must-trace-to-numbers.json checker (paper-writing discipline)
       test_lastbatch_agg.py    <- reproduces the issue-#78 last-batch aggregation defect
       test_vrmse_epsilon.py    <- reproduces the issue-#75 floor defect
@@ -141,7 +141,7 @@ repro-harness/
 
 **Tier 1 (what `verify.py` runs today):** the raw per-frame/per-window
 scalars (MSE, target/prediction variance — never raw field tensors) are
-packaged in `fixtures/` (957,824 bytes in total, of which the RT per-frame/per-window scalars are 240,823; the rest is the Rayleigh-Benard checkpoint rows, the benchmark-wide census, and the Gate-2/Gate-3/provenance fixtures). `verify.py` re-derives the 142 enumerated value checks
+packaged in `fixtures/` (1,069,993 bytes in total, of which the RT per-frame/per-window scalars are 240,823; the rest is the Rayleigh-Benard checkpoint rows, the benchmark-wide census, and the Gate-2/Gate-3/provenance fixtures). `verify.py` re-derives the 142 enumerated value checks
 from those scalars via `aggregate_results.py` and diffs against the
 frozen paper numbers. This is a genuine recomputation, not a file diff: the
 aggregation (eps variants, rollout window means, one-step interpolation,

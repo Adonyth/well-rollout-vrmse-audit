@@ -365,31 +365,74 @@ def validate_guard_fires():
         return {k: good for k in keys}
     # Flip the grading the (a) fix introduced. If the guard cannot see this, the
     # misdeclared/declared legs assert nothing -- which is exactly how it shipped.
+    # The mutation runs against a COPY of the package on a throwaway sys.path entry.
+    # This block used to rewrite normscreen/screen.py in place and restore it in a
+    # `finally`: it changed the shipped instrument's bytes on every successful run, it
+    # crashed with PermissionError on the read-only checkout this package tells reviewers
+    # to use, and any interruption between the two writes left the released instrument
+    # silently mutated -- desynchronising the two packaged copies that
+    # `check_instrument_copies` exists to compare. A test must not edit the artifact
+    # under test.
+    import importlib
     import normscreen.screen as S3
+    import shutil
+    import tempfile
     _src = pathlib.Path(S3.__file__).read_text()
-    try:
-        _mut = _src.replace('notes.append(("assumed",\n                    f"{k}{list(sh)} read as a scalar',
-                            'notes.append(("asserted",\n                    f"{k}{list(sh)} read as a scalar')
-        if _mut != _src:
-            pathlib.Path(S3.__file__).write_text(_mut)
-            import importlib
-            importlib.reload(S3)
-            import normscreen as _ns
-            importlib.reload(_ns)
-            import io, contextlib
-            buf = io.StringIO()
-            with contextlib.redirect_stdout(buf):
-                n_grade = check_no_layout_can_silently_downgrade_a_degenerate_field()
-            bad += _check("guard fires when the inferred grading is flipped to 'asserted'",
-                          n_grade > 0, f"{n_grade} failures")
-        else:
-            bad += _check("grading mutation applied", False, "anchor not found")
-    finally:
-        pathlib.Path(S3.__file__).write_text(_src)
-        import importlib
-        importlib.reload(S3)
-        import normscreen as _ns2
-        importlib.reload(_ns2)
+    _mut = _src.replace('notes.append(("assumed",\n                    f"{k}{list(sh)} read as a scalar',
+                        'notes.append(("asserted",\n                    f"{k}{list(sh)} read as a scalar')
+    if _mut == _src:
+        bad += _check("grading mutation applied", False, "anchor not found")
+    else:
+        _pkg_dir = pathlib.Path(S3.__file__).parent
+        _saved_path = list(sys.path)
+        _saved_mods = {k: v for k, v in sys.modules.items() if k.split(".")[0] == "normscreen"}
+        with tempfile.TemporaryDirectory(prefix="normscreen-mut-") as _tmp:
+            _dst = pathlib.Path(_tmp) / _pkg_dir.name
+            shutil.copytree(_pkg_dir, _dst)
+            for _f in _dst.rglob("*"):
+                if _f.is_file():
+                    _f.chmod(_f.stat().st_mode | 0o200)
+            (_dst / pathlib.Path(S3.__file__).name).write_text(_mut)
+            _rebound = {}
+            try:
+                for _k in list(sys.modules):
+                    if _k.split(".")[0] == "normscreen":
+                        del sys.modules[_k]
+                sys.path.insert(0, _tmp)
+                _mut_mod = importlib.import_module("normscreen.screen")
+                assert pathlib.Path(_mut_mod.__file__).is_relative_to(_tmp), (
+                    "the mutated copy did not shadow the packaged one; the probe would "
+                    "have re-tested the unmutated instrument and passed for the wrong reason")
+                # THIS MODULE imported its helpers by name at import time, so shadowing the
+                # package is not enough: those globals still point into the unmutated
+                # module's namespace, and the probe would exercise the original while
+                # believing it exercised the copy. Rebind them for the duration.
+                _g = globals()
+                _rebound = {}
+                for _n, _o in list(_g.items()):
+                    if getattr(_o, "__module__", "").split(".")[0] == "normscreen":
+                        _new = getattr(_mut_mod, _n, None)
+                        if _new is not None:
+                            _rebound[_n] = _o
+                            _g[_n] = _new
+                assert _rebound, ("no normscreen symbol was rebound; the probe cannot "
+                                  "reach the mutated code")
+                import io, contextlib
+                buf = io.StringIO()
+                with contextlib.redirect_stdout(buf):
+                    n_grade = check_no_layout_can_silently_downgrade_a_degenerate_field()
+                bad += _check("guard fires when the inferred grading is flipped to 'asserted'",
+                              n_grade > 0, f"{n_grade} failures")
+            finally:
+                for _n, _o in _rebound.items():
+                    globals()[_n] = _o
+                sys.path[:] = _saved_path
+                for _k in list(sys.modules):
+                    if _k.split(".")[0] == "normscreen":
+                        del sys.modules[_k]
+                sys.modules.update(_saved_mods)
+                importlib.reload(importlib.import_module("normscreen.screen"))
+                importlib.reload(importlib.import_module("normscreen"))
 
     n2 = run_with(patch_split=alias_healthy)
     bad += _check("guard fires when components are aliased to a healthy one", n2 > 0,
