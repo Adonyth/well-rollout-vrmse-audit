@@ -1,6 +1,6 @@
-# P3 repro-harness
+# Reproduction harness for a rollout VRMSE audit of The Well
 
-Standalone reproduction package for the P3 "benchmark forensics" paper's
+Standalone reproduction package for a "benchmark forensics" paper's
 quantitative pipeline (The Well / `polymathic-ai` Rayleigh-Taylor benchmark,
 issues #75 / #78, class-split census). Public code release, single-blind
 DMLR review — full author attribution intended and preserved
